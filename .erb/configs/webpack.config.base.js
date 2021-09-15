@@ -39,8 +39,18 @@ export default {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     modules: [webpackPaths.srcPath, 'node_modules'],
+    fallback: {
+      stream: require.resolve('stream-browserify'),
+      path: require.resolve('path-browserify'),
+      http: require.resolve('stream-http'),
+      crypto: require.resolve('crypto-browserify'),
+      zlib: require.resolve('browserify-zlib'),
+      util: require.resolve('util/'),
+      assert: require.resolve('assert/'),
+      fs: false,
+      net: false,
+    },
   },
-
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
