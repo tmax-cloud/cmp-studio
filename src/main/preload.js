@@ -8,7 +8,7 @@ const socketIo = require('socket.io');
 const iconv = require('iconv-lite'); // 리스폰스 data 한글깨짐 없애기 위해 사용한 라이브러리
 const path = require('path');
 // const { spawn, exec: childExec } = require('child_process');
-const { spawn, exec: childExec } = require('child_process');
+const { spawn } = require('child_process');
 const index = require('./routes/index');
 
 // MEMO : util.promisify한 exec 사용법 예시를 위해 주석들로 추가해둠
