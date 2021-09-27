@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Drawer, IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
+import DynamicForm from '../form';
+import { sampleSchema } from '../form/test-sample';
 
 export const SIDEPANEL_WIDTH = 500;
 
@@ -37,7 +39,9 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
             <Close />
           </IconButton>
         </div>
-        <div style={{ padding: '50px' }}>[TODO] {id}에 대한 폼 만들기</div>
+        <div style={{ padding: '50px' }}>
+          <DynamicForm schema={sampleSchema} />
+        </div>
       </Drawer>
     </>
   );
