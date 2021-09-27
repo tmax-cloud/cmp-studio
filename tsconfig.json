@@ -12,8 +12,8 @@
     "sourceMap": true,
     "baseUrl": "./src",
     /* Additional Checks */
-    "noUnusedLocals": false,
-    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     /* Module Resolution Options */
