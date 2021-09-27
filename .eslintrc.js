@@ -10,6 +10,13 @@ module.exports = {
     'react/jsx-filename-extension': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/react-in-jsx-scope': 'off',
+    'no-console': 'off',
+    'no-plusplus': 'off',
+    'react/prop-types': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    'react/no-array-index-key': 'off',
+    'array-callback-return': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
