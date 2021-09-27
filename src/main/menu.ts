@@ -23,7 +23,8 @@ export default class MenuBuilder {
       process.env.NODE_ENV === 'development' ||
       process.env.DEBUG_PROD === 'true'
     ) {
-      this.setupDevelopmentEnvironment();
+      // MEMO : 개발모드에서 우클릭 시 나오는 팝업 제거하기 위해 주석처리함.
+      // this.setupDevelopmentEnvironment();
     }
 
     const template =
@@ -37,20 +38,20 @@ export default class MenuBuilder {
     return menu;
   }
 
-  setupDevelopmentEnvironment(): void {
-    this.mainWindow.webContents.on('context-menu', (_, props) => {
-      const { x, y } = props;
+  // setupDevelopmentEnvironment(): void {
+  //   this.mainWindow.webContents.on('context-menu', (_, props) => {
+  //     const { x, y } = props;
 
-      Menu.buildFromTemplate([
-        {
-          label: 'Inspect element',
-          click: () => {
-            this.mainWindow.webContents.inspectElement(x, y);
-          },
-        },
-      ]).popup({ window: this.mainWindow });
-    });
-  }
+  //     Menu.buildFromTemplate([
+  //       {
+  //         label: 'Inspect element',
+  //         click: () => {
+  //           this.mainWindow.webContents.inspectElement(x, y);
+  //         },
+  //       },
+  //     ]).popup({ window: this.mainWindow });
+  //   });
+  // }
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
@@ -192,6 +193,7 @@ export default class MenuBuilder {
     return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
+  // MEMO : 단축키와 관련 있는 부분
   buildDefaultTemplate() {
     const templateDefault = [
       {
@@ -203,7 +205,7 @@ export default class MenuBuilder {
           },
           {
             label: '&Close',
-            accelerator: 'Ctrl+W',
+            accelerator: 'Ctrl+Q',
             click: () => {
               this.mainWindow.close();
             },
