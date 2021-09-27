@@ -17,6 +17,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'off',
     'react/no-array-index-key': 'off',
     'array-callback-return': 'off',
+    'import/no-named-as-default': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

@@ -1,33 +1,24 @@
 import React from 'react';
-import { MemoryRouter as Router, Switch, Route } from 'react-router-dom';
-import socketIOClient, { Socket } from 'socket.io-client';
-import * as path from 'path';
-import './App.global.css';
+import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import socketIOClient from 'socket.io-client';
+import { ThemeProvider, StyledEngineProvider } from '@mui/material';
+import theme from './theme';
+import MainLayout from './components/MainLayout';
+import {
+  tfGraphTest,
+  makeFolderTest,
+  SOCKET_ENDPOINT,
+} from './utils/socket-utils';
+// MEMO : boilerplate에 있던 global css 관리해주는 파일인데 현재는 CliTestComponent 보여줄때만 사용중
+// import './App.global.css';
 
-const ENDPOINT = 'http://127.0.0.1:4001';
-
-function emitTest(socket: Socket, setData: any, tfPath: string) {
-  const tfLoc = path.join(tfPath);
-  socket.emit('[REQUEST] Terraform graph', { data: tfLoc });
-
-  socket.on('[RESPONSE] Terraform graph', (res) => {
-    console.log('[RESPONSE] Terraform graph : ', res);
-    setData(res.data);
-  });
-}
-
-function makeFolderTest(socket: Socket, folderPath: string) {
-  const fPath = path.join(folderPath);
-  socket.emit('[REQUEST] Make new folder', { data: fPath });
-}
-
-const Hello = () => {
+const CliTestComponent = () => {
   const [data, setData] = React.useState('여기에 리스폰스가 표시됩니다.');
   const [newFolderPath, setNewFolderPath] = React.useState('');
   const [desc, setDesc] = React.useState('');
   const [tfPath, setTfPath] = React.useState('');
 
-  const socket = socketIOClient(ENDPOINT);
+  const socket = socketIOClient(SOCKET_ENDPOINT);
   socket.on('[RESPONSE] Make new folder', (res) => {
     setDesc(res.data);
     console.log('[RESPONSE] Make new folder : ', res);
@@ -47,7 +38,7 @@ const Hello = () => {
         />
         <div>{desc}</div>
       </div>
-      <div className="Hello">
+      <div className="CliTestComponent">
         <button
           type="button"
           onClick={() => makeFolderTest(socket, newFolderPath)}
@@ -73,8 +64,11 @@ const Hello = () => {
           style={{ width: '800px' }}
         />
       </div>
-      <div className="Hello">
-        <button type="button" onClick={() => emitTest(socket, setData, tfPath)}>
+      <div className="CliTestComponent">
+        <button
+          type="button"
+          onClick={() => tfGraphTest(socket, setData, tfPath)}
+        >
           <span role="img" aria-label="books">
             🍟
           </span>
@@ -98,10 +92,14 @@ const Hello = () => {
 
 export default function App() {
   return (
-    <Router>
-      <Switch>
-        <Route path="/" component={Hello} />
-      </Switch>
-    </Router>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <Switch>
+            <Route path="/" component={MainLayout} />
+          </Switch>
+        </BrowserRouter>
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 }
