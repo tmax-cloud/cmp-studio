@@ -18,6 +18,7 @@ module.exports = {
     'react/no-array-index-key': 'off',
     'array-callback-return': 'off',
     'import/no-named-as-default': 'off',
+    'func-names': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
