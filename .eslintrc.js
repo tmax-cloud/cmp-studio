@@ -4,6 +4,12 @@ module.exports = {
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',
     'import/newline-after-import': 'off',
+    'import/no-dynamic-require': 'off',
+    'import/prefer-default-export': 'off',
+    'react/forbid-prop-types': 'off',
+    'react/jsx-filename-extension': 'off',
+    'react/jsx-props-no-spreading': 'off',
+    'react/react-in-jsx-scope': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
