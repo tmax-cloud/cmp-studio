@@ -1,18 +1,15 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-// terraform 명령어 돌려줄 process 띄우기 위한 세팅
+// MEMO : terraform 명령어 돌려줄 process 띄우기 위한 세팅
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-// const util = require('util');
 const iconv = require('iconv-lite'); // 리스폰스 data 한글깨짐 없애기 위해 사용한 라이브러리
 const path = require('path');
-// const { spawn, exec: childExec } = require('child_process');
 const { spawn } = require('child_process');
 const index = require('./routes/index');
 
-// MEMO : util.promisify한 exec 사용법 예시를 위해 주석들로 추가해둠
-// const exec = util.promisify(childExec);
+// socket-utils.ts와 childport변수를 공유할 방법을 못찾아서 둘 다 선언해놓음.
 const childPort = 4001;
 
 const tfRunner = express();
@@ -95,7 +92,7 @@ server.listen(childPort, () =>
   console.log(`[INFO] Listening on port ${childPort}`)
 );
 
-// Electron ipcRenderer 세팅
+// MEMO : Electron ipcRenderer 세팅
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
     myPing() {
