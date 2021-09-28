@@ -19,6 +19,9 @@ module.exports = {
     'array-callback-return': 'off',
     'import/no-named-as-default': 'off',
     'func-names': 'off',
+    'no-restricted-syntax': 'off',
+    'no-prototype-builtins': 'off',
+    'prefer-template': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
