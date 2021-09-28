@@ -1,7 +1,8 @@
 import * as path from 'path';
 import { Socket } from 'socket.io-client';
 
-export const SOCKET_ENDPOINT = 'http://127.0.0.1:4001';
+const CHILD_PORT = 4001;
+export const SOCKET_ENDPOINT = `http://127.0.0.1:${CHILD_PORT}`;
 
 export function tfGraphTest(socket: Socket, setData: any, tfPath: string) {
   const tfLoc = path.join(tfPath);
