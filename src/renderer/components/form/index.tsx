@@ -1,5 +1,6 @@
 import * as React from 'react';
-import Form, { JSONSchema7, FormProps } from '@rjsf/material-ui';
+import { FormProps } from '@rjsf/core';
+import Form from '@rjsf/material-ui';
 
 const DynamicForm = (props) => {
   const { fields = {}, schema = {}, formData } = props;
@@ -9,9 +10,9 @@ const DynamicForm = (props) => {
         className=""
         fields={{ ...fields }}
         formData={formData}
+        schema={schema}
         // onChange={(next) => onChange(next.formData)}
         // onSubmit={onSubmit}
-        schema={schema}
       />
     </>
   );
