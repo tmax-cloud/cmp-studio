@@ -1,18 +1,21 @@
 import * as React from 'react';
 import { FormProps } from '@rjsf/core';
 import Form from '@rjsf/material-ui';
+import { ObjectFieldTemplate, FieldTemplate } from './template';
 
-const DynamicForm = (props) => {
+const DynamicForm = (props: FormProps<any>) => {
   const { fields = {}, schema = {}, formData } = props;
   return (
     <>
       <Form
         className=""
+        noHtml5Validate
         fields={{ ...fields }}
+        ObjectFieldTemplate={ObjectFieldTemplate}
+        FieldTemplate={FieldTemplate}
         formData={formData}
         schema={schema}
-        // onChange={(next) => onChange(next.formData)}
-        // onSubmit={onSubmit}
+        onSubmit={(data) => console.log('result: ', data)}
       />
     </>
   );
