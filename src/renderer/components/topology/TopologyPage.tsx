@@ -70,7 +70,6 @@ export const TopologyPage: React.FC = (props) => {
     if (!isSidePanelOpen) {
       setIsSidePanelOpen(true);
     }
-    console.log('Data? ', data);
     setSidePanelData(data);
   };
 

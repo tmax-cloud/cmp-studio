@@ -15,8 +15,10 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
 }) => {
   const id = data.id || 'testIdDummy';
   const terraformSchemaMap = parseJson();
+
+  console.log('all schema: ', terraformSchemaMap);
   const currentData = terraformSchemaMap.get(id);
-  console.log(currentData);
+  console.log('current schema: ', currentData);
   return (
     <>
       <Drawer
