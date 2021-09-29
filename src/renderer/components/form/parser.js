@@ -30,30 +30,40 @@ function parseJson() {
       mergeKey(data, 'block_types', 'properties');
 
       Object.keys(data.properties).forEach(function (k) {
-        if (k.type === 'bool') {
-          k.type = 'boolean';
-        } else if (Array.isArray(k.type)) {
-          if (k.type[0] === 'list') {
-            k.type[0] = 'array';
-          } else if (k.type[0] === 'set' || k.type[0] === 'map') {
-            k.type = 'object';
+        if (data.properties[k].type === 'bool') {
+          data.properties[k].type = 'boolean';
+        } else if (Array.isArray(data.properties[k].type)) {
+          if (data.properties[k].type[0] === 'list') {
+            data.properties[k].type[0] = 'array';
+          } else if (
+            data.properties[k].type[0] === 'set' ||
+            data.properties[k].type[0] === 'map'
+          ) {
+            data.properties[k].type = 'object';
           }
         }
 
-        if (k.hasOwnProperty('block') && k.block.hasOwnProperty('attributes')) {
-          replaceKey(k, 'block', 'attributes', 'properties');
+        if (data.properties[k].required) {
+          delete data.properties[k].required;
+        }
 
-          Object.keys(k.properties).forEach(function (i) {
-            if (k.properties[i].type === 'bool') {
-              k.properties[i].type = 'boolean';
-            } else if (Array.isArray(k.properties[i].type)) {
-              if (k.properties[i].type[0] === 'list') {
-                k.properties[i].type[0] = 'array';
+        if (
+          data.properties[k].hasOwnProperty('block') &&
+          data.properties[k].block.hasOwnProperty('attributes')
+        ) {
+          replaceKey(data.properties[k], 'block', 'attributes', 'properties');
+
+          Object.keys(data.properties[k].properties).forEach(function (i) {
+            if (data.properties[k].properties[i].type === 'bool') {
+              data.properties[k].properties[i].type = 'boolean';
+            } else if (Array.isArray(data.properties[k].properties[i].type)) {
+              if (data.properties[k].properties[i].type[0] === 'list') {
+                data.properties[k].properties[i].type[0] = 'array';
               } else if (
-                k.properties[i].type[0] === 'set' ||
-                k.properties[i].type[0] === 'map'
+                data.properties[k].properties[i].type[0] === 'set' ||
+                data.properties[k].properties[i].type[0] === 'map'
               ) {
-                k.properties[i].type = 'object';
+                data.properties[k].properties[i].type = 'object';
               }
             }
           });
@@ -83,30 +93,48 @@ function parseJson() {
         mergeKey(schemaData, 'block_types', 'properties');
 
         Object.keys(schemaData.properties).forEach(function (k) {
-          if (k.type === 'bool') {
-            k.type = 'boolean';
-          } else if (Array.isArray(k.type)) {
-            if (k.type[0] === 'list') {
-              k.type[0] = 'array';
-            } else if (k.type[0] === 'set' || k.type[0] === 'map') {
-              k.type = 'object';
+          if (schemaData.properties[k].type === 'bool') {
+            schemaData.properties[k].type = 'boolean';
+          } else if (Array.isArray(schemaData.properties[k].type)) {
+            if (schemaData.properties[k].type[0] === 'list') {
+              schemaData.properties[k].type[0] = 'array';
+            } else if (
+              schemaData.properties[k].type[0] === 'set' ||
+              schemaData.properties[k].type[0] === 'map'
+            ) {
+              schemaData.properties[k].type = 'object';
             }
+          }
+          if (schemaData.properties[k].required) {
+            delete schemaData.properties[k].required;
           }
 
           if (
-            k.hasOwnProperty('block') &&
-            k.block.hasOwnProperty('attributes')
+            schemaData.properties[k].hasOwnProperty('block') &&
+            schemaData.properties[k].block.hasOwnProperty('attributes')
           ) {
-            replaceKey(k, 'block', 'attributes', 'properties');
+            replaceKey(
+              schemaData.properties[k],
+              'block',
+              'attributes',
+              'properties'
+            );
 
-            Object.keys(k.properties).forEach(function (i) {
-              if (i.type === 'bool') {
-                i.type = 'boolean';
-              } else if (Array.isArray(i.type)) {
-                if (i.type[0] === 'list') {
-                  i.type[0] = 'array';
-                } else if (i.type[0] === 'set' || i.type[0] === 'map') {
-                  i.type = 'object';
+            Object.keys(schemaData.properties[k].properties).forEach(function (
+              i
+            ) {
+              if (schemaData.properties[k].properties[i].type === 'bool') {
+                schemaData.properties[k].properties[i].type = 'boolean';
+              } else if (
+                Array.isArray(schemaData.properties[k].properties[i].type)
+              ) {
+                if (schemaData.properties[k].properties[i].type[0] === 'list') {
+                  schemaData.properties[k].properties[i].type[0] = 'array';
+                } else if (
+                  schemaData.properties[k].properties[i].type[0] === 'set' ||
+                  schemaData.properties[k].properties[i].type[0] === 'map'
+                ) {
+                  schemaData.properties[k].properties[i].type = 'object';
                 }
               }
             });
