@@ -66,6 +66,7 @@ export const TopologyPage: React.FC = (props) => {
   const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
   const [sidePanelData, setSidePanelData] = React.useState({});
   const [terraformSchema, setTerraformSchema] = React.useState(new Map());
+  const [testtest, setTestTest] = React.useState(false);
 
   React.useEffect(() => {
     setTerraformSchema(parseJson());
@@ -89,12 +90,21 @@ export const TopologyPage: React.FC = (props) => {
             <TopologyGraph data={topologyTestData} />
           </TopologyLayoutContent>
         </TopologyLayoutContainer>
+        <button
+          type="button"
+          onClick={() => {
+            setTestTest(!testtest);
+          }}
+        >
+          TestTest
+        </button>
       </div>
       <TopologySidePanel
         open={isSidePanelOpen}
         toggleSidePanel={setIsSidePanelOpen}
         data={sidePanelData}
         terraformSchemaMap={terraformSchema}
+        testtest={testtest}
       />
     </TopologyLayoutRoot>
   );

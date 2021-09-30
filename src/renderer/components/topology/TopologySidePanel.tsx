@@ -13,6 +13,7 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   toggleSidePanel,
   data,
   terraformSchemaMap,
+  testtest,
 }) => {
   const id = data.id || 'testIdDummy';
   // const terraformSchemaMap = parseJson();
@@ -46,7 +47,7 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
           </IconButton>
         </div>
         <div style={{ padding: '50px' }}>
-          <DynamicForm schema={currentData} />
+          <DynamicForm schema={currentData} testtest={testtest} />
         </div>
       </Drawer>
     </>
@@ -58,6 +59,7 @@ type TopologySidePanelProps = {
   data: any;
   toggleSidePanel: any;
   terraformSchemaMap: any;
+  testtest: any;
 };
 
 export default TopologySidePanel;
