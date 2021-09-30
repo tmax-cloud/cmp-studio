@@ -5,6 +5,7 @@ import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 import TopologyGraph from './TopologyGraph';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
+import parseJson from '../form/parser';
 
 // MEMO : SIDEBAR_WIDTH + SIDEPANEL_WIDTH 값
 const sidebarAndPanelWidth = '800px';
@@ -64,6 +65,11 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
 export const TopologyPage: React.FC = (props) => {
   const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
   const [sidePanelData, setSidePanelData] = React.useState({});
+  const [terraformSchema, setTerraformSchema] = React.useState(new Map());
+
+  React.useEffect(() => {
+    setTerraformSchema(parseJson());
+  }, []);
 
   const classes = useStyles({ isSidePanelOpen });
   const openSidePanel = (data: any) => {
@@ -88,6 +94,7 @@ export const TopologyPage: React.FC = (props) => {
         open={isSidePanelOpen}
         toggleSidePanel={setIsSidePanelOpen}
         data={sidePanelData}
+        terraformSchemaMap={terraformSchema}
       />
     </TopologyLayoutRoot>
   );
