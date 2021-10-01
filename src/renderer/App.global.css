@@ -52,7 +52,7 @@ a:hover {
   text-decoration: none;
 }
 
-.CliTestComponent {
+.TestComponent {
   display: flex;
   justify-content: center;
   align-items: center;

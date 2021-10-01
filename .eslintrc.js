@@ -15,6 +15,7 @@ module.exports = {
     'react/prop-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-expressions': 'off',
     'react/no-array-index-key': 'off',
     'array-callback-return': 'off',
     'import/no-named-as-default': 'off',
