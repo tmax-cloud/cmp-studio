@@ -6,7 +6,11 @@ import MainLayout from './components/MainLayout';
 import { tfGraphTest, makeFolderTest, socket } from './utils/socket-utils';
 // MEMO : boilerplate에 있던 global css 관리해주는 파일인데 현재는 CliTestComponent 보여줄때만 사용중
 // import './App.global.css';
-
+declare global {
+  interface Window {
+    electron?: any;
+  }
+}
 const CliTestComponent = () => {
   const [data, setData] = React.useState('여기에 리스폰스가 표시됩니다.');
   const [newFolderPath, setNewFolderPath] = React.useState('');
