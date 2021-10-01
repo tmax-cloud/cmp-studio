@@ -11,6 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
+import fs from 'fs';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
@@ -27,10 +28,53 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+const CONFIGS_PATH = app.isPackaged
+  ? path.join(process.resourcesPath, 'configs')
+  : path.join(__dirname, '../../configs');
+
+const getConfigsPath = (...paths: string[]): string => {
+  return path.join(CONFIGS_PATH, ...paths);
+};
+
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.on('create-app-config-file', async (event, arg) => {
+  const defaultConfig = {
+    tfExePath: 'PATH_IS_EMPTY',
+  };
+
+  if (!fs.existsSync(getConfigsPath('AppSettings.json'))) {
+    !fs.existsSync(CONFIGS_PATH) && (await fs.mkdirSync(CONFIGS_PATH));
+
+    fs.writeFileSync(
+      getConfigsPath('AppSettings.json'),
+      JSON.stringify(defaultConfig)
+    );
+    event.reply(
+      'create-app-config-file',
+      `[INFO] Config.json is created at ${getConfigsPath('AppSettings.json')}`
+    );
+  } else {
+    event.reply(
+      'create-app-config-file',
+      `[INFO] Config.json already exists in ${getConfigsPath(
+        'AppSettings.json'
+      )}`
+    );
+  }
+});
+
+ipcMain.handle('read-app-config-file', async (event, args) => {
+  const configBuffer = await fs.readFileSync(
+    getConfigsPath('AppSettings.json'),
+    'utf8'
+  );
+  const configStr = Buffer.from(configBuffer).toString();
+  return [configStr];
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -99,6 +143,8 @@ const createWindow = async () => {
       mainWindow.focus();
     }
   });
+
+  mainWindow.webContents.openDevTools();
 
   mainWindow.on('closed', () => {
     mainWindow = null;
