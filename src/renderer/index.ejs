@@ -13,6 +13,11 @@
       console.log(arg);
     });
 
+    window.electron.ipcRenderer.once('create-app-config-file', (resultMsg) => {
+      console.log(resultMsg);
+    });
+
     window.electron.ipcRenderer.myPing();
+    window.electron.ipcRenderer.createAppConfig();
   </script>
 </html>
