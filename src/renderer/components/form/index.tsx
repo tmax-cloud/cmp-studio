@@ -4,88 +4,24 @@ import Form from '@rjsf/material-ui';
 import { ObjectFieldTemplate } from './template/ObjectFieldTemplate';
 
 const DynamicForm = (props: FormProps<any>) => {
-  const { fields = {}, schema = {}, formData, testtest } = props;
-  const textareaTestSchema = {
-    properties: {
-      analyzer_name: {
-        type: 'string',
-      },
-      arn: {
-        type: 'string',
-        computed: true,
-      },
-      id: {
-        type: 'string',
-        optional: true,
-        computed: true,
-      },
-      type: {
-        type: 'string',
-        optional: true,
-      },
-    },
-    title: 'resource-aws_accessanalyzer_analyzer',
-    required: ['analyzer_name'],
-  };
-  const arrayTestSchema = {
-    properties: {
-      singleString: {
-        type: 'array',
-        optional: true,
-        items: {
-          type: 'string',
-        },
-      },
-      multiString: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            test1: {
-              type: 'string',
-            },
-            test2: {
-              type: 'string',
-            },
-          },
-        },
-      },
-      nestedObject: {
-        type: 'array',
-        items: {
-          title: 'items',
-          type: 'object',
-          properties: {
-            obj1: {
-              type: 'object',
-              properties: {
-                obj1_child_str1: {
-                  type: 'string',
-                },
-                obj1_child_str2: {
-                  type: 'string',
-                },
-                obj1_child_obj1: {
-                  type: 'object',
-                  properties: {
-                    obj1_child_obj1_child_str1: {
-                      type: 'string',
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    title: 'provider-aws',
-    type: 'object',
-    additionalProperties: {
-      type: 'string',
-    },
-    required: ['singleString'],
-  };
+  const { fields = {}, schema = {} } = props;
+  let { uiSchema, formData } = props;
+  if (schema.title === 'textareaTest') {
+    uiSchema = {
+      analyzer_name: { 'ui:widget': 'textarea', classNames: 'pleasedoitagain' },
+    };
+    formData = {
+      analyzer_name: `jsonencode({
+      "Statement" = [{
+        # This policy allows software running on the EC2 instance to
+        # access the S3 API.
+        "Action" = "s3:*",
+        "Effect" = "Allow",
+      }],
+    })`,
+    };
+  }
+  // const selectSchema = isTestSchemaActivate(testtest, schema);
   return (
     <>
       <Form
@@ -93,16 +29,9 @@ const DynamicForm = (props: FormProps<any>) => {
         noHtml5Validate
         fields={{ ...fields }}
         ObjectFieldTemplate={ObjectFieldTemplate}
-        // ArrayFieldTemplate={ArrayFieldTemplate}
-        // FieldTemplate={FieldTemplate}
         formData={formData}
-        schema={testtest ? arrayTestSchema : schema}
-        // formContext={{
-        //   semantic: {
-        //     wrapLabel: true,
-        //     wrapContent: true,
-        //   },
-        // }}
+        schema={schema}
+        uiSchema={uiSchema}
         onSubmit={(data) => console.log('result: ', data)}
       />
     </>
@@ -112,9 +41,3 @@ const DynamicForm = (props: FormProps<any>) => {
 DynamicForm.displayName = 'DynamicForm';
 
 export default DynamicForm;
-
-type DynamicFormProps = FormProps<any> & {
-  errors?: string[];
-  ErrorTemplate?: React.FC<{ errors: string[] }>;
-  create?: boolean;
-};
