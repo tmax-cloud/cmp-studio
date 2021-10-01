@@ -2,14 +2,14 @@ import * as React from 'react';
 // import socketIOClient from 'socket.io-client';
 import { tfGraphTest } from '../../utils/socket-utils';
 
-const TopologyGraph: React.FC<TopologyGraphProps> = (props) => {
+const TopologyGraph: React.FC<TopologyGraphProps> = ({ data }) => {
   const [tfPath, setTfPath] = React.useState('');
   const [dg, setDg] = React.useState('');
 
   const updateGraph = async () => {
     tfGraphTest(setDg, tfPath);
   };
-  // TODO : 테라폼 exe위치 입력받는 부분도 초반에 세팅할 수 있도록 구현하고 config.json 등으로 관리하기
+  // TODO : 테라폼 exe위치 입력받는 부분도 초반에 세팅할 수 있도록 구현하고 AppSettings.json 등으로 관리하기
   // TODO : exe로 어떤 위치에서 graph를 실행시켜야 할지 정해야 됨.
   return (
     <>
@@ -39,7 +39,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = (props) => {
 };
 
 type TopologyGraphProps = {
-  // data: any;
+  data: any;
 };
 
 export default TopologyGraph;
