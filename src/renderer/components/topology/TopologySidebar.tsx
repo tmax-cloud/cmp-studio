@@ -154,7 +154,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
                 startIcon={getIcon(item.type)}
                 onClick={() => openSidePanel({ id: item.title })}
               >
-                {item.title}
+                {item.displayName}
               </Button>
             );
           })}
