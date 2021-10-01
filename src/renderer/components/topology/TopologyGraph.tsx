@@ -28,7 +28,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ data }) => {
           style={{ width: '800px' }}
         />
       </div>
-      <div className="CliTestComponent">
+      <div className="TestComponent">
         <button type="button" onClick={updateGraph}>
           Terraform graph Test
         </button>
