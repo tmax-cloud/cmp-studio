@@ -27,7 +27,12 @@ const TopologyToolbar = () => {
             }}
           >
             <SaveButton disabled />
-            <Divider orientation="vertical" variant="middle" flexItem />
+            <Divider
+              orientation="vertical"
+              variant="middle"
+              flexItem
+              sx={{ mx: 1 }}
+            />
             <ZoomInButton />
             <ZoomOutButton />
             <FitScreenButton />
