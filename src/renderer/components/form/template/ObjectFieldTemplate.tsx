@@ -1,17 +1,10 @@
 import * as React from 'react';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 
 import { makeStyles } from '@mui/styles';
 
 import { ObjectFieldTemplateProps } from '@rjsf/core';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Typography,
-  Grid,
-} from '@mui/material';
-import { ExpandMore } from '@mui/icons-material';
+import { Grid } from '@mui/material';
 
 const useStyles = makeStyles({
   root: {
@@ -73,31 +66,4 @@ export const ObjectFieldTemplate = ({
       </Grid>
     </>
   );
-};
-
-// Accordion Object 용
-export const ObjectFieldTemplateAccordion = ({
-  idSchema,
-  properties,
-  required,
-  schema,
-  title,
-  uiSchema,
-}: ObjectFieldTemplateProps) => {
-  return properties?.length ? (
-    <Accordion>
-      <AccordionSummary
-        expandIcon={<ExpandMore />}
-        aria-controls="panel1a-content"
-        id={`${idSchema.$id}_field-group`}
-      >
-        <Typography sx={{ font: 'bold', fontSize: '10px' }}>
-          {title?.toUpperCase()}
-        </Typography>
-      </AccordionSummary>
-      <AccordionDetails id={`${idSchema.$id}_accordion-content`}>
-        {_.map(properties, (p: any) => p.content)}
-      </AccordionDetails>
-    </Accordion>
-  ) : null;
 };
