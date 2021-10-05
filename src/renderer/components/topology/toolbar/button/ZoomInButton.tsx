@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { ReactElement } from 'react';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton, { IconButtonProps } from '@material-ui/core/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 
 const ZoomInButton = (props: ZoomInButtonProps) => {
   const {
-    label = 'Zoom In',
+    label = '확대',
     icon = <ZoomInIcon />,
     onClick,
     className,

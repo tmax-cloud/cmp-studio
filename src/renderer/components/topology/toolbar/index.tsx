@@ -19,7 +19,7 @@ const TopologyToolbar = () => {
         <Grid item justifyContent="center">
           <ViewBreadcrumbs />
         </Grid>
-        <Grid item>
+        <Grid item sx={{ display: 'flex' }}>
           <Box
             sx={{
               display: 'flex',

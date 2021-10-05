@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ReactElement } from 'react';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton, { IconButtonProps } from '@material-ui/core/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 
 const FitScreenButton = (props: FitScreenButtonProps) => {
