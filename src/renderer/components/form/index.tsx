@@ -1,15 +1,16 @@
 import * as React from 'react';
 import Form, { FormProps } from '@rjsf/core';
 import defaultFields from './fields';
-// import Form from '@rjsf/material-ui';
+// import defaultWidgets from './widgets';
 import { ObjectFieldTemplate } from './template/ObjectFieldTemplate';
+import ArrayFieldTemplate from './template/ArrayFieldTemplate';
 import { FieldTemplate } from './template/FieldTemplate';
 
-// eslint-disable-next-line consistent-return
-const setPredefinedData = (title: string) => {
+const setPredefinedData = (title: string): { uiSchema: any; formData: any } => {
+  let predefinedData = { uiSchema: {}, formData: {} };
   switch (title) {
     case 'textareaTest':
-      return {
+      predefinedData = {
         formData: {
           analyzer_name: `jsonencode({
         "Statement" = [{
@@ -27,8 +28,10 @@ const setPredefinedData = (title: string) => {
           },
         },
       };
+      break;
     case 'resource-aws_iam_policy':
-      return {
+      predefinedData = {
+        uiSchema: {},
         formData: {
           description: 'My test policy',
           name: 'test_policy',
@@ -36,8 +39,10 @@ const setPredefinedData = (title: string) => {
           policy: `\${jsonencode({\r\n    Version = "2012-10-17"\r\n    Statement = [\r\n      {\r\n        Action = [\r\n          "ec2:Describe*",\r\n        ]\r\n        Effect   = "Allow"\r\n        Resource = "*"\r\n      },\r\n    ]\r\n  })}`,
         },
       };
+      break;
     default:
   }
+  return predefinedData;
 };
 
 const DynamicForm = (props: FormProps<any>) => {
@@ -51,10 +56,12 @@ const DynamicForm = (props: FormProps<any>) => {
       <Form
         className=""
         noHtml5Validate
-        // FieldTemplate={FieldTemplate}
+        FieldTemplate={FieldTemplate}
         ObjectFieldTemplate={ObjectFieldTemplate}
         formData={formData}
-        fields={{ ...defaultFields }}
+        ArrayFieldTemplate={ArrayFieldTemplate}
+        fields={{ ...defaultFields, ...fields }}
+        // widgets={{ ...defaultWidgets }}
         schema={schema}
         uiSchema={uiSchema}
         onSubmit={(data) => console.log('result: ', data)}
