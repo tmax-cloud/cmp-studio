@@ -1,0 +1,41 @@
+import * as React from 'react';
+import Grid from '@mui/material/Grid';
+import Toolbar from '@mui/material/Toolbar';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import ViewBreadcrumbs from './breadcrumb/ViewBreadcrumb';
+import SaveButton from './button/SaveButton';
+import ZoomInButton from './button/ZoomInButton';
+import ZoomOutButton from './button/ZoomOutButton';
+import FitScreenButton from './button/FitScreenButton';
+
+const TopologyToolbar = () => {
+  return (
+    <Toolbar
+      style={{ minHeight: 48, paddingLeft: 12, paddingRight: 12 }}
+      sx={{ borderBottom: '1px solid', borderColor: 'rgba(0, 0, 0, 0.12)' }}
+    >
+      <Grid container justifyContent="space-between">
+        <Grid item justifyContent="center">
+          <ViewBreadcrumbs />
+        </Grid>
+        <Grid item>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <SaveButton disabled />
+            <Divider orientation="vertical" variant="middle" flexItem />
+            <ZoomInButton />
+            <ZoomOutButton />
+            <FitScreenButton />
+          </Box>
+        </Grid>
+      </Grid>
+    </Toolbar>
+  );
+};
+
+export default TopologyToolbar;

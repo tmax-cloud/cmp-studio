@@ -3,8 +3,8 @@ import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
+import TopologyToolbar from './toolbar';
 import TopologyGraph from './TopologyGraph';
-import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 
 // MEMO : SIDEBAR_WIDTH + SIDEPANEL_WIDTH 값
 const sidebarAndPanelWidth = '800px';
@@ -49,7 +49,6 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
       display: 'flex',
       flex: '1 1 auto',
       overflow: 'hidden',
-      paddingTop: TOP_NAVBAR_HEIGHT,
       width: (props) =>
         props.isSidePanelOpen
           ? `calc(100% - ${sidebarAndPanelWidth})`
@@ -81,6 +80,7 @@ export const TopologyPage: React.FC = (props) => {
       <div className={classes.topologyLayoutWrapper}>
         <TopologyLayoutContainer>
           <TopologyLayoutContent>
+            <TopologyToolbar />
             <TopologyGraph data={topologyTestData} />
           </TopologyLayoutContent>
         </TopologyLayoutContainer>
