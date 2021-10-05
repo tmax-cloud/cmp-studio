@@ -1,7 +1,9 @@
 import * as React from 'react';
 import Form, { FormProps } from '@rjsf/core';
+import defaultFields from './fields';
 // import Form from '@rjsf/material-ui';
 import { ObjectFieldTemplate } from './template/ObjectFieldTemplate';
+import { FieldTemplate } from './template/FieldTemplate';
 
 // eslint-disable-next-line consistent-return
 const setPredefinedData = (title: string) => {
@@ -49,9 +51,10 @@ const DynamicForm = (props: FormProps<any>) => {
       <Form
         className=""
         noHtml5Validate
-        fields={{ ...fields }}
+        // FieldTemplate={FieldTemplate}
         ObjectFieldTemplate={ObjectFieldTemplate}
         formData={formData}
+        fields={{ ...defaultFields }}
         schema={schema}
         uiSchema={uiSchema}
         onSubmit={(data) => console.log('result: ', data)}
