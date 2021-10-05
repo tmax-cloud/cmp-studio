@@ -1,0 +1,62 @@
+{
+  "arrayTest": {
+    "properties": {
+      "singleString": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "nestedObject": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "amis": {
+              "type": "object",
+              "properties": {
+                "account_id": { "type": "string" },
+                "description": { "type": "string" },
+                "image": { "type": "string" },
+                "name": { "type": "string" },
+                "region": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "title": "arrayTest",
+    "type": "object",
+    "additionalProperties": {
+      "type": "string"
+    },
+    "required": ["singleString"]
+  },
+  "textareaTest": {
+    "properties": {
+      "analyzer_name": {
+        "type": "string"
+      },
+      "arn": {
+        "type": "string",
+        "computed": true
+      },
+      "id": {
+        "type": "string",
+        "optional": true,
+        "computed": true
+      },
+      "type": {
+        "type": "string",
+        "optional": true
+      }
+    },
+    "type": "object",
+    "title": "textareaTest",
+    "required": ["analyzer_name"],
+    "additionalProperties": {
+      "type": "string"
+    }
+  }
+}
