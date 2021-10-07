@@ -24,6 +24,9 @@ module.exports = {
     'no-prototype-builtins': 'off',
     'prefer-template': 'off',
     'class-methods-use-this': 'off',
+    'no-extra-boolean-cast': 'off',
+    'spaced-comment': 'off',
+    'consistent-return': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
