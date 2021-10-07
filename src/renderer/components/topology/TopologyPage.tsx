@@ -3,8 +3,10 @@ import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
+import TopologyToolbar from './toolbar';
 import TopologyGraph from './TopologyGraph';
-import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
+import parseJson from '../form/parser';
+import testSchema from '../form/test_schema.json';
 
 // MEMO : SIDEBAR_WIDTH + SIDEPANEL_WIDTH 값
 const sidebarAndPanelWidth = '800px';
@@ -49,7 +51,6 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
       display: 'flex',
       flex: '1 1 auto',
       overflow: 'hidden',
-      paddingTop: TOP_NAVBAR_HEIGHT,
       width: (props) =>
         props.isSidePanelOpen
           ? `calc(100% - ${sidebarAndPanelWidth})`
@@ -64,13 +65,20 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
 export const TopologyPage: React.FC = (props) => {
   const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
   const [sidePanelData, setSidePanelData] = React.useState({});
+  const [terraformSchema, setTerraformSchema] = React.useState(new Map());
+
+  React.useEffect(() => {
+    const schema = parseJson();
+    schema.set('arrayTest', testSchema.arrayTest);
+    schema.set('textareaTest', testSchema.textareaTest);
+    setTerraformSchema(schema);
+  }, []);
 
   const classes = useStyles({ isSidePanelOpen });
   const openSidePanel = (data: any) => {
     if (!isSidePanelOpen) {
       setIsSidePanelOpen(true);
     }
-    console.log('Data? ', data);
     setSidePanelData(data);
   };
 
@@ -81,14 +89,32 @@ export const TopologyPage: React.FC = (props) => {
       <div className={classes.topologyLayoutWrapper}>
         <TopologyLayoutContainer>
           <TopologyLayoutContent>
+            <TopologyToolbar />
             <TopologyGraph data={topologyTestData} />
           </TopologyLayoutContent>
         </TopologyLayoutContainer>
+        <button
+          type="button"
+          onClick={() => {
+            openSidePanel({ id: 'arrayTest' });
+          }}
+        >
+          Array Test
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            openSidePanel({ id: 'textareaTest' });
+          }}
+        >
+          Textarea Test
+        </button>
       </div>
       <TopologySidePanel
         open={isSidePanelOpen}
         toggleSidePanel={setIsSidePanelOpen}
         data={sidePanelData}
+        terraformSchemaMap={terraformSchema}
       />
     </TopologyLayoutRoot>
   );

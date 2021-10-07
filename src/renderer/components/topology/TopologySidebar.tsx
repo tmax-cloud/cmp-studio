@@ -90,6 +90,7 @@ function a11yProps(index: number) {
 
 interface Item {
   title: string;
+  displayName: string;
   type: string;
 }
 
@@ -112,6 +113,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
     dummySchema.forEach((i: Item) => {
       itemsList.push({
         title: i.title,
+        displayName: i.displayName,
         type: i.type,
       });
     });
@@ -152,7 +154,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
                 startIcon={getIcon(item.type)}
                 onClick={() => openSidePanel({ id: item.title })}
               >
-                {item.title}
+                {item.displayName}
               </Button>
             );
           })}

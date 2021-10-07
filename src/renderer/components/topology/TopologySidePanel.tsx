@@ -3,8 +3,6 @@ import { Drawer, IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import DynamicForm from '../form';
-// import { sampleSchema } from '../form/test-sample';
-import parseJson from '../form/parser';
 
 export const SIDEPANEL_WIDTH = 500;
 
@@ -12,11 +10,13 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   open,
   toggleSidePanel,
   data,
+  terraformSchemaMap,
 }) => {
   const id = data.id || 'testIdDummy';
-  const terraformSchemaMap = parseJson();
+
+  console.log('all schema: ', terraformSchemaMap);
   const currentData = terraformSchemaMap.get(id);
-  console.log(currentData);
+  console.log('current schema: ', currentData);
   return (
     <>
       <Drawer
@@ -54,6 +54,7 @@ type TopologySidePanelProps = {
   open: boolean;
   data: any;
   toggleSidePanel: any;
+  terraformSchemaMap: any;
 };
 
 export default TopologySidePanel;
