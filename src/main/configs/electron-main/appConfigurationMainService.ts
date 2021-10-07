@@ -6,12 +6,12 @@ import {
   readFileJson,
 } from '../../base/common/fileUtils';
 import { getConfigsPath } from '../../base/common/pathUtils';
-import { IAppConfigurationMainService } from '../common/configuration';
+import { AppConfigurationMainServiceInterface } from '../common/configuration';
 
 const APP_SETTING_PATH = getConfigsPath('AppSettings.json');
 
 export class AppConfigurationMainService
-  implements IAppConfigurationMainService
+  implements AppConfigurationMainServiceInterface
 {
   constructor() {
     this.init();

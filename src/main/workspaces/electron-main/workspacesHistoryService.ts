@@ -1,20 +1,22 @@
 import path from 'path';
-import { IStorageMainService } from '../../storage/common/storage';
-import { IRecentWorkspace } from '../common/workspace';
+import { StorageMainServiceInterface } from '../../storage/common/storage';
+import { RecentWorkspace } from '../common/workspace';
 
 export class WorkspacesHistoryService {
   static readonly workspaceHistoryStorageKey = 'workspaceEntries';
 
-  constructor(private readonly storageMainService: IStorageMainService) {}
+  constructor(
+    private readonly storageMainService: StorageMainServiceInterface
+  ) {}
 
   addWorkspaceToStorage(folderUri: string) {
     // TODO : 디렉토리에서도 parse쓰면 name에 뭐가 들어가지?
-    const entryToAdd: IRecentWorkspace = {
+    const entryToAdd: RecentWorkspace = {
       folderUri,
       labelTitle: path.parse(folderUri).name,
       labelUri: path.parse(folderUri).dir,
     };
-    const entries: IRecentWorkspace[] = this.storageMainService.getItem(
+    const entries: RecentWorkspace[] = this.storageMainService.getItem(
       WorkspacesHistoryService.workspaceHistoryStorageKey
     );
     const newEntries = [];
@@ -32,13 +34,13 @@ export class WorkspacesHistoryService {
     );
   }
 
-  serializeEntries(entries: IRecentWorkspace[]): IRecentWorkspace[] {
+  serializeEntries(entries: RecentWorkspace[]): RecentWorkspace[] {
     // TODO : isPinned여부 체크해서 순서 정리해주는 로직 구현하기
     return entries;
   }
 
-  getRecentlyOpenedWorkspaces(): IRecentWorkspace[] {
-    const entries: IRecentWorkspace[] = this.storageMainService.getItem(
+  getRecentlyOpenedWorkspaces(): RecentWorkspace[] {
+    const entries: RecentWorkspace[] = this.storageMainService.getItem(
       WorkspacesHistoryService.workspaceHistoryStorageKey
     );
     return entries;

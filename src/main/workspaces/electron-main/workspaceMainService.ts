@@ -1,21 +1,23 @@
 import { ipcMain } from 'electron';
 import { makeDir } from '../../base/common/fileUtils';
 import {
-  IWorkspacesHistoryService,
-  IWorkspaceManagementService,
+  WorkspacesHistoryServiceInterface,
+  WorkspaceManagementServiceInterface,
 } from '../common/workspace';
 import { WorkspaceManagementService } from './workspaceManagementService';
 import { IPCResponse } from '../../base/common/ipc';
 import { WorkspacesHistoryService } from './workspacesHistoryService';
-import { IStorageMainService } from '../../storage/common/storage';
+import { StorageMainServiceInterface } from '../../storage/common/storage';
 
 // TODO : history, management에 워크스페이스 지워주는 기능들도 구현해야 됨.
 export class WorkspaceMainService {
-  public workspaceManagementService: IWorkspaceManagementService;
+  public workspaceManagementService: WorkspaceManagementServiceInterface;
 
-  public workspacesHistoryService: IWorkspacesHistoryService;
+  public workspacesHistoryService: WorkspacesHistoryServiceInterface;
 
-  constructor(private readonly storageMainService: IStorageMainService) {
+  constructor(
+    private readonly storageMainService: StorageMainServiceInterface
+  ) {
     this.workspaceManagementService = new WorkspaceManagementService();
     this.workspacesHistoryService = new WorkspacesHistoryService(
       this.storageMainService
@@ -91,6 +93,8 @@ export class WorkspaceMainService {
             // TODO : 지금은 uid만 반환해주는데 열리는 부분은 어떻게 처리하지? win size도 바꿔줘야 함
             return { status: 'Success', data: { uid } };
           }
+
+          this.workspaceManagementService.removeGhostWorkspaceMeta(folderUri);
           return {
             status: 'Error',
             data: { message: `There is no such folder : ${folderUri}` },

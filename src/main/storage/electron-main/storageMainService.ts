@@ -7,11 +7,11 @@ import {
   readFileJson,
 } from '../../base/common/fileUtils';
 import { getUserDataFolderPath } from '../../base/common/pathUtils';
-import { IStorageMainService } from '../common/storage';
+import { StorageMainServiceInterface } from '../common/storage';
 
 const STORAGE_PATH = path.join(getUserDataFolderPath(), 'storage.json');
 
-export class StorageMainService implements IStorageMainService {
+export class StorageMainService implements StorageMainServiceInterface {
   constructor() {
     this.init();
     this.registerListeners();

@@ -1,4 +1,4 @@
-export interface IPCResponse {
+export type IPCResponse = {
   status: string;
   data: any;
-}
+};

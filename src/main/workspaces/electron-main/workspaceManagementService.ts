@@ -7,8 +7,8 @@ import {
   writeFileJson,
 } from '../../base/common/fileUtils';
 import {
-  IWorkspaceIdentifier,
-  IWorkspaceManagementService,
+  WorkspaceIdentifier,
+  WorkspaceManagementServiceInterface,
 } from '../common/workspace';
 import { getWorkspaceMetaFolderPath } from '../../base/common/pathUtils';
 
@@ -22,13 +22,18 @@ export const getWorkspaceConfigPath = (uid: string) => {
   return path.join(getWorkspaceMetaFolderPath(), uid, WORKSPACE_CONFIG_PATH);
 };
 
-export class WorkspaceManagementService implements IWorkspaceManagementService {
+export class WorkspaceManagementService
+  implements WorkspaceManagementServiceInterface
+{
   constructor() {
     this.init();
   }
 
   init() {
-    createFile(workspaceMapPath);
+    if (!fs.existsSync(workspaceMapPath)) {
+      createFile(workspaceMapPath);
+      writeFileJson(workspaceMapPath, {});
+    }
   }
 
   checkRealWorkspaceExists(workspaceRealPath: string): boolean {
@@ -52,7 +57,7 @@ export class WorkspaceManagementService implements IWorkspaceManagementService {
       try {
         const uid = uuidv4();
         createFile(getWorkspaceConfigPath(uid));
-        const workspaceConfig: IWorkspaceIdentifier = {
+        const workspaceConfig: WorkspaceIdentifier = {
           id: uid,
           workspaceRealPath,
           isPinned: false,
@@ -90,6 +95,24 @@ export class WorkspaceManagementService implements IWorkspaceManagementService {
     duplicateKeys.forEach((key) => {
       delete workspaceMap[key];
     });
+    writeFileJson(workspaceMapPath, workspaceMap);
+  }
+
+  // MEMO : 존재하지 않는 폴더경로에 대한 workspace meta들을 지워주는 함수
+  removeGhostWorkspaceMeta(workspaceRealPath: string) {
+    const workspaceMap = readFileJson(workspaceMapPath);
+    const duplicateKeys: string[] = [];
+    Object.keys(workspaceMap)?.forEach((key) => {
+      if (workspaceMap[key] === workspaceRealPath) {
+        duplicateKeys.push(key);
+      }
+    });
+    duplicateKeys.forEach((key) => {
+      delete workspaceMap[key];
+      const workspaceMetaPath = path.join(getWorkspaceMetaFolderPath(), key);
+      fs.rmdirSync(workspaceMetaPath, { recursive: true });
+    });
+    writeFileJson(workspaceMapPath, workspaceMap);
   }
 
   getWorkspaceIdByFolderUri(folderUri: string): string | null {

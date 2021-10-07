@@ -50,7 +50,7 @@ export function readFileString(resourcePath: string) {
 export function readFileJson(resourcePath: string) {
   if (fs.existsSync(resourcePath)) {
     const fileStr = fs.readFileSync(resourcePath, { encoding: 'utf-8' });
-    return !fileStr ? JSON.parse(fileStr) : {};
+    return !!fileStr ? JSON.parse(fileStr) : {};
   }
   return `[Error] There is no such file : ${resourcePath}`;
 }
