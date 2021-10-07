@@ -2,7 +2,6 @@ import React from 'react';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material';
 import theme from './theme';
-import { getAppConfig } from './utils/ipc-utils';
 import MainLayout from './components/MainLayout';
 import { tfGraphTest, makeFolderTest, socket } from './utils/socket-utils';
 // MEMO : boilerplate에 있던 global css 관리해주는 파일인데 현재는 TestComponent 보여줄때만 사용중
@@ -17,6 +16,8 @@ const TestComponent = () => {
   const [newFolderPath, setNewFolderPath] = React.useState('');
   const [desc, setDesc] = React.useState('');
   const [tfPath, setTfPath] = React.useState('');
+  const [folderPathToCreate, setFolderPathToCreate] = React.useState('');
+  const [folderToOpen, setFolderToOpen] = React.useState('');
 
   socket.on('[RESPONSE] Make new folder', (res) => {
     setDesc(res.data);
@@ -83,14 +84,83 @@ const TestComponent = () => {
         <button
           type="button"
           onClick={async () => {
-            const appConfig = await getAppConfig();
-            setData(JSON.stringify(appConfig));
+            window.electron.ipcRenderer.send('studio:setAppConfigItem', {
+              key: 'test1',
+              data: 'hello',
+            });
+            window.electron.ipcRenderer.send('studio:setAppConfigItems', {
+              items: [
+                {
+                  key: 'test1',
+                  data: 'hello1',
+                },
+                { key: 'test2', data: 12 },
+                {
+                  key: 'test3',
+                  data: { my: 'name' },
+                },
+              ],
+            });
+
+            const item = await window.electron.ipcRenderer.invoke(
+              'studio:getAppConfigItem',
+              { key: 'test1' }
+            );
+            console.log('item?? ', item);
           }}
         >
           <span role="img" aria-label="books">
             🍟
           </span>
-          Config File Test
+          App Config File Test
+        </button>
+      </div>
+      <div className="TestComponentBlock">
+        <input
+          type="text"
+          value={folderPathToCreate}
+          id="new-folder-path"
+          onChange={(event) => {
+            setFolderPathToCreate(event.target.value);
+          }}
+          style={{ width: '800px' }}
+        />
+        <button
+          type="button"
+          onClick={async () => {
+            const response = await window.electron.ipcRenderer.invoke(
+              'studio:createNewFolderAndWorkspace',
+              { folderUri: folderPathToCreate }
+            );
+            console.log('REsponse? ', response);
+          }}
+        >
+          Create new folder and workspace test
+        </button>
+      </div>
+      <div className="TestComponentBlock">
+        <input
+          type="text"
+          value={folderToOpen}
+          id="folder-to-open"
+          onChange={(event) => {
+            setFolderToOpen(event.target.value);
+          }}
+          style={{ width: '800px', display: 'block' }}
+        />
+        <button
+          type="button"
+          onClick={async () => {
+            const response = await window.electron.ipcRenderer.invoke(
+              'studio:openExistFolder',
+              { folderUri: folderToOpen }
+            );
+            console.log('REsponse? ', response);
+
+            // window.electron.ipcRenderer.send('studio:setWindowSize', {width: 150, height: 50})
+          }}
+        >
+          Open folder test
         </button>
       </div>
     </div>
