@@ -1,8 +1,12 @@
 import * as React from 'react';
-import TopologyGraph from './TopologyGraph';
+import TopologyGraph, { GraphProps } from './TopologyGraph';
 
-const TopologyGraphLayout = () => {
-  return <TopologyGraph />;
+const TopologyGraphLayout = (props: TopologyGraphLayoutProps) => {
+  return <TopologyGraph {...props} />;
 };
+
+// export interface GraphLayoutProps {} // TODO
+
+export type TopologyGraphLayoutProps = GraphProps;
 
 export default TopologyGraphLayout;

@@ -4,9 +4,10 @@ import { makeStyles, createStyles } from '@mui/styles';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 import TopologyToolbar from './toolbar';
-import TopologyGraph from './graph';
+import TopologyGraphLayout from './graph';
 import parseJson from '../form/parser';
 import testSchema from '../form/test_schema.json';
+import { useGraphProps } from '../../hooks/useGraphProps';
 
 // MEMO : SIDEBAR_WIDTH + SIDEPANEL_WIDTH 값
 const sidebarAndPanelWidth = '800px';
@@ -63,6 +64,8 @@ export const TopologyPage: React.FC = (props) => {
     setTerraformSchema(schema);
   }, []);
 
+  const { graphRef, graphOption, graphHandler } = useGraphProps();
+
   const classes = useStyles({ isSidePanelOpen });
   const openSidePanel = (data: any) => {
     if (!isSidePanelOpen) {
@@ -75,8 +78,8 @@ export const TopologyPage: React.FC = (props) => {
     <TopologyLayoutRoot>
       <TopologySidebar openSidePanel={openSidePanel} />
       <div className={classes.topologyLayoutWrapper}>
-        <TopologyToolbar />
-        <TopologyGraph />
+        <TopologyToolbar handlers={graphHandler} />
+        <TopologyGraphLayout graphRef={graphRef} graphOptions={graphOption} />
         <button
           type="button"
           onClick={() => {

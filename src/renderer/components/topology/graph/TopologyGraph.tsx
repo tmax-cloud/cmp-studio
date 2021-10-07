@@ -1,15 +1,15 @@
 import * as React from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
-import ReactResizeDetector from 'react-resize-detector';
+import { withResizeDetector } from 'react-resize-detector';
 import Box from '@mui/material/Box';
+import { GraphRef, GraphOptionProps } from 'renderer/hooks/useGraphProps';
 
-const TopologyGraph = () => {
-  const graphRef = React.useRef();
+const TopologyGraph = (props: TopologyGraphProps) => {
+  const { width, height, graphRef, graphOptions } = props;
 
-  const [canvasSize, setCanvasSize] = React.useState({
-    width: 0,
-    height: 0,
-  });
+  React.useEffect(() => {
+    graphRef.current?.zoomToFit(0, 100);
+  }, [graphRef]);
 
   const genRandomTree = (N = 10, reverse = false) => {
     return {
@@ -32,23 +32,28 @@ const TopologyGraph = () => {
         overflow: 'hidden',
       }}
     >
-      <ReactResizeDetector
-        handleWidth
-        handleHeight
-        onResize={(width, height) =>
-          setCanvasSize({ width: width || 0, height: height || 0 })
-        }
-      />
-      {canvasSize.width && canvasSize.height && (
+      {width && height && (
         <ForceGraph2D
           ref={graphRef}
-          width={canvasSize.width}
-          height={canvasSize.height}
+          width={width}
+          height={height}
           graphData={genRandomTree()}
+          {...graphOptions}
         />
       )}
     </Box>
   );
 };
 
-export default TopologyGraph;
+export interface GraphSizeProps {
+  width: number;
+  height: number;
+}
+export interface GraphProps {
+  graphRef: GraphRef;
+  graphOptions: GraphOptionProps;
+}
+
+export type TopologyGraphProps = GraphSizeProps & GraphProps;
+
+export default withResizeDetector(TopologyGraph);
