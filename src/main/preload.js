@@ -24,6 +24,18 @@ const io = socketIo(server, {
   },
 });
 
+/**
+ * @param {string} channel
+ * @returns {true | never}
+ */
+function validateIPC(channel) {
+  if (!channel || !channel.startsWith('studio:')) {
+    throw new Error(`Unsupported event IPC channel '${channel}'`);
+  }
+
+  return true;
+}
+
 // TODO : terraform.exe를 어떻게 찾아서 돌려줄지 정하기
 // TODO : Windows cmd 명령어만 구현돼있음. os에 따라 다르게 처리해주는 부분들 추가하기.
 io.on('connection', (socket) => {
@@ -96,28 +108,29 @@ server.listen(childPort, () =>
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
     myPing() {
-      ipcRenderer.send('ipc-example', 'ping');
+      ipcRenderer.send('studio:ipc-example', 'ping');
     },
     on(channel, func) {
-      const validChannels = ['ipc-example', 'create-app-config-file'];
-      if (validChannels.includes(channel)) {
+      if (validateIPC(channel)) {
         // Deliberately strip event as it includes `sender`
         ipcRenderer.on(channel, (event, ...args) => func(...args));
       }
     },
     once(channel, func) {
-      const validChannels = ['ipc-example', 'create-app-config-file'];
-      if (validChannels.includes(channel)) {
+      if (validateIPC(channel)) {
         // Deliberately strip event as it includes `sender`
         ipcRenderer.once(channel, (event, ...args) => func(...args));
       }
     },
-    createAppConfig() {
-      ipcRenderer.send('create-app-config-file');
+    send(channel, args) {
+      if (validateIPC(channel)) {
+        ipcRenderer.send(channel, args);
+      }
     },
     invoke(channel, args) {
-      const validChannels = ['read-app-config-file'];
-      return ipcRenderer.invoke(channel, args);
+      if (validateIPC(channel)) {
+        return ipcRenderer.invoke(channel, args);
+      }
     },
   },
 });
