@@ -5,8 +5,8 @@ import {
   createFile,
   writeFileJson,
   readFileJson,
-} from '../../base/common/file-utils';
-import { getUserDataFolderPath } from '../../base/common/path-utils';
+} from '../../base/common/fileUtils';
+import { getUserDataFolderPath } from '../../base/common/pathUtils';
 import { IStorageMainService } from '../common/storage';
 
 const STORAGE_PATH = path.join(getUserDataFolderPath(), 'storage.json');

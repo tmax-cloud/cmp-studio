@@ -4,8 +4,8 @@ import {
   createFile,
   writeFileJson,
   readFileJson,
-} from '../../base/common/file-utils';
-import { getConfigsPath } from '../../base/common/path-utils';
+} from '../../base/common/fileUtils';
+import { getConfigsPath } from '../../base/common/pathUtils';
 import { IAppConfigurationMainService } from '../common/configuration';
 
 const APP_SETTING_PATH = getConfigsPath('AppSettings.json');

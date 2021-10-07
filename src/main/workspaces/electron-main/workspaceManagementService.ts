@@ -5,12 +5,12 @@ import {
   createFile,
   readFileJson,
   writeFileJson,
-} from '../../base/common/file-utils';
+} from '../../base/common/fileUtils';
 import {
   IWorkspaceIdentifier,
   IWorkspaceManagementService,
 } from '../common/workspace';
-import { getWorkspaceMetaFolderPath } from '../../base/common/path-utils';
+import { getWorkspaceMetaFolderPath } from '../../base/common/pathUtils';
 
 const WORKSPACE_MAP_PATH = 'workspaceMap.json';
 const WORKSPACE_CONFIG_PATH = 'workspace.json';

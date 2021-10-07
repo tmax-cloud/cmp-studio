@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { makeDir } from '../../base/common/file-utils';
+import { makeDir } from '../../base/common/fileUtils';
 import {
   IWorkspacesHistoryService,
   IWorkspaceManagementService,
