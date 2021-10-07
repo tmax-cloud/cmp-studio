@@ -13,7 +13,15 @@ const TopologyToolbar = () => {
   return (
     <Toolbar
       style={{ minHeight: 48, paddingLeft: 12, paddingRight: 12 }}
-      sx={{ borderBottom: '1px solid', borderColor: 'rgba(0, 0, 0, 0.12)' }}
+      sx={{
+        display: 'flex',
+        flexShrink: 0,
+        borderBottom: '1px solid',
+        borderRight: '1px solid',
+        borderColor: 'rgba(0, 0, 0, 0.12)',
+        backgroundColor: 'white',
+        zIndex: 2,
+      }}
     >
       <Grid container justifyContent="space-between">
         <Grid item justifyContent="center">

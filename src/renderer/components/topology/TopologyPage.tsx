@@ -4,7 +4,7 @@ import { makeStyles, createStyles } from '@mui/styles';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 import TopologyToolbar from './toolbar';
-import TopologyGraph from './TopologyGraph';
+import TopologyGraph from './graph';
 import parseJson from '../form/parser';
 import testSchema from '../form/test_schema.json';
 
@@ -32,24 +32,13 @@ const TopologyLayoutRoot = styled('div')(({ theme }) => ({
 //   marginLeft: SIDEBAR_WIDTH,
 // }));
 
-const TopologyLayoutContainer = styled('div')({
-  display: 'flex',
-  flex: '1 1 auto',
-  overflow: 'hidden',
-});
-
-const TopologyLayoutContent = styled('div')({
-  flex: '1 1 auto',
-  height: '100%',
-  overflow: 'auto',
-});
-
 // MEMO : sidepanel 열릴 때 topology 크기도 줄여야 하나? 안줄여도 되면 위에 주석처리된 TopologyLayoutWrapper 사용해도 됨.
 const useStyles = makeStyles<Theme, StyleProps>((theme) =>
   createStyles({
     topologyLayoutWrapper: {
       display: 'flex',
       flex: '1 1 auto',
+      flexDirection: 'column',
       overflow: 'hidden',
       width: (props) =>
         props.isSidePanelOpen
@@ -82,17 +71,12 @@ export const TopologyPage: React.FC = (props) => {
     setSidePanelData(data);
   };
 
-  const topologyTestData = {};
   return (
     <TopologyLayoutRoot>
       <TopologySidebar openSidePanel={openSidePanel} />
       <div className={classes.topologyLayoutWrapper}>
-        <TopologyLayoutContainer>
-          <TopologyLayoutContent>
-            <TopologyToolbar />
-            <TopologyGraph data={topologyTestData} />
-          </TopologyLayoutContent>
-        </TopologyLayoutContainer>
+        <TopologyToolbar />
+        <TopologyGraph />
         <button
           type="button"
           onClick={() => {
