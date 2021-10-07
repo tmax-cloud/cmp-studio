@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
     "target": "ES2018",
     "module": "CommonJS",
     "lib": ["dom", "esnext"],
