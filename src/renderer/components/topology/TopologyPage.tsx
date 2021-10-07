@@ -69,7 +69,7 @@ export const TopologyPage: React.FC = (props) => {
   const [terraformSchema, setTerraformSchema] = React.useState(new Map());
 
   React.useEffect(() => {
-    const schema = parseJson();
+    const schema = parseJson('aws');
     schema.set('arrayTest', testSchema.arrayTest);
     schema.set('textareaTest', testSchema.textareaTest);
     setTerraformSchema(schema);
