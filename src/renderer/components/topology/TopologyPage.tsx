@@ -5,8 +5,8 @@ import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 import TopologyGraph from './TopologyGraph';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
-import parseJson from '../form/parser';
-import testSchema from '../form/test_schema.json';
+import parseJson from '../form/utils/json2JsonSchemaParser';
+// import testSchema from '../form/test_schema.json';
 
 // MEMO : SIDEBAR_WIDTH + SIDEPANEL_WIDTH 값
 const sidebarAndPanelWidth = '800px';
@@ -70,8 +70,8 @@ export const TopologyPage: React.FC = (props) => {
 
   React.useEffect(() => {
     const schema = parseJson('aws');
-    schema.set('arrayTest', testSchema.arrayTest);
-    schema.set('textareaTest', testSchema.textareaTest);
+    // schema.set('arrayTest', testSchema.arrayTest);
+    // schema.set('textareaTest', testSchema.textareaTest);
     setTerraformSchema(schema);
   }, []);
 
@@ -93,7 +93,7 @@ export const TopologyPage: React.FC = (props) => {
             <TopologyGraph data={topologyTestData} />
           </TopologyLayoutContent>
         </TopologyLayoutContainer>
-        <button
+        {/* <button
           type="button"
           onClick={() => {
             openSidePanel({ id: 'arrayTest' });
@@ -108,7 +108,7 @@ export const TopologyPage: React.FC = (props) => {
           }}
         >
           Textarea Test
-        </button>
+        </button> */}
       </div>
       <TopologySidePanel
         open={isSidePanelOpen}

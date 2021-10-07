@@ -1,4 +1,4 @@
-import terraformSchema from './terraform_schema.json';
+import terraformSchema from '../terraform_schema.json';
 /*
 import { readFile } from 'fs/promises';
 const terraformSchema = JSON.parse(
@@ -150,7 +150,7 @@ function parseJson(cloud) {
                 schemaData.properties[k].properties[i].items = {
                   type: schemaData.properties[k].properties[i].type[1],
                 };
-                schemaData.properties[k].properties[i].type = 'map'; // 'object'아닌가? 확인 필요****
+                schemaData.properties[k].properties[i].type = 'map';
               }
             }
 
