@@ -3,7 +3,6 @@ import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material';
 import theme from './theme';
 import MainLayout from './components/MainLayout';
-import { tfGraphTest, makeFolderTest, socket } from './utils/socket-utils';
 // MEMO : boilerplate에 있던 global css 관리해주는 파일인데 현재는 TestComponent 보여줄때만 사용중
 import './App.global.css';
 declare global {
@@ -13,74 +12,60 @@ declare global {
 }
 const TestComponent = () => {
   const [data, setData] = React.useState('여기에 리스폰스가 표시됩니다.');
-  const [newFolderPath, setNewFolderPath] = React.useState('');
-  const [desc, setDesc] = React.useState('');
-  const [tfPath, setTfPath] = React.useState('');
+  const [workspaceUid, setWorkspaceUid] = React.useState('');
   const [folderPathToCreate, setFolderPathToCreate] = React.useState('');
   const [folderToOpen, setFolderToOpen] = React.useState('');
 
-  socket.on('[RESPONSE] Make new folder', (res) => {
-    setDesc(res.data);
-    console.log('[RESPONSE] Make new folder : ', res);
-  });
+  const getGraph = async () => {
+    const response = await window.electron.ipcRenderer.invoke(
+      'studio:getTerraformGraph',
+      { workspaceUid }
+    );
+    if (response.status === 'Error') {
+      setData(response.data.message);
+    } else if (response.status === 'Success') {
+      setData(response.data.graph);
+    }
+  };
+
   return (
     <div>
       <div>
-        <div id="newfolder-path-label">폴더를 생성할 경로를 입력해주세요.</div>
-        <input
-          id="newfolder-path"
-          type="text"
-          value={newFolderPath}
-          onChange={(event) => {
-            setNewFolderPath(event.target.value);
-          }}
-          style={{ width: '800px' }}
-        />
-        <div>{desc}</div>
-      </div>
-      <div className="TestComponent">
-        <button type="button" onClick={() => makeFolderTest(newFolderPath)}>
-          <span role="img" aria-label="books">
-            🍕
-          </span>
-          Make Folder Test
-        </button>
-      </div>
-      <div>
-        <div id="terraform-location-label">
-          테라폼 프로젝트 디렉토리 경로를 입력해주세요. (terraform.exe파일이
-          있어야 함)
+        <div className="TestComponentBlock">
+          <div id="workspace-uid-label">
+            워크스페이스 id를 입력해주세요.(워크스페이스 메타 workspace.json에
+            terraformExePath값 있어야 함)
+          </div>
+          <input
+            type="text"
+            value={workspaceUid}
+            id="workspace-uid"
+            onChange={(event) => {
+              setWorkspaceUid(event.target.value);
+            }}
+            style={{ width: '800px' }}
+          />
+          <button type="button" onClick={getGraph}>
+            <span role="img" aria-label="books">
+              🍟
+            </span>
+            Terraform graph Test
+          </button>
+          <div
+            style={{
+              width: '800px',
+              height: '300px',
+              overflowY: 'auto',
+              backgroundColor: 'white',
+              color: 'black',
+              margin: 'auto auto',
+            }}
+          >
+            {data}
+          </div>
         </div>
-        <input
-          type="text"
-          value={tfPath}
-          id="terraform-location"
-          onChange={(event) => {
-            setTfPath(event.target.value);
-          }}
-          style={{ width: '800px' }}
-        />
       </div>
-      <div className="TestComponent">
-        <button type="button" onClick={() => tfGraphTest(setData, tfPath)}>
-          <span role="img" aria-label="books">
-            🍟
-          </span>
-          Terraform graph Test
-        </button>
-      </div>
-      <div
-        style={{
-          width: '800px',
-          height: '300px',
-          overflowY: 'auto',
-          backgroundColor: 'white',
-          color: 'black',
-        }}
-      >
-        {data}
-      </div>
-      <div className="TestComponent">
+      <div className="TestComponentBlock">
         <button
           type="button"
           onClick={async () => {
@@ -112,7 +97,7 @@ const TestComponent = () => {
           <span role="img" aria-label="books">
             🍟
           </span>
-          App Config File Test
+          App Config File Test (console log 확인)
         </button>
       </div>
       <div className="TestComponentBlock">
@@ -132,10 +117,10 @@ const TestComponent = () => {
               'studio:createNewFolderAndWorkspace',
               { folderUri: folderPathToCreate }
             );
-            console.log('REsponse? ', response);
+            console.log('Response? ', response);
           }}
         >
-          Create new folder and workspace test
+          Create new folder and workspace test (console log 확인)
         </button>
       </div>
       <div className="TestComponentBlock">
@@ -146,7 +131,7 @@ const TestComponent = () => {
           onChange={(event) => {
             setFolderToOpen(event.target.value);
           }}
-          style={{ width: '800px', display: 'block' }}
+          style={{ width: '800px' }}
         />
         <button
           type="button"
@@ -155,12 +140,12 @@ const TestComponent = () => {
               'studio:openExistFolder',
               { folderUri: folderToOpen }
             );
-            console.log('REsponse? ', response);
+            console.log('Response? ', response);
 
             // window.electron.ipcRenderer.send('studio:setWindowSize', {width: 150, height: 50})
           }}
         >
-          Open folder test
+          Open folder test (console log 확인)
         </button>
       </div>
     </div>
