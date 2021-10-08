@@ -3,6 +3,7 @@ import { makeDir } from '../../base/common/fileUtils';
 import {
   WorkspacesHistoryServiceInterface,
   WorkspaceManagementServiceInterface,
+  WorkspaceMainServiceInterface,
 } from '../common/workspace';
 import { WorkspaceManagementService } from './workspaceManagementService';
 import { IPCResponse } from '../../base/common/ipc';
@@ -10,7 +11,7 @@ import { WorkspacesHistoryService } from './workspacesHistoryService';
 import { StorageMainServiceInterface } from '../../storage/common/storage';
 
 // TODO : history, management에 워크스페이스 지워주는 기능들도 구현해야 됨.
-export class WorkspaceMainService {
+export class WorkspaceMainService implements WorkspaceMainServiceInterface {
   public workspaceManagementService: WorkspaceManagementServiceInterface;
 
   public workspacesHistoryService: WorkspacesHistoryServiceInterface;
