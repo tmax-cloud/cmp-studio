@@ -20,6 +20,7 @@ import { StorageMainService } from './storage/electron-main/storageMainService';
 import { AppConfigurationMainService } from './configs/electron-main/appConfigurationMainService';
 import { WorkspaceMainService } from './workspaces/electron-main/workspaceMainService';
 import { WindowMainService } from './windows/electron-main/windowMainService';
+import { TerraformMainService } from './terraform-command/electron-main/terraformMainService';
 
 export default class AppUpdater {
   constructor() {
@@ -85,6 +86,7 @@ const createWindow = async () => {
   const storageMainService = new StorageMainService();
   const configurationMainService = new AppConfigurationMainService();
   const workspaceMainService = new WorkspaceMainService(storageMainService);
+  const terraformMainService = new TerraformMainService(workspaceMainService);
 
   const menuBuilder = new MenuBuilder(studioWindow.win);
   menuBuilder.buildMenu();
