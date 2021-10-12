@@ -18,6 +18,7 @@ module.exports = {
     '@typescript-eslint/no-unused-expressions': 'off',
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/no-shadow': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
     'react/no-array-index-key': 'off',
     'array-callback-return': 'off',
     'import/no-named-as-default': 'off',
@@ -30,6 +31,7 @@ module.exports = {
     'no-extra-boolean-cast': 'off',
     'spaced-comment': 'off',
     'consistent-return': 'off',
+    'no-else-return': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

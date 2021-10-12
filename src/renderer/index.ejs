@@ -6,18 +6,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <div id="modal-container"></div>
   </body>
   <script>
-    window.electron.ipcRenderer.once('ipc-example', (arg) => {
+    window.electron.ipcRenderer.once('studio:ipc-example', (arg) => {
       // eslint-disable-next-line no-console
       console.log(arg);
     });
-
-    window.electron.ipcRenderer.once('create-app-config-file', (resultMsg) => {
-      console.log(resultMsg);
-    });
-
     window.electron.ipcRenderer.myPing();
-    window.electron.ipcRenderer.createAppConfig();
   </script>
 </html>

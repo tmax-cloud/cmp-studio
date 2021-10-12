@@ -15,6 +15,7 @@ export class WorkspacesHistoryService {
       folderUri,
       labelTitle: path.parse(folderUri).name,
       labelUri: path.parse(folderUri).dir,
+      lastOpenedTime: Math.floor(+new Date() / 1000),
     };
     const entries: RecentWorkspace[] = this.storageMainService.getItem(
       WorkspacesHistoryService.workspaceHistoryStorageKey

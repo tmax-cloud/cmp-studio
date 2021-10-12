@@ -11,12 +11,17 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import fs from 'fs';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import { StudioWindow } from './windows/electron-main/window';
+import { StorageMainService } from './storage/electron-main/storageMainService';
+import { AppConfigurationMainService } from './configs/electron-main/appConfigurationMainService';
+import { WorkspaceMainService } from './workspaces/electron-main/workspaceMainService';
+import { WindowMainService } from './windows/electron-main/windowMainService';
+import { TerraformMainService } from './terraform-command/electron-main/terraformMainService';
+import { DialogMainService } from './files/electron-main/DialogMainService';
 
 export default class AppUpdater {
   constructor() {
@@ -28,53 +33,10 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-const CONFIGS_PATH = app.isPackaged
-  ? path.join(process.resourcesPath, 'configs')
-  : path.join(__dirname, '../../configs');
-
-const getConfigsPath = (...paths: string[]): string => {
-  return path.join(CONFIGS_PATH, ...paths);
-};
-
-ipcMain.on('ipc-example', async (event, arg) => {
+ipcMain.on('studio:ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
-
-ipcMain.on('create-app-config-file', async (event, arg) => {
-  const defaultConfig = {
-    tfExePath: 'PATH_IS_EMPTY',
-  };
-
-  if (!fs.existsSync(getConfigsPath('AppSettings.json'))) {
-    !fs.existsSync(CONFIGS_PATH) && (await fs.mkdirSync(CONFIGS_PATH));
-
-    fs.writeFileSync(
-      getConfigsPath('AppSettings.json'),
-      JSON.stringify(defaultConfig)
-    );
-    event.reply(
-      'create-app-config-file',
-      `[INFO] Config.json is created at ${getConfigsPath('AppSettings.json')}`
-    );
-  } else {
-    event.reply(
-      'create-app-config-file',
-      `[INFO] Config.json already exists in ${getConfigsPath(
-        'AppSettings.json'
-      )}`
-    );
-  }
-});
-
-ipcMain.handle('read-app-config-file', async (event, args) => {
-  const configBuffer = await fs.readFileSync(
-    getConfigsPath('AppSettings.json'),
-    'utf8'
-  );
-  const configStr = Buffer.from(configBuffer).toString();
-  return [configStr];
+  event.reply('studio:ipc-example', msgTemplate('pong'));
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -110,54 +72,26 @@ const createWindow = async () => {
     await installExtensions();
   }
 
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
-
-  mainWindow = new BrowserWindow({
-    show: false,
-    width: 1024,
-    height: 728,
-    icon: getAssetPath('icon.png'),
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+  const studioWindow = new StudioWindow({
+    preloadPath: path.join(__dirname, 'preload.js'),
+    state: {
+      width: 1024,
+      height: 700,
     },
   });
-  mainWindow.setMenuBarVisibility(false);
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
 
-  // @TODO: Use 'ready-to-show' event
-  //        https://github.com/electron/electron/blob/main/docs/api/browser-window.md#using-ready-to-show-event
-  mainWindow.webContents.on('did-finish-load', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
-    }
-    if (process.env.START_MINIMIZED) {
-      mainWindow.minimize();
-    } else {
-      mainWindow.show();
-      mainWindow.focus();
-    }
-  });
+  mainWindow = studioWindow.win;
 
-  mainWindow.webContents.openDevTools();
+  // TODO : 생성해놓은 service들을 어떻게 관리할 것인지 정하기
+  const windowMainService = new WindowMainService(studioWindow);
+  const storageMainService = new StorageMainService();
+  const configurationMainService = new AppConfigurationMainService();
+  const workspaceMainService = new WorkspaceMainService(storageMainService);
+  const terraformMainService = new TerraformMainService(workspaceMainService);
+  const dialogMainService = new DialogMainService(studioWindow);
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
-  const menuBuilder = new MenuBuilder(mainWindow);
+  const menuBuilder = new MenuBuilder(studioWindow.win);
   menuBuilder.buildMenu();
-
-  // Open urls in the user's browser
-  mainWindow.webContents.on('new-window', (event, url) => {
-    event.preventDefault();
-    shell.openExternal(url);
-  });
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
