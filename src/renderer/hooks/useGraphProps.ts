@@ -1,35 +1,51 @@
 import * as React from 'react';
 import { ForceGraphMethods } from 'react-force-graph-2d';
 
-const INITIAL_ZOOM_LEVEL = 2;
+const initialConfig = {
+  isMounted: false,
+  zoomLevel: 1,
+};
 
 export const useGraphProps = () => {
-  const [zoomLevel, setZoomLevel] = React.useState(INITIAL_ZOOM_LEVEL);
-
   const graphRef = React.useRef<ForceGraphMethods>();
+  const configRef = React.useRef<GraphConfig>(initialConfig);
 
   const handleZoomIn = () => {
-    graphRef.current?.zoom(zoomLevel + 1);
+    graphRef.current?.zoom(configRef.current.zoomLevel + 1, 500);
   };
 
   const handleZoomOut = () => {
-    graphRef.current?.zoom(zoomLevel - 1);
+    graphRef.current?.zoom(configRef.current.zoomLevel - 1, 500);
   };
 
   const handleZoomEnd = (transform: { k: number; x: number; y: number }) => {
-    zoomLevel !== transform.k && setZoomLevel(transform.k);
+    if (configRef.current.zoomLevel !== transform.k) {
+      configRef.current.zoomLevel = transform.k;
+    }
   };
 
   const handleZoomToFit = () => {
-    graphRef.current?.zoomToFit(0, 100);
+    graphRef.current?.zoomToFit(500);
   };
 
-  const graphOption: GraphOptionProps = {
+  const handleEngineStop = () => {
+    if (!configRef.current.isMounted) {
+      handleZoomToFit();
+      configRef.current.isMounted = true;
+    }
+  };
+
+  const graphOption = {
+    nodeLabel: 'name',
+    dagMode: 'td' as DagMode,
+    dagLevelDistance: 40,
     enableZoomInteraction: false,
+    cooldownTicks: 50,
+    onEngineStop: handleEngineStop,
     onZoomEnd: handleZoomEnd,
   };
 
-  const graphHandler: GraphHandlerProps = {
+  const graphHandler = {
     handleZoomIn,
     handleZoomOut,
     handleZoomToFit,
@@ -38,15 +54,9 @@ export const useGraphProps = () => {
   return { graphRef, graphOption, graphHandler };
 };
 
-export type GraphRef = React.MutableRefObject<ForceGraphMethods | undefined>;
+type DagMode = 'td' | 'bu' | 'lr' | 'rl' | 'radialout' | 'radialin';
 
-export interface GraphOptionProps {
-  enableZoomInteraction: boolean;
-  onZoomEnd: (transform: { k: number; x: number; y: number }) => void;
-}
-
-export interface GraphHandlerProps {
-  handleZoomIn: () => void;
-  handleZoomOut: () => void;
-  handleZoomToFit: () => void;
+interface GraphConfig {
+  isMounted: boolean;
+  zoomLevel: number;
 }

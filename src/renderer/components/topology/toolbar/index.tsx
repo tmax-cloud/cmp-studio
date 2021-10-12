@@ -8,7 +8,6 @@ import SaveButton from './button/SaveButton';
 import ZoomInButton from './button/ZoomInButton';
 import ZoomOutButton from './button/ZoomOutButton';
 import FitScreenButton from './button/FitScreenButton';
-import { GraphHandlerProps } from '../../../hooks/useGraphProps';
 
 const TopologyToolbar = (props: TopologyToolbarProps) => {
   const { handlers } = props;
@@ -52,6 +51,11 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
   );
 };
 
+export interface GraphHandlerProps {
+  handleZoomIn: () => void;
+  handleZoomOut: () => void;
+  handleZoomToFit: () => void;
+}
 export interface TopologyToolbarProps {
   handlers: GraphHandlerProps;
 }

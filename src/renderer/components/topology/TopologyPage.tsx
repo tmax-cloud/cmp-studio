@@ -4,7 +4,7 @@ import { makeStyles, createStyles } from '@mui/styles';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 import TopologyToolbar from './toolbar';
-import TopologyGraphLayout from './graph';
+import TopologyGraph from './graph';
 import parseJson from '../form/parser';
 import testSchema from '../form/test_schema.json';
 import { useGraphProps } from '../../hooks/useGraphProps';
@@ -79,7 +79,7 @@ export const TopologyPage: React.FC = (props) => {
       <TopologySidebar openSidePanel={openSidePanel} />
       <div className={classes.topologyLayoutWrapper}>
         <TopologyToolbar handlers={graphHandler} />
-        <TopologyGraphLayout graphRef={graphRef} graphOptions={graphOption} />
+        <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
         <button
           type="button"
           onClick={() => {
