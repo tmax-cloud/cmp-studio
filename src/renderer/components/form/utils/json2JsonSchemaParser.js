@@ -42,11 +42,66 @@ function parseJson(cloud) {
     delete obj[oldKey1][oldKey2];
   }
 
+  function buildSchema(schemaData) {
+    schemaData.required = [];
+
+    Object.keys(schemaData.properties).forEach(function (k) {
+      if (schemaData.properties[k].type === 'bool') {
+        schemaData.properties[k].type = 'boolean';
+      } else if (Array.isArray(schemaData.properties[k].type)) {
+        if (
+          schemaData.properties[k].type[0] === 'list' ||
+          schemaData.properties[k].type[0] === 'set'
+        ) {
+          schemaData.properties[k].items = {
+            type: schemaData.properties[k].type[1],
+          };
+          schemaData.properties[k].type = 'array';
+        } else if (schemaData.properties[k].type[0] === 'map') {
+          schemaData.properties[k].items = {
+            type: schemaData.properties[k].type[1],
+          };
+          schemaData.properties[k].type = 'map';
+        }
+      }
+
+      if (
+        schemaData.properties[k].hasOwnProperty('required') &&
+        schemaData.properties[k].required
+      ) {
+        schemaData.required.push(k);
+        delete schemaData.properties[k].required;
+      }
+      if (
+        schemaData.properties[k].hasOwnProperty('block') &&
+        schemaData.properties[k].block.hasOwnProperty('attributes')
+      ) {
+        renameKey2(
+          schemaData.properties[k],
+          'block',
+          'attributes',
+          'properties'
+        );
+
+        if (schemaData.properties[k].block.hasOwnProperty('block_types')) {
+          mergeKey2(
+            schemaData.properties[k],
+            'block',
+            'block_types',
+            'properties'
+          );
+        }
+        return buildSchema(schemaData.properties[k]);
+      }
+    });
+  }
+
   const schemaMap = new Map();
+
+  // readJSON('./json/terraform_schema.json', function (text) {
 
   const typeList = ['provider', 'resource', 'datasource'];
   let schemaList;
-  let requiredField = [];
   const schemaArray = [];
   let tmpPath;
 
@@ -74,160 +129,13 @@ function parseJson(cloud) {
       } else {
         schemaData = tmpPath[key].block;
       }
-      requiredField = [];
 
       renameKey(schemaData, 'attributes', 'properties');
       mergeKey(schemaData, 'block_types', 'properties');
 
-      // eslint-disable-next-line @typescript-eslint/no-loop-func
-      Object.keys(schemaData.properties).forEach(function (k) {
-        if (schemaData.properties[k].type === 'bool') {
-          schemaData.properties[k].type = 'boolean';
-        } else if (Array.isArray(schemaData.properties[k].type)) {
-          if (
-            schemaData.properties[k].type[0] === 'list' ||
-            schemaData.properties[k].type[0] === 'set'
-          ) {
-            schemaData.properties[k].items = {
-              type: schemaData.properties[k].type[1],
-            };
-            schemaData.properties[k].type = 'array';
-          } else if (schemaData.properties[k].type[0] === 'map') {
-            schemaData.properties[k].items = {
-              type: schemaData.properties[k].type[1],
-            };
-            schemaData.properties[k].type = 'map'; // 'object'아닌가? 확인 필요****
-          }
-        }
-
-        if (
-          schemaData.properties[k].hasOwnProperty('required') &&
-          schemaData.properties[k].required
-        ) {
-          requiredField.push(k);
-          delete schemaData.properties[k].required;
-        }
-
-        if (
-          schemaData.properties[k].hasOwnProperty('block') &&
-          schemaData.properties[k].block.hasOwnProperty('attributes')
-        ) {
-          renameKey2(
-            schemaData.properties[k],
-            'block',
-            'attributes',
-            'properties'
-          );
-
-          if (schemaData.properties[k].block.hasOwnProperty('block_types')) {
-            mergeKey2(
-              schemaData.properties[k],
-              'block',
-              'block_types',
-              'properties'
-            );
-          }
-
-          Object.keys(schemaData.properties[k].properties).forEach(function (
-            i
-          ) {
-            if (schemaData.properties[k].properties[i].type === 'bool') {
-              schemaData.properties[k].properties[i].type = 'boolean';
-            } else if (
-              Array.isArray(schemaData.properties[k].properties[i].type)
-            ) {
-              if (
-                schemaData.properties[k].properties[i].type[0] === 'list' ||
-                schemaData.properties[k].properties[i].type[0] === 'set'
-              ) {
-                schemaData.properties[k].properties[i].items = {
-                  type: schemaData.properties[k].properties[i].type[1],
-                };
-                schemaData.properties[k].properties[i].type = 'array';
-              } else if (
-                schemaData.properties[k].properties[i].type[0] === 'map'
-              ) {
-                schemaData.properties[k].properties[i].items = {
-                  type: schemaData.properties[k].properties[i].type[1],
-                };
-                schemaData.properties[k].properties[i].type = 'map';
-              }
-            }
-
-            if (
-              schemaData.properties[k].properties[i].hasOwnProperty('block') &&
-              schemaData.properties[k].properties[i].block.hasOwnProperty(
-                'attributes'
-              )
-            ) {
-              renameKey2(
-                schemaData.properties[k].properties[i],
-                'block',
-                'attributes',
-                'properties'
-              );
-              if (
-                schemaData.properties[k].properties[i].block.hasOwnProperty(
-                  'block_types'
-                )
-              ) {
-                mergeKey2(
-                  schemaData.properties[k].properties[i],
-                  'block',
-                  'block_types',
-                  'properties'
-                );
-              }
-              Object.keys(
-                schemaData.properties[k].properties[i].properties
-              ).forEach(function (j) {
-                if (
-                  schemaData.properties[k].properties[i].properties[j].type ===
-                  'bool'
-                ) {
-                  schemaData.properties[k].properties[i].properties[j].type =
-                    'boolean';
-                } else if (
-                  Array.isArray(
-                    schemaData.properties[k].properties[i].properties[j].type
-                  )
-                ) {
-                  if (
-                    schemaData.properties[k].properties[i].properties[j]
-                      .type[0] === 'list' ||
-                    schemaData.properties[k].properties[i].properties[j]
-                      .type[0] === 'set'
-                  ) {
-                    schemaData.properties[k].properties[i].properties[j].items =
-                      {
-                        type: schemaData.properties[k].properties[i].properties[
-                          j
-                        ].type[1],
-                      };
-                    schemaData.properties[k].properties[i].properties[j].type =
-                      'array';
-                  } else if (
-                    schemaData.properties[k].properties[i].properties[j]
-                      .type[0] === 'map'
-                  ) {
-                    schemaData.properties[k].properties[i].properties[j].items =
-                      {
-                        type: schemaData.properties[k].properties[i].properties[
-                          j
-                        ].type[1],
-                      };
-                    schemaData.properties[k].properties[i].properties[j].type =
-                      'map'; // 'object'아닌가? 확인 필요****
-                  }
-                }
-              });
-            }
-          });
-        }
-      });
+      buildSchema(schemaData);
 
       schemaData.title = type + '-' + key;
-      schemaData.required = requiredField;
       schemaArray.push(schemaData);
       schemaMap.set(schemaData.title, schemaData);
     }
