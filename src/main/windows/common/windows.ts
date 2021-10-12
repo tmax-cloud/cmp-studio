@@ -4,6 +4,7 @@ export interface StudioWindowInterface {
   readonly id: number;
   readonly win: BrowserWindow | null /* `null` after being disposed */;
   setWindowSize(width: number, height: number): void;
+  maximizeWindowSize(): void;
   close(): void;
 }
 

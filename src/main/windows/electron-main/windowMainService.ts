@@ -12,5 +12,8 @@ export class WindowMainService {
         this.studioWindow.setWindowSize(arg.width || 100, arg.height || 100);
       }
     );
+    ipcMain.on('studio:maximizeWindowSize', (event, arg) => {
+      this.studioWindow.maximizeWindowSize();
+    });
   }
 }

@@ -73,6 +73,12 @@ export class StudioWindow implements StudioWindowInterface {
     }
   }
 
+  maximizeWindowSize() {
+    if (this.win) {
+      this.win.maximize();
+    }
+  }
+
   close(): void {
     if (this.win) {
       this.win.close();
