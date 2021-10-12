@@ -1,10 +1,12 @@
 import React from 'react';
-import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import { Switch, Route, BrowserRouter, Redirect } from 'react-router-dom';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material';
 import theme from './theme';
 import MainLayout from './components/MainLayout';
+import WorkspacesListPage from './components/workspace/WorkspacesListPage';
+
 // MEMO : boilerplate에 있던 global css 관리해주는 파일인데 현재는 TestComponent 보여줄때만 사용중
-import './App.global.css';
+import './App.global.scss';
 declare global {
   interface Window {
     electron?: any;
@@ -158,7 +160,9 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <BrowserRouter>
           <Switch>
-            <Route path="/" component={MainLayout} />
+            <Route path="/home" exact component={WorkspacesListPage} />
+            <Route path="/main/:uid" exact component={MainLayout} />{' '}
+            <Route render={() => <Redirect to="/home" />} />
           </Switch>
         </BrowserRouter>
       </ThemeProvider>

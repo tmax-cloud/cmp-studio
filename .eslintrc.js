@@ -28,6 +28,7 @@ module.exports = {
     'no-extra-boolean-cast': 'off',
     'spaced-comment': 'off',
     'consistent-return': 'off',
+    'no-else-return': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
