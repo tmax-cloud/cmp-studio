@@ -21,6 +21,7 @@ import { AppConfigurationMainService } from './configs/electron-main/appConfigur
 import { WorkspaceMainService } from './workspaces/electron-main/workspaceMainService';
 import { WindowMainService } from './windows/electron-main/windowMainService';
 import { TerraformMainService } from './terraform-command/electron-main/terraformMainService';
+import { DialogMainService } from './files/electron-main/DialogMainService';
 
 export default class AppUpdater {
   constructor() {
@@ -75,7 +76,7 @@ const createWindow = async () => {
     preloadPath: path.join(__dirname, 'preload.js'),
     state: {
       width: 1024,
-      height: 728,
+      height: 700,
     },
   });
 
@@ -87,6 +88,7 @@ const createWindow = async () => {
   const configurationMainService = new AppConfigurationMainService();
   const workspaceMainService = new WorkspaceMainService(storageMainService);
   const terraformMainService = new TerraformMainService(workspaceMainService);
+  const dialogMainService = new DialogMainService(studioWindow);
 
   const menuBuilder = new MenuBuilder(studioWindow.win);
   menuBuilder.buildMenu();

@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import { useHistory } from 'react-router-dom';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import { dummySchema } from './dummy';
 
@@ -96,6 +97,7 @@ interface Item {
 
 const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
   const classes = useStyles();
+  const history = useHistory();
   const [items, setItems] = React.useState<Item[]>([]);
   const [prjContextMenuOpen, setPrjContextMenuOpen] = React.useState(false);
   const [prjAnchorEl, setPrjAnchorEl] = React.useState(null);
@@ -119,6 +121,29 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
     });
     setItems(itemsList);
   }, []);
+
+  React.useEffect(() => {
+    window.electron.ipcRenderer.on(
+      'studio:dirSelectionResponse',
+      (res: { canceled: boolean; filePaths: string[] }) => {
+        const { filePaths, canceled } = res;
+        if (!canceled) {
+          window.electron.ipcRenderer
+            .invoke('studio:openExistFolder', { folderUri: filePaths[0] })
+            .then((response: any) => {
+              const uid = response?.data?.uid;
+              if (uid) {
+                history.push(`/main/${uid}`);
+              }
+              return response;
+            })
+            .catch((err: any) => {
+              console.log('[Error] Failed to open exist folder : ', err);
+            });
+        }
+      }
+    );
+  }, [history]);
 
   const onProjectTabClick = (event: any) => {
     // Mouse Right Click
@@ -191,7 +216,8 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
                 <MenuItem
                   className={classes.menuItem}
                   onClick={() => {
-                    console.log(' 메뉴 클릭');
+                    setPrjContextMenuOpen(false);
+                    window.electron.ipcRenderer.send('studio:openDialog');
                   }}
                 >
                   <span className={classes.menuItemText}>열기</span>
