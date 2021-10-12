@@ -3,6 +3,7 @@ import { makeDir } from '../../base/common/fileUtils';
 import {
   WorkspacesHistoryServiceInterface,
   WorkspaceManagementServiceInterface,
+  WorkspaceMainServiceInterface,
 } from '../common/workspace';
 import { WorkspaceManagementService } from './workspaceManagementService';
 import { IPCResponse } from '../../base/common/ipc';
@@ -10,7 +11,7 @@ import { WorkspacesHistoryService } from './workspacesHistoryService';
 import { StorageMainServiceInterface } from '../../storage/common/storage';
 
 // TODO : history, management에 워크스페이스 지워주는 기능들도 구현해야 됨.
-export class WorkspaceMainService {
+export class WorkspaceMainService implements WorkspaceMainServiceInterface {
   public workspaceManagementService: WorkspaceManagementServiceInterface;
 
   public workspacesHistoryService: WorkspacesHistoryServiceInterface;
@@ -93,7 +94,6 @@ export class WorkspaceMainService {
             // TODO : 지금은 uid만 반환해주는데 열리는 부분은 어떻게 처리하지? win size도 바꿔줘야 함
             return { status: 'Success', data: { uid } };
           }
-
           this.workspaceManagementService.removeGhostWorkspaceMeta(folderUri);
           return {
             status: 'Error',
@@ -110,7 +110,23 @@ export class WorkspaceMainService {
         try {
           const entries =
             this.workspacesHistoryService.getRecentlyOpenedWorkspaces();
-          return { status: 'Success', data: { entries } };
+          const prettyEntries = [];
+          for (const entry of entries) {
+            const uid =
+              this.workspaceManagementService.getWorkspaceIdByFolderUri(
+                entry.folderUri
+              );
+            if (uid) {
+              const workspaceConfig =
+                this.workspaceManagementService.getWorkspaceConfig(uid);
+              prettyEntries.push({
+                ...entry,
+                isPinned: workspaceConfig.isPinned || false,
+                workspaceUid: uid,
+              });
+            }
+          }
+          return { status: 'Success', data: { entries: prettyEntries } };
         } catch (err) {
           return {
             status: 'Error',

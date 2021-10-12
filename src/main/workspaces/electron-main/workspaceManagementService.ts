@@ -61,6 +61,7 @@ export class WorkspaceManagementService
           id: uid,
           workspaceRealPath,
           isPinned: false,
+          terraformExePath: 'EMPTY',
         };
         writeFileJson(getWorkspaceConfigPath(uid), workspaceConfig);
         const workspaceMap = readFileJson(workspaceMapPath);
