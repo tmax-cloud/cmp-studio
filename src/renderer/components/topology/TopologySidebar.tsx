@@ -124,7 +124,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on(
-      'studio:dirSelectionResponse',
+      'studio:dirPathToOpen',
       (res: { canceled: boolean; filePaths: string[] }) => {
         const { filePaths, canceled } = res;
         if (!canceled) {
@@ -217,7 +217,9 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
                   className={classes.menuItem}
                   onClick={() => {
                     setPrjContextMenuOpen(false);
-                    window.electron.ipcRenderer.send('studio:openDialog');
+                    window.electron.ipcRenderer.send('studio:openDialog', {
+                      openTo: 'OPEN_FOLDER',
+                    });
                   }}
                 >
                   <span className={classes.menuItemText}>열기</span>

@@ -16,6 +16,7 @@ const TestComponent = () => {
   const [data, setData] = React.useState('여기에 리스폰스가 표시됩니다.');
   const [workspaceUid, setWorkspaceUid] = React.useState('');
   const [folderPathToCreate, setFolderPathToCreate] = React.useState('');
+  const [workspaceNameToCreate, setWorkspaceNameToCreate] = React.useState('');
   const [folderToOpen, setFolderToOpen] = React.useState('');
 
   const getGraph = async () => {
@@ -112,12 +113,24 @@ const TestComponent = () => {
           }}
           style={{ width: '800px' }}
         />
+        <input
+          type="text"
+          value={workspaceNameToCreate}
+          id="new-project-name"
+          onChange={(event) => {
+            setWorkspaceNameToCreate(event.target.value);
+          }}
+          style={{ width: '800px' }}
+        />
         <button
           type="button"
           onClick={async () => {
             const response = await window.electron.ipcRenderer.invoke(
               'studio:createNewFolderAndWorkspace',
-              { folderUri: folderPathToCreate }
+              {
+                folderUri: folderPathToCreate,
+                workspaceName: workspaceNameToCreate,
+              }
             );
             console.log('Response? ', response);
           }}

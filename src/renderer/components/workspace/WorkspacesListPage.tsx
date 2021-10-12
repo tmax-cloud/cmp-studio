@@ -32,7 +32,7 @@ const WorkspacesListPage: React.FC = (props) => {
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on(
-      'studio:dirSelectionResponse',
+      'studio:dirPathToOpen',
       (res: { canceled: boolean; filePaths: string[] }) => {
         console.log('res?', res);
         const { filePaths, canceled } = res;

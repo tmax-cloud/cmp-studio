@@ -26,6 +26,11 @@ export function getUserDataFolderPath() {
   }
   return path.join(__dirname, '../../../../TestMeta');
 }
+
 export const getWorkspaceMetaFolderPath = () => {
   return path.join(getUserDataFolderPath(), 'Workspaces');
+};
+
+export const getDocumentsPath = () => {
+  return path.join(app.getPath('documents'), `${PRODUCT_NAME} Projects`);
 };

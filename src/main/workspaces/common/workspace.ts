@@ -20,6 +20,7 @@ export interface WorkspaceManagementServiceInterface {
   getWorkspaceIdByFolderUri(folderUri: string): string | null;
   checkRealWorkspaceExists(workspaceRealPath: string): boolean;
   getWorkspaceConfig(uid: string): any;
+  generateDefaultNewWorkspaceName(): string;
 }
 export interface WorkspacesHistoryServiceInterface {
   addWorkspaceToStorage(folderUri: string): void;
