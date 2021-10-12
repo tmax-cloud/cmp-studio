@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppBar, Toolbar } from '@mui/material';
+import { AppBar, Toolbar, Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 
 export const TOP_NAVBAR_HEIGHT = 40;
@@ -13,9 +13,11 @@ const useStyles = makeStyles({
 const MainNavbar: React.FC = (props) => {
   const classes = useStyles();
   return (
-    <AppBar elevation={0} {...props}>
-      <Toolbar className={classes.root}>CMP Studio</Toolbar>
-    </AppBar>
+    <Box>
+      <AppBar elevation={0} position="static" {...props}>
+        <Toolbar className={classes.root}>CMP Studio</Toolbar>
+      </AppBar>
+    </Box>
   );
 };
 

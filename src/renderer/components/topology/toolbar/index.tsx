@@ -8,12 +8,21 @@ import SaveButton from './button/SaveButton';
 import ZoomInButton from './button/ZoomInButton';
 import ZoomOutButton from './button/ZoomOutButton';
 import FitScreenButton from './button/FitScreenButton';
+import { GraphHandlerProps } from '../../../hooks/useGraphProps';
 
-const TopologyToolbar = () => {
+const TopologyToolbar = (props: TopologyToolbarProps) => {
+  const { handlers } = props;
   return (
     <Toolbar
       style={{ minHeight: 48, paddingLeft: 12, paddingRight: 12 }}
-      sx={{ borderBottom: '1px solid', borderColor: 'rgba(0, 0, 0, 0.12)' }}
+      sx={{
+        display: 'flex',
+        flexShrink: 0,
+        borderBottom: '1px solid',
+        borderRight: '1px solid',
+        borderColor: 'rgba(0, 0, 0, 0.12)',
+        backgroundColor: 'white',
+      }}
     >
       <Grid container justifyContent="space-between">
         <Grid item justifyContent="center">
@@ -33,14 +42,18 @@ const TopologyToolbar = () => {
               flexItem
               sx={{ mx: 1 }}
             />
-            <ZoomInButton />
-            <ZoomOutButton />
-            <FitScreenButton />
+            <ZoomInButton onClick={handlers.handleZoomIn} />
+            <ZoomOutButton onClick={handlers.handleZoomOut} />
+            <FitScreenButton onClick={handlers.handleZoomToFit} />
           </Box>
         </Grid>
       </Grid>
     </Toolbar>
   );
 };
+
+export interface TopologyToolbarProps {
+  handlers: GraphHandlerProps;
+}
 
 export default TopologyToolbar;
