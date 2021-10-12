@@ -9,6 +9,7 @@ export type RecentWorkspace = {
   folderUri: string;
   labelTitle?: string;
   labelUri?: string;
+  lastOpenedTime: number;
 };
 
 export interface WorkspaceManagementServiceInterface {
