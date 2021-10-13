@@ -3,8 +3,11 @@ import * as _ from 'lodash-es';
 
 import { makeStyles } from '@mui/styles';
 
-import { ObjectFieldTemplateProps } from '@rjsf/core';
+import { ObjectFieldTemplateProps, utils } from '@rjsf/core';
 import { Grid } from '@mui/material';
+import AddButton from './AddButton';
+
+const { canExpand } = utils;
 
 const useStyles = makeStyles({
   root: {
@@ -62,6 +65,17 @@ export const ObjectFieldTemplate = ({
               {element.content}
             </Grid>
           )
+        )}
+        {canExpand(schema, uiSchema, formData) && (
+          <Grid container>
+            <Grid item>
+              <AddButton
+                className="object-property-expand"
+                onClick={onAddClick(schema)}
+                disabled={disabled || readonly}
+              />
+            </Grid>
+          </Grid>
         )}
       </Grid>
     </>
