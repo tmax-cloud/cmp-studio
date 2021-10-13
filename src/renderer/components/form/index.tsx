@@ -1,57 +1,24 @@
 import * as React from 'react';
 import Form, { FormProps } from '@rjsf/core';
-// import Form from '@rjsf/material-ui';
+import defaultFields from './fields';
+// import defaultWidgets from './widgets';
 import { ObjectFieldTemplate } from './template/ObjectFieldTemplate';
-
-// eslint-disable-next-line consistent-return
-const setPredefinedData = (title: string) => {
-  switch (title) {
-    case 'textareaTest':
-      return {
-        formData: {
-          analyzer_name: `jsonencode({
-        "Statement" = [{
-          # This policy allows software running on the EC2 instance to
-          # access the S3 API.
-          "Action" = "s3:*",
-          "Effect" = "Allow",
-        }],
-      })`,
-        },
-        uiSchema: {
-          analyzer_name: {
-            'ui:widget': 'textarea',
-            classNames: 'pleasedoitagain',
-          },
-        },
-      };
-    case 'resource-aws_iam_policy':
-      return {
-        formData: {
-          description: 'My test policy',
-          name: 'test_policy',
-          path: '/',
-          policy: `\${jsonencode({\r\n    Version = "2012-10-17"\r\n    Statement = [\r\n      {\r\n        Action = [\r\n          "ec2:Describe*",\r\n        ]\r\n        Effect   = "Allow"\r\n        Resource = "*"\r\n      },\r\n    ]\r\n  })}`,
-        },
-      };
-    default:
-  }
-};
+import ArrayFieldTemplate from './template/ArrayFieldTemplate';
+import { FieldTemplate } from './template/FieldTemplate';
 
 const DynamicForm = (props: FormProps<any>) => {
-  const { fields = {}, schema = {} } = props;
-  const { uiSchema, formData } =
-    setPredefinedData(schema.title as string) || props;
-
-  // const selectSchema = isTestSchemaActivate(testtest, schema);
+  const { fields = {}, schema = {}, formData = {}, uiSchema = {} } = props;
   return (
     <>
       <Form
         className=""
         noHtml5Validate
-        fields={{ ...fields }}
+        FieldTemplate={FieldTemplate}
         ObjectFieldTemplate={ObjectFieldTemplate}
         formData={formData}
+        ArrayFieldTemplate={ArrayFieldTemplate}
+        fields={{ ...defaultFields, ...fields }}
+        // widgets={{ ...defaultWidgets }}
         schema={schema}
         uiSchema={uiSchema}
         onSubmit={(data) => console.log('result: ', data)}

@@ -3,10 +3,11 @@ import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
+import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
+import parseJson from '../form/utils/json2JsonSchemaParser';
+// import testSchema from '../form/test_schema.json';
 import TopologyToolbar from './toolbar';
-import TopologyGraph from './graph';
-import parseJson from '../form/parser';
-import testSchema from '../form/test_schema.json';
+import TopologyGraphLayout from './graph';
 import { useGraphProps } from '../../hooks/useGraphProps';
 
 // MEMO : SIDEBAR_WIDTH + SIDEPANEL_WIDTH 값
@@ -58,9 +59,9 @@ export const TopologyPage: React.FC = (props) => {
   const [terraformSchema, setTerraformSchema] = React.useState(new Map());
 
   React.useEffect(() => {
-    const schema = parseJson();
-    schema.set('arrayTest', testSchema.arrayTest);
-    schema.set('textareaTest', testSchema.textareaTest);
+    const schema = parseJson('aws');
+    // schema.set('arrayTest', testSchema.arrayTest);
+    // schema.set('textareaTest', testSchema.textareaTest);
     setTerraformSchema(schema);
   }, []);
 
@@ -79,23 +80,7 @@ export const TopologyPage: React.FC = (props) => {
       <TopologySidebar openSidePanel={openSidePanel} />
       <div className={classes.topologyLayoutWrapper}>
         <TopologyToolbar handlers={graphHandler} />
-        <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
-        <button
-          type="button"
-          onClick={() => {
-            openSidePanel({ id: 'arrayTest' });
-          }}
-        >
-          Array Test
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            openSidePanel({ id: 'textareaTest' });
-          }}
-        >
-          Textarea Test
-        </button>
+        <TopologyGraphLayout graphRef={graphRef} graphOptions={graphOption} />
       </div>
       <TopologySidePanel
         open={isSidePanelOpen}
