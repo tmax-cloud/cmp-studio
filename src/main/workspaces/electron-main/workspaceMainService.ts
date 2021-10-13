@@ -83,7 +83,7 @@ export class WorkspaceMainService implements WorkspaceMainServiceInterface {
               return {
                 status: 'Error',
                 data: {
-                  messaage: `${workspaceName} is already exists.`,
+                  message: `${workspaceName} is already exists.`,
                 },
               };
             }
