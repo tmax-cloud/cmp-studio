@@ -14,46 +14,17 @@ const AWS_ACM_CERTIFICATE_VALIDATION_OBJ = {
     aws_acm_certificate_validation: {
       example: {
         // eslint-disable-next-line no-template-curly-in-string
-        certificate_arn: '${aws_acm_certificate.example.arn}',
+        certificate_arn: '${test}',
         validation_record_fqdns:
           // '${[for record in aws_route53_record.example : record.fqdn]}',
           ['a', 'b'],
+        timeouts: {
+          create: 'true',
+        },
       },
     },
   },
 };
-
-// const setPredefinedData = (
-//   title: string
-// ): { uiSchema: any; formData: any; fixedSchema: any } => {
-//   let predefinedData = { uiSchema: {}, formData: {}, fixedSchema: {} };
-
-//   // text area 테스트
-//   if (title === 'textareaTest') {
-//     predefinedData = {
-//       uiSchema: {
-//         analyzer_name: {
-//           'ui:widget': 'textarea',
-//           classNames: 'pleasedoitagain',
-//         },
-//       },
-//       formData: {
-//         analyzer_name: `jsonencode({
-//         "Statement" = [{
-//           # This policy allows software running on the EC2 instance to
-//           # access the S3 API.
-//           "Action" = "s3:*",
-//           "Effect" = "Allow",
-//         }],
-//       })`,
-//       },
-//       fixedSchema: {},
-//     };
-//   }
-
-//   return predefinedData;
-// };
-
 const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   open,
   toggleSidePanel,
