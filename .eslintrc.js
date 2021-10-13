@@ -32,6 +32,7 @@ module.exports = {
     'spaced-comment': 'off',
     'consistent-return': 'off',
     'no-else-return': 'off',
+    'no-async-promise-executor': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
