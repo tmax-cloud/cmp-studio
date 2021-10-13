@@ -1,5 +1,8 @@
 import { ipcMain } from 'electron';
+import fs from 'fs';
+import path from 'path';
 import { makeDir } from '../../base/common/fileUtils';
+import { getDocumentsPath } from '../../base/common/pathUtils';
 import {
   WorkspacesHistoryServiceInterface,
   WorkspaceManagementServiceInterface,
@@ -67,15 +70,32 @@ export class WorkspaceMainService implements WorkspaceMainServiceInterface {
   private registerListeners() {
     ipcMain.handle(
       'studio:createNewFolderAndWorkspace',
-      async (event, arg: { folderUri: string }): Promise<IPCResponse> => {
-        const { folderUri } = arg;
-        if (!!folderUri) {
-          const uid = await this.makeNewFolderAndWorkspaceMeta(folderUri);
-          this.workspacesHistoryService.addWorkspaceToStorage(folderUri);
-          return {
-            status: 'Success',
-            data: { uid },
-          };
+      async (
+        event,
+        arg: { folderUri: string; workspaceName: string }
+      ): Promise<IPCResponse> => {
+        const { folderUri, workspaceName } = arg;
+        try {
+          if (!!folderUri) {
+            const uri = path.join(folderUri, workspaceName);
+            if (fs.existsSync(uri)) {
+              // TODO : 존재하는 프로젝트 이름인것에 대한 에러인지는 어떻게 구별할지 정하기. status 코드를 정해야되나?
+              return {
+                status: 'Error',
+                data: {
+                  messaage: `${workspaceName} is already exists.`,
+                },
+              };
+            }
+            const uid = await this.makeNewFolderAndWorkspaceMeta(uri);
+            this.workspacesHistoryService.addWorkspaceToStorage(uri);
+            return {
+              status: 'Success',
+              data: { uid },
+            };
+          }
+        } catch (e) {
+          return { status: 'Error', data: { message: e } };
         }
         return { status: 'Error', data: { message: 'Invalid folder uri.' } };
       }
@@ -133,6 +153,26 @@ export class WorkspaceMainService implements WorkspaceMainServiceInterface {
             data: { message: 'Failed to get workspace history' },
           };
         }
+      }
+    );
+
+    ipcMain.handle(
+      'studio:getDefaultNewProjectsFolderPath',
+      (event, arg): IPCResponse => {
+        return {
+          status: 'Success',
+          data: getDocumentsPath(),
+        };
+      }
+    );
+
+    ipcMain.handle(
+      'studio:getDefaultNewProjectName',
+      (event, arg): IPCResponse => {
+        return {
+          status: 'Success',
+          data: this.workspaceManagementService.generateDefaultNewWorkspaceName(),
+        };
       }
     );
   }

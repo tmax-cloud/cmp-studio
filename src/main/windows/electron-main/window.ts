@@ -24,7 +24,7 @@ export class StudioWindow implements StudioWindowInterface {
       minHeight: WindowMinimumSize.HEIGHT,
       show: false,
       icon: getAssetPath('icon.png'),
-      title: 'IaC Studio',
+      title: 'CMP Studio',
       webPreferences: {
         preload: config.preloadPath,
         enableWebSQL: false,
@@ -37,6 +37,8 @@ export class StudioWindow implements StudioWindowInterface {
     this.id = this.win.id;
 
     this.win.setMenuBarVisibility(false);
+    // TODO : 초기화면에서만 크기조정 못하게 할 것인지 정하기.
+    this.win.setResizable(false);
     this.win.loadURL(resolveHtmlPath('index.html'));
     this.win.webContents.openDevTools();
 
@@ -69,12 +71,14 @@ export class StudioWindow implements StudioWindowInterface {
 
   setWindowSize(width: number, height: number): void {
     if (this.win) {
+      this.win.setResizable(true);
       this.win.setSize(width, height);
     }
   }
 
   maximizeWindowSize() {
     if (this.win) {
+      this.win.setResizable(true);
       this.win.maximize();
     }
   }

@@ -10,7 +10,10 @@ import {
   WorkspaceIdentifier,
   WorkspaceManagementServiceInterface,
 } from '../common/workspace';
-import { getWorkspaceMetaFolderPath } from '../../base/common/pathUtils';
+import {
+  getWorkspaceMetaFolderPath,
+  getDocumentsPath,
+} from '../../base/common/pathUtils';
 
 const WORKSPACE_MAP_PATH = 'workspaceMap.json';
 const WORKSPACE_CONFIG_PATH = 'workspace.json';
@@ -110,8 +113,11 @@ export class WorkspaceManagementService
     });
     duplicateKeys.forEach((key) => {
       delete workspaceMap[key];
-      const workspaceMetaPath = path.join(getWorkspaceMetaFolderPath(), key);
-      fs.rmdirSync(workspaceMetaPath, { recursive: true });
+      if (key?.split('-').length === 5) {
+        // MEMO : 다른 폴더 지울 위험 방지위해 key형태로 한번 validation 해줌
+        const workspaceMetaPath = path.join(getWorkspaceMetaFolderPath(), key);
+        fs.rmdirSync(workspaceMetaPath, { recursive: true });
+      }
     });
     writeFileJson(workspaceMapPath, workspaceMap);
   }
@@ -133,5 +139,20 @@ export class WorkspaceManagementService
       default:
         throw new Error('[Error] Duplicate folderUri in workspaceMap');
     }
+  }
+
+  generateDefaultNewWorkspaceName(): string {
+    let index = 1;
+    let newWorkspaceName = `새프로젝트${index}`;
+    let ok = false;
+    while (!ok) {
+      if (fs.existsSync(path.join(getDocumentsPath(), newWorkspaceName))) {
+        index += 1;
+        newWorkspaceName = `새프로젝트${index}`;
+      } else {
+        ok = true;
+      }
+    }
+    return newWorkspaceName;
   }
 }

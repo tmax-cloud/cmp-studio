@@ -1,7 +1,7 @@
 import path from 'path';
 import { app } from 'electron';
 
-const PRODUCT_NAME = 'IaC Studio';
+const PRODUCT_NAME = 'CMPStudio';
 export const SRC_MAIN_PATH = path.join(__dirname, '../../');
 
 const RESOURCES_PATH = app.isPackaged
@@ -13,7 +13,7 @@ export const getAssetPath = (...paths: string[]): string => {
 };
 
 const CONFIGS_PATH = app.isPackaged
-  ? path.join(process.resourcesPath, 'Config')
+  ? path.join(app.getPath('appData'), 'Config')
   : path.join(__dirname, '../../../../TestMeta/Config');
 
 export const getConfigsPath = (...paths: string[]): string => {
@@ -26,6 +26,11 @@ export function getUserDataFolderPath() {
   }
   return path.join(__dirname, '../../../../TestMeta');
 }
+
 export const getWorkspaceMetaFolderPath = () => {
   return path.join(getUserDataFolderPath(), 'Workspaces');
+};
+
+export const getDocumentsPath = () => {
+  return path.join(app.getPath('documents'), `${PRODUCT_NAME}Projects`);
 };
