@@ -1,7 +1,7 @@
 import path from 'path';
 import { app } from 'electron';
 
-const PRODUCT_NAME = 'IaC Studio';
+const PRODUCT_NAME = 'CMPStudio';
 export const SRC_MAIN_PATH = path.join(__dirname, '../../');
 
 const RESOURCES_PATH = app.isPackaged
@@ -32,5 +32,5 @@ export const getWorkspaceMetaFolderPath = () => {
 };
 
 export const getDocumentsPath = () => {
-  return path.join(app.getPath('documents'), `${PRODUCT_NAME} Projects`);
+  return path.join(app.getPath('documents'), `${PRODUCT_NAME}Projects`);
 };

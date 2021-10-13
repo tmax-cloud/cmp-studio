@@ -42,7 +42,7 @@ const WorkspacesRightSection: React.FC = (props) => {
     <div className={classes.contentWrapper}>
       <img className={classes.logoImage} src={project} alt="Studio Logo" />
       <Typography style={{ margin: '5px' }} variant="h4">
-        IaC Studio
+        CMP Studio
       </Typography>
       <Typography style={{ margin: '5px' }} variant="subtitle1">
         version 2021.10.08

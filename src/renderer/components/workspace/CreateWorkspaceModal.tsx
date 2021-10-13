@@ -167,7 +167,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
       <Box className={classes.boxContainer}>
         <div className={classes.barContainer}>
           <Typography variant="h6" style={{ marginLeft: 10 }}>
-            IaC Studio 생성
+            CMP Studio 생성
           </Typography>
           <IconButton style={{ marginRight: 10 }} onClick={closeModal}>
             <Close className={classes.close} />

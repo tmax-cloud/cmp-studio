@@ -24,7 +24,7 @@ export class StudioWindow implements StudioWindowInterface {
       minHeight: WindowMinimumSize.HEIGHT,
       show: false,
       icon: getAssetPath('icon.png'),
-      title: 'IaC Studio',
+      title: 'CMP Studio',
       webPreferences: {
         preload: config.preloadPath,
         enableWebSQL: false,
