@@ -39,6 +39,9 @@ export default {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     modules: [webpackPaths.srcPath, 'node_modules'],
+    alias: {
+      '@main': webpackPaths.srcMainPath,
+    },
     fallback: {
       path: require.resolve('path-browserify'),
       util: require.resolve('util/'),

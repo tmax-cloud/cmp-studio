@@ -1,4 +1,4 @@
-export type IPCResponse = {
-  status: string;
-  data: any;
-};
+export interface IPCResponse<StatusType, DataType> {
+  status: StatusType;
+  data: DataType;
+}
