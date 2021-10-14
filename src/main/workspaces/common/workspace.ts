@@ -1,3 +1,54 @@
+import { IPCResponse } from '../../base/common/ipc';
+
+export type WorkspaceCreateNewProjectArgs = {
+  folderUri: string;
+  workspaceName: string;
+};
+
+export type WorkspaceOpenProjectArgs = {
+  folderUri: string;
+};
+
+export enum WorkspaceStatusType {
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR',
+  ERROR_FILE_EXISTS = 'ERROR_FILE_EXISTS',
+  ERROR_NO_PROJECT = 'ERROR_NO_PROJECT',
+}
+
+export type WorkspaceStatus =
+  | WorkspaceStatusType.SUCCESS
+  | WorkspaceStatusType.ERROR
+  | WorkspaceStatusType.ERROR_NO_PROJECT
+  | WorkspaceStatusType.ERROR_FILE_EXISTS;
+
+export type RecentWorkspaceData = RecentWorkspace & {
+  isPinned: boolean;
+  workspaceUid: string;
+};
+
+export type RecentWorkspacesDataArray = {
+  entries: RecentWorkspaceData[];
+};
+
+export type WorkspaceSuccessUidData = {
+  uid: string;
+};
+
+export type MakeDefaultNameSuccessData = string;
+
+export type WorkspaceErrorData = {
+  message: string;
+};
+
+export type WorkspaceData =
+  | WorkspaceSuccessUidData
+  | MakeDefaultNameSuccessData
+  | RecentWorkspacesDataArray
+  | WorkspaceErrorData;
+
+export type WorkspaceResponse = IPCResponse<WorkspaceStatus, WorkspaceData>;
+
 export type WorkspaceIdentifier = {
   id: string;
   workspaceRealPath: string;
