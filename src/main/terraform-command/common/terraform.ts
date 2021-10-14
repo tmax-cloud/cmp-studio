@@ -21,9 +21,9 @@ type TerraformStatus =
   | TerraformStatusType.ERROR_GRAPH
   | TerraformStatusType.ERROR_TF_EXE_PATH;
 
-export type TerraformGraphSuccessDataType = { graphData: string };
-export type TerraformErrorDataType = { message: string };
+export type TerraformGraphSuccessData = { graphData: string };
+export type TerraformErrorData = { message: string };
 
-type TerraformData = TerraformGraphSuccessDataType | TerraformErrorDataType;
+type TerraformData = TerraformGraphSuccessData | TerraformErrorData;
 
 export type TerraformResponse = IPCResponse<TerraformStatus, TerraformData>;

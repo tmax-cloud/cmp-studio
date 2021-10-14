@@ -1,4 +1,4 @@
-import { TerraformResponse } from '../../../main/terraform-command/common/terraform';
+import { TerraformResponse } from '@main/terraform-command/common/terraform';
 
 export const getTerraformGraph = (
   workspaceUid: string
