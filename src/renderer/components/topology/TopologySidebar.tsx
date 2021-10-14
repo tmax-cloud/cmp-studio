@@ -16,6 +16,7 @@ import {
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useHistory } from 'react-router-dom';
+import { OptionProperties } from '@main/dialog/common/dialog';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import { dummySchema } from './dummy';
 
@@ -217,8 +218,10 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
                   className={classes.menuItem}
                   onClick={() => {
                     setPrjContextMenuOpen(false);
+                    const properties: OptionProperties = ['openDirectory'];
                     window.electron.ipcRenderer.send('studio:openDialog', {
                       openTo: 'OPEN_FOLDER',
+                      properties,
                     });
                   }}
                 >

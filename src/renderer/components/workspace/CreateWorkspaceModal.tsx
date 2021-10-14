@@ -13,6 +13,13 @@ import {
 import { Close, MoreHoriz } from '@mui/icons-material';
 import { makeStyles, createStyles } from '@mui/styles';
 import { History } from 'history';
+import {
+  WorkspaceStatusType,
+  WorkspaceResponse,
+  MakeDefaultNameSuccessData,
+  WorkspaceSuccessUidData,
+} from '@main/workspaces/common/workspace';
+import { OptionProperties } from '@main/dialog/common/dialog';
 import StudioTheme from '../../theme';
 
 const useStyles = makeStyles<Theme>((theme) => {
@@ -98,9 +105,9 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
 
     window.electron.ipcRenderer
       .invoke('studio:getDefaultNewProjectName')
-      .then((res: { status: string; data: string }) => {
+      .then((res: WorkspaceResponse) => {
         if (res?.data) {
-          setNewProjectName(res.data);
+          setNewProjectName(res.data as MakeDefaultNameSuccessData);
         }
         return res;
       })
@@ -110,9 +117,9 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
 
     window.electron.ipcRenderer
       .invoke('studio:getDefaultNewProjectsFolderPath')
-      .then((res: { status: string; data: string }) => {
+      .then((res: WorkspaceResponse) => {
         if (res?.data) {
-          setNewProjectPath(res.data);
+          setNewProjectPath(res.data as MakeDefaultNameSuccessData);
         }
         return res;
       })
@@ -143,16 +150,16 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
         folderUri: newProjectPath,
         workspaceName: newProjectName,
       })
-      .then((res: { status: string; data: any }) => {
+      .then((res: WorkspaceResponse) => {
         const { status, data } = res;
-        if (status === 'Success') {
-          const uid = data?.uid;
+        if (status === WorkspaceStatusType.SUCCESS) {
+          const uid = (data as WorkspaceSuccessUidData)?.uid;
           if (uid) {
             setOpen(false);
             history.push(`/main/${uid}`);
             window.electron.ipcRenderer.send('studio:maximizeWindowSize');
           }
-        } else {
+        } else if (status === WorkspaceStatusType.ERROR_FILE_EXISTS) {
           setPrjNameErrMsg('이미 존재하는 프로젝트 이름입니다.');
         }
         return res;
@@ -228,8 +235,10 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
                   marginLeft: 5,
                 }}
                 onClick={() => {
+                  const properties: OptionProperties = ['openDirectory'];
                   window.electron.ipcRenderer.send('studio:openDialog', {
                     openTo: 'CREATE_NEW_PROJECT',
+                    properties,
                   });
                 }}
               >
@@ -239,8 +248,8 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
           </div>
         </div>
         <div className={classes.footerContainer}>
-          <StyledButton variant="outlined">{'< 이전'}</StyledButton>
-          <StyledButton variant="outlined">{'다음 >'}</StyledButton>
+          {/* <StyledButton variant="outlined">{'< 이전'}</StyledButton>
+          <StyledButton variant="outlined">{'다음 >'}</StyledButton> */}
           <StyledButton variant="contained" onClick={onClickCreate}>
             생성
           </StyledButton>

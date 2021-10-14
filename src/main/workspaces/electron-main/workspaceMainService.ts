@@ -3,21 +3,18 @@ import fs from 'fs';
 import path from 'path';
 import { makeDir } from '../../base/common/fileUtils';
 import { getDocumentsPath } from '../../base/common/pathUtils';
-import {
-  WorkspacesHistoryServiceInterface,
-  WorkspaceManagementServiceInterface,
-  WorkspaceMainServiceInterface,
-} from '../common/workspace';
+import * as WorkspaceTypes from '../common/workspace';
 import { WorkspaceManagementService } from './workspaceManagementService';
-import { IPCResponse } from '../../base/common/ipc';
 import { WorkspacesHistoryService } from './workspacesHistoryService';
 import { StorageMainServiceInterface } from '../../storage/common/storage';
 
 // TODO : history, management에 워크스페이스 지워주는 기능들도 구현해야 됨.
-export class WorkspaceMainService implements WorkspaceMainServiceInterface {
-  public workspaceManagementService: WorkspaceManagementServiceInterface;
+export class WorkspaceMainService
+  implements WorkspaceTypes.WorkspaceMainServiceInterface
+{
+  public workspaceManagementService: WorkspaceTypes.WorkspaceManagementServiceInterface;
 
-  public workspacesHistoryService: WorkspacesHistoryServiceInterface;
+  public workspacesHistoryService: WorkspaceTypes.WorkspacesHistoryServiceInterface;
 
   constructor(
     private readonly storageMainService: StorageMainServiceInterface
@@ -72,16 +69,15 @@ export class WorkspaceMainService implements WorkspaceMainServiceInterface {
       'studio:createNewFolderAndWorkspace',
       async (
         event,
-        arg: { folderUri: string; workspaceName: string }
-      ): Promise<IPCResponse> => {
+        arg: WorkspaceTypes.WorkspaceCreateNewProjectArgs
+      ): Promise<WorkspaceTypes.WorkspaceResponse> => {
         const { folderUri, workspaceName } = arg;
         try {
           if (!!folderUri) {
             const uri = path.join(folderUri, workspaceName);
             if (fs.existsSync(uri)) {
-              // TODO : 존재하는 프로젝트 이름인것에 대한 에러인지는 어떻게 구별할지 정하기. status 코드를 정해야되나?
               return {
-                status: 'Error',
+                status: WorkspaceTypes.WorkspaceStatusType.ERROR_FILE_EXISTS,
                 data: {
                   message: `${workspaceName} is already exists.`,
                 },
@@ -90,20 +86,29 @@ export class WorkspaceMainService implements WorkspaceMainServiceInterface {
             const uid = await this.makeNewFolderAndWorkspaceMeta(uri);
             this.workspacesHistoryService.addWorkspaceToStorage(uri);
             return {
-              status: 'Success',
+              status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
               data: { uid },
             };
           }
-        } catch (e) {
-          return { status: 'Error', data: { message: e } };
+        } catch (e: any) {
+          return {
+            status: WorkspaceTypes.WorkspaceStatusType.ERROR,
+            data: { message: e },
+          };
         }
-        return { status: 'Error', data: { message: 'Invalid folder uri.' } };
+        return {
+          status: WorkspaceTypes.WorkspaceStatusType.ERROR,
+          data: { message: 'Invalid folder uri.' },
+        };
       }
     );
 
     ipcMain.handle(
       'studio:openExistFolder',
-      async (event, arg: { folderUri: string }): Promise<IPCResponse> => {
+      async (
+        event,
+        arg: WorkspaceTypes.WorkspaceOpenProjectArgs
+      ): Promise<WorkspaceTypes.WorkspaceResponse> => {
         const { folderUri } = arg;
         if (!!folderUri) {
           if (
@@ -112,25 +117,31 @@ export class WorkspaceMainService implements WorkspaceMainServiceInterface {
             const uid = await this.getWorkspaceMetaOfExistFolder(folderUri);
             this.workspacesHistoryService.addWorkspaceToStorage(folderUri);
             // TODO : 지금은 uid만 반환해주는데 열리는 부분은 어떻게 처리하지? win size도 바꿔줘야 함
-            return { status: 'Success', data: { uid } };
+            return {
+              status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
+              data: { uid },
+            };
           }
           this.workspaceManagementService.removeGhostWorkspaceMeta(folderUri);
           return {
-            status: 'Error',
+            status: WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT,
             data: { message: `There is no such folder : ${folderUri}` },
           };
         }
-        return { status: 'Error', data: { message: 'Invalid folder uri.' } };
+        return {
+          status: WorkspaceTypes.WorkspaceStatusType.ERROR,
+          data: { message: 'Invalid folder uri.' },
+        };
       }
     );
 
     ipcMain.handle(
       'studio:getRecentlyOpenedWorkspaces',
-      async (event, arg): Promise<IPCResponse> => {
+      async (event, arg): Promise<WorkspaceTypes.WorkspaceResponse> => {
         try {
           const entries =
             this.workspacesHistoryService.getRecentlyOpenedWorkspaces();
-          const prettyEntries = [];
+          const prettyEntries: WorkspaceTypes.RecentWorkspaceData[] = [];
           for (const entry of entries) {
             const uid =
               this.workspaceManagementService.getWorkspaceIdByFolderUri(
@@ -146,10 +157,13 @@ export class WorkspaceMainService implements WorkspaceMainServiceInterface {
               });
             }
           }
-          return { status: 'Success', data: { entries: prettyEntries } };
+          return {
+            status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
+            data: { entries: prettyEntries },
+          };
         } catch (err) {
           return {
-            status: 'Error',
+            status: WorkspaceTypes.WorkspaceStatusType.ERROR,
             data: { message: 'Failed to get workspace history' },
           };
         }
@@ -158,9 +172,9 @@ export class WorkspaceMainService implements WorkspaceMainServiceInterface {
 
     ipcMain.handle(
       'studio:getDefaultNewProjectsFolderPath',
-      (event, arg): IPCResponse => {
+      (event, arg): WorkspaceTypes.WorkspaceResponse => {
         return {
-          status: 'Success',
+          status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
           data: getDocumentsPath(),
         };
       }
@@ -168,9 +182,9 @@ export class WorkspaceMainService implements WorkspaceMainServiceInterface {
 
     ipcMain.handle(
       'studio:getDefaultNewProjectName',
-      (event, arg): IPCResponse => {
+      (event, arg): WorkspaceTypes.WorkspaceResponse => {
         return {
-          status: 'Success',
+          status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
           data: this.workspaceManagementService.generateDefaultNewWorkspaceName(),
         };
       }

@@ -4,8 +4,8 @@ import { ThemeProvider, StyledEngineProvider } from '@mui/material';
 import theme from './theme';
 import {
   TerraformStatusType,
-  TerraformErrorDataType,
-  TerraformGraphSuccessDataType,
+  TerraformErrorData,
+  TerraformGraphSuccessData,
 } from '../main/terraform-command/common/terraform';
 import {
   getTerraformGraph,
@@ -37,7 +37,7 @@ const TestComponent = () => {
       if (response2.status === TerraformStatusType.ERROR_INIT) {
         setData(
           'terraform init에 실패했습니다. 에러 내용 :' +
-            (response2.data as TerraformErrorDataType).message
+            (response2.data as TerraformErrorData).message
         );
       } else if (response2.status === TerraformStatusType.SUCCESS) {
         setData('init 성공 후 다시 graph가져오는중..');
@@ -45,14 +45,14 @@ const TestComponent = () => {
         if (response3.status === TerraformStatusType.ERROR_GRAPH) {
           setData(
             'terraform graph 커맨드 실행에 문제가 있습니다. ' +
-              (response3.data as TerraformErrorDataType).message
+              (response3.data as TerraformErrorData).message
           );
         } else if (response3.status === TerraformStatusType.SUCCESS) {
-          setData((response3.data as TerraformGraphSuccessDataType).graphData);
+          setData((response3.data as TerraformGraphSuccessData).graphData);
         }
       }
     } else if (response.status === TerraformStatusType.SUCCESS) {
-      setData((response.data as TerraformGraphSuccessDataType).graphData);
+      setData((response.data as TerraformGraphSuccessData).graphData);
     }
   };
 
