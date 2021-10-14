@@ -1,5 +1,6 @@
 import { dialog, ipcMain } from 'electron';
 import { StudioWindowInterface } from '../../windows/common/windows';
+import { OpenType, OpenDialogArgs } from '../common/dialog';
 
 export class DialogMainService {
   constructor(private readonly studioWindow: StudioWindowInterface) {
@@ -9,19 +10,19 @@ export class DialogMainService {
   init() {}
 
   registerListeners() {
-    ipcMain.on('studio:openDialog', (event, arg: { openTo: string }) => {
+    ipcMain.on('studio:openDialog', (event, arg: OpenDialogArgs) => {
       if (this.studioWindow.win) {
+        const { openTo, properties } = arg;
         dialog
           .showOpenDialog(this.studioWindow.win, {
-            properties: ['openDirectory'],
+            properties,
           })
           .then((result) => {
-            const { openTo } = arg;
             switch (openTo) {
-              case 'OPEN_FOLDER':
+              case OpenType.OPEN_FOLDER:
                 event.reply('studio:dirPathToOpen', result);
                 break;
-              case 'CREATE_NEW_PROJECT':
+              case OpenType.CREATE_NEW_PROJECT:
                 event.reply('studio:dirPathToCreateProject', result);
                 break;
               default:
