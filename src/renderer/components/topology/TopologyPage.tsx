@@ -5,7 +5,6 @@ import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import parseJson from '../form/utils/json2JsonSchemaParser';
-// import testSchema from '../form/test_schema.json';
 import TopologyToolbar from './toolbar';
 import TopologyGraphLayout from './graph';
 import { useGraphProps } from '../../hooks/useGraphProps';

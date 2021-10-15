@@ -5,7 +5,7 @@ import { JSONSchema7 } from 'json-schema';
 
 import { Grid, FormControl, Input, InputLabel } from '@mui/material';
 
-import IconButton from './IconButton';
+import IconButton from '../IconButton';
 
 const { ADDITIONAL_PROPERTY_FLAG } = utils;
 
