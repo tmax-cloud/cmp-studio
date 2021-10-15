@@ -7,6 +7,7 @@ import {
   TerraformStatusType,
   TerraformGraphArgs,
   TerraformInitArgs,
+  TerraformVersionArgs,
 } from '../common/terraform';
 import {
   WorkspaceIdentifier,
@@ -18,6 +19,36 @@ export class TerraformMainService {
     private readonly workspaceMainService: WorkspaceMainServiceInterface
   ) {
     this.registerListeners();
+  }
+
+  getTerraformVersion(tfExePath: string) {
+    return new Promise(async (resolve, reject) => {
+      const tfVersionCmd = spawn('terraform version', { shell: true });
+      // MEMO : 워크스페이스마다 다른 테라폼 exe경로로 커맨드 실행시켜줘야될 경우 아래 주석으로 대체하기
+      /*
+      const tfVersionCmd = spawn(`${tfExePath} version`);
+      */
+
+      let tfVersionData = '';
+      for await (const chunk of tfVersionCmd.stdout) {
+        tfVersionData += chunk;
+      }
+
+      let tfVersionError = '';
+      for await (const chunk of tfVersionCmd.stderr) {
+        tfVersionError += chunk;
+      }
+
+      const tfVersionxitCode = await new Promise((resolve, reject) => {
+        tfVersionCmd.on('close', resolve);
+      });
+
+      if (tfVersionxitCode) {
+        reject(tfVersionError);
+      }
+
+      resolve(tfVersionData);
+    });
   }
 
   doTerraformInit(folderUri: string, tfExePath: string) {
@@ -160,6 +191,38 @@ export class TerraformMainService {
         } catch (message: any) {
           return {
             status: TerraformStatusType.ERROR_GRAPH,
+            data: { message },
+          };
+        }
+      }
+    );
+    ipcMain.handle(
+      'studio:getTerraformVersion',
+      async (event, arg: TerraformVersionArgs) => {
+        // MEMO : 워크스페이스 설정마다 다른 terraform.exe 실행시켜주려면 위와 아래부분 주석처리부분 사용하기
+        /*
+        const { workspaceUid } = arg;
+        const workspaceConfig: WorkspaceIdentifier =
+          this.workspaceMainService.workspaceManagementService.getWorkspaceConfig(
+            workspaceUid
+          );
+        const tfExePath = workspaceConfig.terraformExePath || 'EMPTY';
+        if (tfExePath === 'EMPTY') {
+          return {
+            status: TerraformStatusType.ERROR_TF_EXE_PATH,
+            data: { message: 'Check terraform .exe file path setting.' },
+          };
+        }
+        */
+        try {
+          const versionData = await this.getTerraformVersion('');
+          return {
+            status: TerraformStatusType.SUCCESS,
+            data: { versionData },
+          };
+        } catch (message: any) {
+          return {
+            status: TerraformStatusType.ERROR,
             data: { message },
           };
         }
