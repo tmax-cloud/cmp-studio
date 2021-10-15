@@ -2,6 +2,11 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { useHistory } from 'react-router-dom';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
+import {
+  openExistFolder,
+  getRecentlyOpenedWorkspaces,
+} from '../../utils/ipc/workspaceIpcUtils';
+import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
 import WorkspacesList from './WorkspacesList';
 import WorkspacesRightSection from './WorkspacesRightSection';
 import { WORKSPACE_ROOT_HEIGHT } from './enums';
@@ -43,15 +48,14 @@ const WorkspacesListPage: React.FC = (props) => {
           const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
             folderUri: filePaths[0],
           };
-          window.electron.ipcRenderer
-            .invoke('studio:openExistFolder', args)
+          openExistFolder(args)
             .then((response: WorkspaceTypes.WorkspaceResponse) => {
               console.log('Res? ', response);
               const { data } = response;
               const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)?.uid;
               if (uid) {
                 history.push(`/main/${uid}`);
-                window.electron.ipcRenderer.send('studio:maximizeWindowSize');
+                maximizeWindowSize();
               }
               return response;
             })
@@ -62,8 +66,7 @@ const WorkspacesListPage: React.FC = (props) => {
       }
     );
 
-    window.electron.ipcRenderer
-      .invoke('studio:getRecentlyOpenedWorkspaces')
+    getRecentlyOpenedWorkspaces()
       .then((res: WorkspaceTypes.WorkspaceResponse) => {
         const { status, data } = res;
         if (status === WorkspaceTypes.WorkspaceStatusType.SUCCESS) {

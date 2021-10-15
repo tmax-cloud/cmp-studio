@@ -19,7 +19,10 @@ import {
   MakeDefaultNameSuccessData,
   WorkspaceSuccessUidData,
 } from '@main/workspaces/common/workspace';
-import { OptionProperties } from '@main/dialog/common/dialog';
+import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
+import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
+import * as WorkspaceIpcUtils from '../../utils/ipc/workspaceIpcUtils';
+import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import StudioTheme from '../../theme';
 
 const useStyles = makeStyles<Theme>((theme) => {
@@ -103,8 +106,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
       }
     );
 
-    window.electron.ipcRenderer
-      .invoke('studio:getDefaultNewProjectName')
+    WorkspaceIpcUtils.getDefaultNewProjectName()
       .then((res: WorkspaceResponse) => {
         if (res?.data) {
           setNewProjectName(res.data as MakeDefaultNameSuccessData);
@@ -115,8 +117,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
         console.log('[Error] Failed to get default new project name : ', err);
       });
 
-    window.electron.ipcRenderer
-      .invoke('studio:getDefaultNewProjectsFolderPath')
+    WorkspaceIpcUtils.getDefaultNewProjectsFolderPath()
       .then((res: WorkspaceResponse) => {
         if (res?.data) {
           setNewProjectPath(res.data as MakeDefaultNameSuccessData);
@@ -145,11 +146,10 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
   };
 
   const onClickCreate = () => {
-    window.electron.ipcRenderer
-      .invoke('studio:createNewFolderAndWorkspace', {
-        folderUri: newProjectPath,
-        workspaceName: newProjectName,
-      })
+    WorkspaceIpcUtils.createNewFolderAndWorkspace({
+      folderUri: newProjectPath,
+      workspaceName: newProjectName,
+    })
       .then((res: WorkspaceResponse) => {
         const { status, data } = res;
         if (status === WorkspaceStatusType.SUCCESS) {
@@ -157,7 +157,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
           if (uid) {
             setOpen(false);
             history.push(`/main/${uid}`);
-            window.electron.ipcRenderer.send('studio:maximizeWindowSize');
+            maximizeWindowSize();
           }
         } else if (status === WorkspaceStatusType.ERROR_FILE_EXISTS) {
           setPrjNameErrMsg('이미 존재하는 프로젝트 이름입니다.');
@@ -236,10 +236,11 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
                 }}
                 onClick={() => {
                   const properties: OptionProperties = ['openDirectory'];
-                  window.electron.ipcRenderer.send('studio:openDialog', {
-                    openTo: 'CREATE_NEW_PROJECT',
+                  const args = {
+                    openTo: OpenType.CREATE_NEW_PROJECT,
                     properties,
-                  });
+                  };
+                  openDialog(args);
                 }}
               >
                 <MoreHoriz />
