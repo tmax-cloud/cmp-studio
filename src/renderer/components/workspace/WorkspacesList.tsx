@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Theme, Paper, Typography, InputBase } from '@mui/material';
 import { PushPin, Search } from '@mui/icons-material';
 import { makeStyles, createStyles } from '@mui/styles';
+import { RecentWorkspaceData } from '@main/workspaces/common/workspace';
 import { timeDifference } from '../../utils/timeUtils';
 
 // TODO : 검색 구현하기
@@ -77,7 +78,7 @@ const WorkspacesSearchBar: React.FC = (props) => {
   );
 };
 
-const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
+const WorkspaceItem: React.FC<RecentWorkspaceData> = ({
   labelTitle,
   labelUri,
   workspaceUid,
@@ -148,21 +149,12 @@ const WorkspacesList: React.FC<WorkspacesListProps> = ({ items }) => {
   );
 };
 
-export type WorkspaceItemProps = {
-  labelTitle: string;
-  labelUri: string;
-  folderUri: string;
-  lastOpenedTime: number;
-  workspaceUid: string;
-  isPinned: boolean;
-};
-
 type WorkspacesListContentProps = {
-  items: WorkspaceItemProps[];
+  items: RecentWorkspaceData[];
 };
 
 type WorkspacesListProps = {
-  items: WorkspaceItemProps[];
+  items: RecentWorkspaceData[];
 };
 
 export default WorkspacesList;

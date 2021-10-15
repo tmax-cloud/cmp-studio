@@ -2,6 +2,15 @@ import React from 'react';
 import { Switch, Route, BrowserRouter, Redirect } from 'react-router-dom';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material';
 import theme from './theme';
+import {
+  TerraformStatusType,
+  TerraformErrorData,
+  TerraformGraphSuccessData,
+} from '../main/terraform-command/common/terraform';
+import {
+  getTerraformGraph,
+  doTerraformInit,
+} from './utils/ipc/terraformIpcUtils';
 import MainLayout from './components/MainLayout';
 import WorkspacesListPage from './components/workspace/WorkspacesListPage';
 
@@ -16,17 +25,34 @@ const TestComponent = () => {
   const [data, setData] = React.useState('여기에 리스폰스가 표시됩니다.');
   const [workspaceUid, setWorkspaceUid] = React.useState('');
   const [folderPathToCreate, setFolderPathToCreate] = React.useState('');
+  const [workspaceNameToCreate, setWorkspaceNameToCreate] = React.useState('');
   const [folderToOpen, setFolderToOpen] = React.useState('');
 
   const getGraph = async () => {
-    const response = await window.electron.ipcRenderer.invoke(
-      'studio:getTerraformGraph',
-      { workspaceUid }
-    );
-    if (response.status === 'Error') {
-      setData(response.data.message);
-    } else if (response.status === 'Success') {
-      setData(response.data.graph);
+    setData('terraform graph 그래프데이타 가져오는 중입니다..');
+    const response = await getTerraformGraph(workspaceUid);
+    if (response.status === TerraformStatusType.ERROR_GRAPH) {
+      setData('terraform graph 커맨드에 에러가 있어 init 시도중입니다...');
+      const response2 = await doTerraformInit(workspaceUid);
+      if (response2.status === TerraformStatusType.ERROR_INIT) {
+        setData(
+          'terraform init에 실패했습니다. 에러 내용 :' +
+            (response2.data as TerraformErrorData).message
+        );
+      } else if (response2.status === TerraformStatusType.SUCCESS) {
+        setData('init 성공 후 다시 graph가져오는중..');
+        const response3 = await getTerraformGraph(workspaceUid);
+        if (response3.status === TerraformStatusType.ERROR_GRAPH) {
+          setData(
+            'terraform graph 커맨드 실행에 문제가 있습니다. ' +
+              (response3.data as TerraformErrorData).message
+          );
+        } else if (response3.status === TerraformStatusType.SUCCESS) {
+          setData((response3.data as TerraformGraphSuccessData).graphData);
+        }
+      }
+    } else if (response.status === TerraformStatusType.SUCCESS) {
+      setData((response.data as TerraformGraphSuccessData).graphData);
     }
   };
 
@@ -112,12 +138,24 @@ const TestComponent = () => {
           }}
           style={{ width: '800px' }}
         />
+        <input
+          type="text"
+          value={workspaceNameToCreate}
+          id="new-project-name"
+          onChange={(event) => {
+            setWorkspaceNameToCreate(event.target.value);
+          }}
+          style={{ width: '800px' }}
+        />
         <button
           type="button"
           onClick={async () => {
             const response = await window.electron.ipcRenderer.invoke(
               'studio:createNewFolderAndWorkspace',
-              { folderUri: folderPathToCreate }
+              {
+                folderUri: folderPathToCreate,
+                workspaceName: workspaceNameToCreate,
+              }
             );
             console.log('Response? ', response);
           }}
@@ -161,7 +199,7 @@ export default function App() {
         <BrowserRouter>
           <Switch>
             <Route path="/home" exact component={WorkspacesListPage} />
-            <Route path="/main/:uid" exact component={MainLayout} />{' '}
+            <Route path="/main/:uid" exact component={MainLayout} />
             <Route render={() => <Redirect to="/home" />} />
           </Switch>
         </BrowserRouter>

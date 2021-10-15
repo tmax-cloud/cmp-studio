@@ -16,6 +16,7 @@ import {
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useHistory } from 'react-router-dom';
+import { OptionProperties } from '@main/dialog/common/dialog';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import { dummySchema } from './dummy';
 
@@ -124,7 +125,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on(
-      'studio:dirSelectionResponse',
+      'studio:dirPathToOpen',
       (res: { canceled: boolean; filePaths: string[] }) => {
         const { filePaths, canceled } = res;
         if (!canceled) {
@@ -217,7 +218,11 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
                   className={classes.menuItem}
                   onClick={() => {
                     setPrjContextMenuOpen(false);
-                    window.electron.ipcRenderer.send('studio:openDialog');
+                    const properties: OptionProperties = ['openDirectory'];
+                    window.electron.ipcRenderer.send('studio:openDialog', {
+                      openTo: 'OPEN_FOLDER',
+                      properties,
+                    });
                   }}
                 >
                   <span className={classes.menuItemText}>열기</span>

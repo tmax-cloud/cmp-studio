@@ -2,6 +2,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Theme, Typography, ThemeProvider, Button } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
+import { useHistory } from 'react-router-dom';
+import { OptionProperties } from '@main/dialog/common/dialog';
 import project from '../../../../assets/images/project.png';
 import { WORKSPACE_ROOT_HEIGHT } from './enums';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
@@ -35,12 +37,13 @@ const useStyles = makeStyles<Theme>((theme) =>
 );
 
 const WorkspacesRightSection: React.FC = (props) => {
+  const history = useHistory();
   const classes = useStyles();
   return (
     <div className={classes.contentWrapper}>
       <img className={classes.logoImage} src={project} alt="Studio Logo" />
       <Typography style={{ margin: '5px' }} variant="h4">
-        IaC Studio
+        CMP Studio
       </Typography>
       <Typography style={{ margin: '5px' }} variant="subtitle1">
         version 2021.10.08
@@ -52,7 +55,7 @@ const WorkspacesRightSection: React.FC = (props) => {
           onClick={() => {
             ReactDOM.render(
               <ThemeProvider theme={StudioTheme}>
-                <CreateWorkspaceModal />
+                <CreateWorkspaceModal history={history} />
               </ThemeProvider>,
               document.getElementById('modal-container')
             );
@@ -64,7 +67,11 @@ const WorkspacesRightSection: React.FC = (props) => {
           className={classes.button}
           variant="contained"
           onClick={() => {
-            window.electron.ipcRenderer.send('studio:openDialog');
+            const properties: OptionProperties = ['openDirectory'];
+            window.electron.ipcRenderer.send('studio:openDialog', {
+              openTo: 'OPEN_FOLDER',
+              properties,
+            });
           }}
         >
           열기

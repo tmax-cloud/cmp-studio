@@ -12,6 +12,14 @@ import {
 } from '@mui/material';
 import { Close, MoreHoriz } from '@mui/icons-material';
 import { makeStyles, createStyles } from '@mui/styles';
+import { History } from 'history';
+import {
+  WorkspaceStatusType,
+  WorkspaceResponse,
+  MakeDefaultNameSuccessData,
+  WorkspaceSuccessUidData,
+} from '@main/workspaces/common/workspace';
+import { OptionProperties } from '@main/dialog/common/dialog';
 import StudioTheme from '../../theme';
 
 const useStyles = makeStyles<Theme>((theme) => {
@@ -64,6 +72,7 @@ const useStyles = makeStyles<Theme>((theme) => {
       width: '80%',
       textAlign: 'start',
       marginBottom: 10,
+      color: '#5664d2',
     },
   });
 });
@@ -74,10 +83,54 @@ const StyledButton = styled(Button)(({ theme }) => ({
   margin: 5,
 }));
 
-const CreateWorkspaceModal: React.FC = () => {
+const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
+  history,
+}) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const [prjNameErrMsg, setPrjNameErrMsg] = React.useState('');
+  const [newProjectName, setNewProjectName] = React.useState('');
+  const [newProjectPath, setNewProjectPath] = React.useState('');
+
+  React.useEffect(() => {
+    window.electron.ipcRenderer.on(
+      'studio:dirPathToCreateProject',
+      (res: { canceled: boolean; filePaths: string[] }) => {
+        const { filePaths, canceled } = res;
+        if (!canceled) {
+          setNewProjectPath(filePaths[0]);
+        }
+      }
+    );
+
+    window.electron.ipcRenderer
+      .invoke('studio:getDefaultNewProjectName')
+      .then((res: WorkspaceResponse) => {
+        if (res?.data) {
+          setNewProjectName(res.data as MakeDefaultNameSuccessData);
+        }
+        return res;
+      })
+      .catch((err: any) => {
+        console.log('[Error] Failed to get default new project name : ', err);
+      });
+
+    window.electron.ipcRenderer
+      .invoke('studio:getDefaultNewProjectsFolderPath')
+      .then((res: WorkspaceResponse) => {
+        if (res?.data) {
+          setNewProjectPath(res.data as MakeDefaultNameSuccessData);
+        }
+        return res;
+      })
+      .catch((err: any) => {
+        console.log('[Error] Failed to get default new project path : ', err);
+      });
+
+    return () => {
+      setOpen(false);
+    };
+  }, []);
 
   const handleClose = () => {
     setOpen(false);
@@ -91,12 +144,37 @@ const CreateWorkspaceModal: React.FC = () => {
     modalContainer && ReactDOM.unmountComponentAtNode(modalContainer);
   };
 
+  const onClickCreate = () => {
+    window.electron.ipcRenderer
+      .invoke('studio:createNewFolderAndWorkspace', {
+        folderUri: newProjectPath,
+        workspaceName: newProjectName,
+      })
+      .then((res: WorkspaceResponse) => {
+        const { status, data } = res;
+        if (status === WorkspaceStatusType.SUCCESS) {
+          const uid = (data as WorkspaceSuccessUidData)?.uid;
+          if (uid) {
+            setOpen(false);
+            history.push(`/main/${uid}`);
+            window.electron.ipcRenderer.send('studio:maximizeWindowSize');
+          }
+        } else if (status === WorkspaceStatusType.ERROR_FILE_EXISTS) {
+          setPrjNameErrMsg('이미 존재하는 프로젝트 이름입니다.');
+        }
+        return res;
+      })
+      .catch((err: any) => {
+        console.log('[Error] Failed to create new project : ', err);
+      });
+  };
+
   return (
     <Modal open={open} onClose={handleClose}>
       <Box className={classes.boxContainer}>
         <div className={classes.barContainer}>
           <Typography variant="h6" style={{ marginLeft: 10 }}>
-            IaC Studio 생성
+            CMP Studio 생성
           </Typography>
           <IconButton style={{ marginRight: 10 }} onClick={closeModal}>
             <Close className={classes.close} />
@@ -111,7 +189,13 @@ const CreateWorkspaceModal: React.FC = () => {
             >
               프로젝트 이름
             </Typography>
-            <Input style={{ width: '80%', height: 40 }} />
+            <Input
+              style={{ width: '80%', height: 40 }}
+              value={newProjectName}
+              onChange={(event) => {
+                setNewProjectName(event.target.value);
+              }}
+            />
             <Typography
               variant="h6"
               className={classes.fieldTitle}
@@ -137,12 +221,25 @@ const CreateWorkspaceModal: React.FC = () => {
                 justifyContent: 'space-between',
               }}
             >
-              <Input style={{ flex: 1 }} />
+              <Input
+                style={{ flex: 1 }}
+                value={newProjectPath}
+                onChange={(event) => {
+                  setNewProjectPath(event.target.value);
+                }}
+              />
               <IconButton
                 style={{
                   color: StudioTheme.palette.primary.main,
                   backgroundColor: '#eaeaea',
                   marginLeft: 5,
+                }}
+                onClick={() => {
+                  const properties: OptionProperties = ['openDirectory'];
+                  window.electron.ipcRenderer.send('studio:openDialog', {
+                    openTo: 'CREATE_NEW_PROJECT',
+                    properties,
+                  });
                 }}
               >
                 <MoreHoriz />
@@ -151,9 +248,11 @@ const CreateWorkspaceModal: React.FC = () => {
           </div>
         </div>
         <div className={classes.footerContainer}>
-          <StyledButton variant="outlined">{'< 이전'}</StyledButton>
-          <StyledButton variant="outlined">{'다음 >'}</StyledButton>
-          <StyledButton variant="contained">생성</StyledButton>
+          {/* <StyledButton variant="outlined">{'< 이전'}</StyledButton>
+          <StyledButton variant="outlined">{'다음 >'}</StyledButton> */}
+          <StyledButton variant="contained" onClick={onClickCreate}>
+            생성
+          </StyledButton>
           <StyledButton variant="outlined" onClick={closeModal}>
             취소
           </StyledButton>
@@ -163,4 +262,7 @@ const CreateWorkspaceModal: React.FC = () => {
   );
 };
 
+type CreateWorkspaceModalProps = {
+  history: History;
+};
 export default CreateWorkspaceModal;

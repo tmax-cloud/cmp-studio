@@ -21,7 +21,7 @@ import { AppConfigurationMainService } from './configs/electron-main/appConfigur
 import { WorkspaceMainService } from './workspaces/electron-main/workspaceMainService';
 import { WindowMainService } from './windows/electron-main/windowMainService';
 import { TerraformMainService } from './terraform-command/electron-main/terraformMainService';
-import { DialogMainService } from './files/electron-main/DialogMainService';
+import { DialogMainService } from './dialog/electron-main/DialogMainService';
 
 export default class AppUpdater {
   constructor() {
