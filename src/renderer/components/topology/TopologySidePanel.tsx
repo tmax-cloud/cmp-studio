@@ -15,12 +15,27 @@ const AWS_ACM_CERTIFICATE_VALIDATION_OBJ = {
       example: {
         // eslint-disable-next-line no-template-curly-in-string
         certificate_arn: '${test}',
-        validation_record_fqdns:
-          // '${[for record in aws_route53_record.example : record.fqdn]}',
-          ['a', 'b'],
+        // validation_record_fqdns: ['a', 'b'],
         timeouts: {
           create: 'true',
         },
+      },
+    },
+  },
+};
+const AWS_ACMPCA_CERTIFICATE_AUTHORITY = {
+  resource: {
+    aws_acmpca_certificate_authority: {
+      example: {
+        certificate_authority_configuration: {
+          key_algorithm: 'RSA_4096',
+          signing_algorithm: 'SHA512WITHRSA',
+          subject: {
+            common_name: 'example.com',
+          },
+        },
+        permanent_deletion_time_in_days: 7,
+        tags: [{ test: 'good' }, { test2: 'bad' }],
       },
     },
   },
@@ -40,10 +55,11 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   console.log('current schema: ', currentSchema);
   if (id === 'resource-aws_acm_certificate_validation') {
     formSample = AWS_ACM_CERTIFICATE_VALIDATION_OBJ;
+  } else if (id === 'resource-aws_acmpca_certificate_authority') {
+    formSample = AWS_ACMPCA_CERTIFICATE_AUTHORITY;
   }
-
   const {
-    uiSchema = {},
+    customUISchema = {},
     formData = {},
     fixedSchema = {},
   } = preDefinedData(currentSchema, formSample);
@@ -77,7 +93,7 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
           <DynamicForm
             schema={fixedSchema}
             formData={formData}
-            uiSchema={uiSchema}
+            uiSchema={customUISchema}
           />
         </div>
       </Drawer>

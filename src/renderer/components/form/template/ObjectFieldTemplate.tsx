@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles';
 
 import { ObjectFieldTemplateProps, utils } from '@rjsf/core';
 import { Grid } from '@mui/material';
-import AddButton from './AddButton';
+import AddButton from '../AddButton';
 
 const { canExpand } = utils;
 

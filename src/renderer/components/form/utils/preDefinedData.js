@@ -7,41 +7,105 @@ const preDefinedData = (jsonSchema = {}, obj = {}) => {
   const displayName = !isEmpty(obj) && Object.keys(obj[type][name])[0];
   const formData =
     (!isEmpty(obj) && _.cloneDeep(obj[type][name][displayName])) || {};
-  const filterdList = Object.keys(formData).filter((key) => formData[key]);
+  // const filterdList = Object.keys(formData).filter((key) => formData[key]);
 
-  const fixedSchema = _.cloneDeep(jsonSchema) || {};
-  const uiSchema = (!isEmpty(obj) && _.cloneDeep(formData)) || {};
+  const makePath = () => {};
+  let fixedSchema = {};
+  const customUISchema = {};
+  const makeCustomUISchema = (obj, prevPath) => {
+    Object.keys(obj).forEach((currKey) => {
+      const makeSchemaPath = () => {
+        if (prevPath) {
+          return prevPath + `.properties.${currKey}`;
+        }
+        return `properties.${currKey}`;
+      };
+      const makeUIPath = () => {
+        if (prevPath) {
+          return prevPath + `.${currKey}`;
+        }
+        return `${currKey}`;
+      };
+      console.log(
+        makeSchemaPath(),
+        _.get(jsonSchema, makeSchemaPath() + '.type')
+      );
+      if (
+        !_.get(jsonSchema, makeSchemaPath() + '.type') &&
+        'properties' in _.get(jsonSchema, makeSchemaPath())
+      ) {
+        makeCustomUISchema(obj[currKey], makeSchemaPath());
+      } else if (_.get(jsonSchema, makeSchemaPath() + '.type') === 'map') {
+        _.set(customUISchema, makeUIPath(), {
+          [`ui:field`]: 'MapField',
+        });
+      }
+    });
+  };
+  // formData로 정의된 부분에 대해서만 schema 필터링 (일단 aws_acm_certificate_validation 리소스에 대해서만 해놓음. 다른 스키마들은 밑에 로직 안타서 전체스키마 나오도록 해둠.)
+  const makeFixedSchema = (obj, prevPath) => {
+    Object.keys(obj).forEach((currKey) => {
+      const makePath = () => {
+        if (prevPath) {
+          return prevPath + `.properties.${currKey}`;
+        }
+        return `properties.${currKey}`;
+      };
+      console.log(makePath(), _.get(jsonSchema, makePath() + '.type'));
+      if (
+        !_.get(jsonSchema, makePath() + '.type') &&
+        'properties' in _.get(jsonSchema, makePath())
+      ) {
+        makeFixedSchema(obj[currKey], makePath());
+      } else if (_.get(jsonSchema, makePath() + '.type') === 'map') {
+        _.set(fixedSchema, makePath(), {
+          type: 'array',
+          items: {
+            type: 'object',
+          },
+        });
+        // _.omit(fixedSchema, makePath());
+      } else {
+        _.set(fixedSchema, makePath(), _.get(jsonSchema, makePath()));
+      }
+    });
+  };
 
-  // uiSchema 변환 로직 `${}`로 분기처리로 변환해주는 로직
-  // !isEmpty(obj) &&
-  //   Object.keys(uiSchema).forEach((curKey) => {
-  //     if (
-  //       typeof uiSchema[curKey] === 'string' &&
-  //       _.startsWith(uiSchema[curKey], '${')
-  //     ) {
-  //       uiSchema[curKey] = {
-  //         [`ui:widget`]: 'textarea',
-  //       };
-  //     }
-  //   });
-
-  // fixedSchema 변환 로직
-  // for (const curKey in jsonSchema?.properties) {
-  //   if (filterdList.indexOf(curKey) < 0) {
-  //     delete fixedSchema.properties[curKey];
-  //   } else {
-  //     // string 타입이 아닌데 테라폼 syntax 사용되서 정의 된 경우
-  //     // eslint-disable-next-line no-lonely-if
-  //     if (
-  //       !isEmpty(obj) &&
-  //       typeof uiSchema[curKey] !== 'string' &&
-  //       `ui:widget` in uiSchema[curKey]
-  //     ) {
-  //       fixedSchema.properties[curKey].type = 'string';
-  //     }
-  //   }
-  // }
-
-  return { uiSchema, formData, fixedSchema };
+  //임의로
+  const makeFixedSchema2 = (prevPath) => {
+    Object.keys(jsonSchema).forEach((currKey) => {
+      const makePath = () => {
+        if (prevPath) {
+          return prevPath + `.properties.${currKey}`;
+        }
+        return `properties.${currKey}`;
+      };
+      console.log(makePath(), _.get(jsonSchema, makePath() + '.type'));
+      if (
+        !_.get(jsonSchema, makePath() + '.type') &&
+        'properties' in _.get(jsonSchema, makePath())
+      ) {
+        makeFixedSchema2(makePath());
+      } else if (_.get(jsonSchema, makePath() + '.type') === 'map') {
+        _.set(fixedSchema, makePath(), {
+          type: 'array',
+          items: {
+            type: 'object',
+          },
+        });
+      } else {
+        _.set(fixedSchema, makePath(), _.get(jsonSchema, makePath()));
+      }
+    });
+  };
+  if (!_.isEmpty(formData)) {
+    makeFixedSchema(formData, '');
+    makeCustomUISchema(formData, '');
+  } else {
+    // makeFixedSchema2(formData, '');
+    fixedSchema = jsonSchema;
+  }
+  // const uiSchema = (!isEmpty(obj) && _.cloneDeep(formData)) || {};
+  return { customUISchema, formData, fixedSchema };
 };
 export default preDefinedData;

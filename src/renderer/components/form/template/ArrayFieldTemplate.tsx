@@ -4,8 +4,8 @@ import { utils, ArrayFieldTemplateProps, IdSchema } from '@rjsf/core';
 
 import { Box, Grid, Paper } from '@mui/material';
 
-import AddButton from './AddButton';
-import IconButton from './IconButton';
+import AddButton from '../AddButton';
+import IconButton from '../IconButton';
 
 const { isMultiSelect, getDefaultRegistry } = utils;
 
