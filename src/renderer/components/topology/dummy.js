@@ -1,6 +1,11 @@
 /* eslint-disable import/prefer-default-export */
 export const dummySchema = [
   {
+    displayName: 'test_asdfasdfasdfasdfasdf',
+    title: 'provider-test',
+    type: 'provider',
+  },
+  {
     displayName: 'aws',
     title: 'provider-aws',
     type: 'provider',

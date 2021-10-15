@@ -140,6 +140,24 @@ function parseJson(cloud) {
       schemaMap.set(schemaData.title, schemaData);
     }
   }
+  let schemaData = {};
+  const testType = 'provider';
+  const testKey = 'test';
+  const TestTmpPath = terraformSchema.provider_schemas[testKey].provider;
+  if (testType === 'provider') {
+    schemaData = TestTmpPath.block;
+  } else {
+    schemaData = TestTmpPath[testKey].block;
+  }
+
+  renameKey(schemaData, 'attributes', 'properties');
+  mergeKey(schemaData, 'block_types', 'properties');
+
+  buildSchema(schemaData);
+
+  schemaData.title = testType + '-' + testKey;
+  schemaArray.push(schemaData);
+  schemaMap.set(schemaData.title, schemaData);
   return schemaMap;
 }
 export default parseJson;
