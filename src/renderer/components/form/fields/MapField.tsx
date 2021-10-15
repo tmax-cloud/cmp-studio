@@ -55,8 +55,7 @@ const MapField = (props: FieldProps) => {
     fontWeight: 'bold',
   };
 
-  const [mapData, setMapData] = React.useState(_.cloneDeep(formData));
-  React.useMemo(() => console.log('바꼈다!!!'), [mapData]);
+  const [mapData, setMapData] = React.useState(_.cloneDeep(formData) || []);
 
   if (!additional) {
     return <>{children}</>;
@@ -87,7 +86,7 @@ const MapField = (props: FieldProps) => {
                   onChange={(e) => {
                     onChange(
                       (() => {
-                        const result = mapData.map((cur, i) => {
+                        const result = mapData.map((cur: any, i: number) => {
                           if (i === idx) {
                             return { [e.target.value]: key };
                           }
@@ -112,7 +111,7 @@ const MapField = (props: FieldProps) => {
                   onChange={(e) => {
                     onChange(
                       (() => {
-                        const result = mapData.map((cur, i) => {
+                        const result = mapData.map((cur: any, i: number) => {
                           if (i === idx) {
                             return { [key]: e.target.value };
                           }
@@ -139,7 +138,7 @@ const MapField = (props: FieldProps) => {
                 onClick={() => {
                   onChange(
                     (() => {
-                      const result = mapData.filter((cur, i) => {
+                      const result = mapData.filter((cur: any, i: number) => {
                         if (idx === i) return false;
                         return true;
                       });

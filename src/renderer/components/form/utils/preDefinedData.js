@@ -10,7 +10,7 @@ const preDefinedData = (jsonSchema = {}, obj = {}) => {
   // const filterdList = Object.keys(formData).filter((key) => formData[key]);
 
   const makePath = () => {};
-  let fixedSchema = {};
+  const fixedSchema = {};
   const customUISchema = {};
   const makeCustomUISchema = (obj, prevPath) => {
     Object.keys(obj).forEach((currKey) => {
@@ -72,38 +72,77 @@ const preDefinedData = (jsonSchema = {}, obj = {}) => {
   };
 
   //임의로
-  const makeFixedSchema2 = (prevPath) => {
-    Object.keys(jsonSchema).forEach((currKey) => {
-      const makePath = () => {
-        if (prevPath) {
-          return prevPath + `.properties.${currKey}`;
+
+  const makeCustomUISchema2 = (prevPath) => {
+    !_.isEmpty(jsonSchema) &&
+      Object.keys(
+        prevPath ? _.get(jsonSchema, prevPath) : jsonSchema.properties
+      ).forEach((currKey) => {
+        const makeSchemaPath = () => {
+          if (prevPath) {
+            return prevPath + '.' + currKey;
+          }
+          return `properties.${currKey}`;
+        };
+        const makeUIPath = () => {
+          if (prevPath) {
+            return prevPath + `.${currKey}`;
+          }
+          return `${currKey}`;
+        };
+        console.log(
+          makeSchemaPath(),
+          _.get(jsonSchema, makeSchemaPath() + '.type')
+        );
+        if (
+          !_.get(jsonSchema, makeSchemaPath() + '.type') &&
+          'properties' in _.get(jsonSchema, makeSchemaPath())
+        ) {
+          // if ('properties' in _.get(jsonSchema, makeSchemaPath())) {
+          makeCustomUISchema2(makeSchemaPath() + '.properties');
+          // }
+        } else if (_.get(jsonSchema, makeSchemaPath() + '.type') === 'map') {
+          _.set(customUISchema, makeUIPath(), {
+            [`ui:field`]: 'MapField',
+          });
         }
-        return `properties.${currKey}`;
-      };
-      console.log(makePath(), _.get(jsonSchema, makePath() + '.type'));
-      if (
-        !_.get(jsonSchema, makePath() + '.type') &&
-        'properties' in _.get(jsonSchema, makePath())
-      ) {
-        makeFixedSchema2(makePath());
-      } else if (_.get(jsonSchema, makePath() + '.type') === 'map') {
-        _.set(fixedSchema, makePath(), {
-          type: 'array',
-          items: {
-            type: 'object',
-          },
-        });
-      } else {
-        _.set(fixedSchema, makePath(), _.get(jsonSchema, makePath()));
-      }
-    });
+      });
+  };
+  const makeFixedSchema2 = (prevPath) => {
+    !_.isEmpty(jsonSchema) &&
+      Object.keys(
+        prevPath ? _.get(jsonSchema, prevPath) : jsonSchema.properties
+      ).forEach((currKey) => {
+        const makePath = () => {
+          if (prevPath) {
+            return prevPath + '.' + currKey;
+          }
+          return `properties.${currKey}`;
+        };
+        console.log(makePath(), _.get(jsonSchema, makePath() + '.type'));
+        if (!_.get(jsonSchema, makePath() + '.type')) {
+          if ('properties' in _.get(jsonSchema, makePath())) {
+            makeFixedSchema2(makePath() + '.properties');
+          }
+        } else if (_.get(jsonSchema, makePath() + '.type') === 'map') {
+          _.set(fixedSchema, makePath(), {
+            type: 'array',
+            items: {
+              type: 'object',
+            },
+          });
+        } else {
+          _.set(fixedSchema, makePath(), _.get(jsonSchema, makePath()));
+        }
+      });
   };
   if (!_.isEmpty(formData)) {
     makeFixedSchema(formData, '');
     makeCustomUISchema(formData, '');
   } else {
-    // makeFixedSchema2(formData, '');
-    fixedSchema = jsonSchema;
+    makeFixedSchema2('');
+    makeCustomUISchema2('');
+    // fixedSchema = jsonSchema;
   }
   // const uiSchema = (!isEmpty(obj) && _.cloneDeep(formData)) || {};
   return { customUISchema, formData, fixedSchema };
