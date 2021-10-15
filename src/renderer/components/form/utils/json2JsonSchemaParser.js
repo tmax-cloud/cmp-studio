@@ -1,26 +1,6 @@
 import terraformSchema from '../terraform_schema.json';
-/*
-import { readFile } from 'fs/promises';
-const terraformSchema = JSON.parse(
-    await readFile(
-        new URL('./json/terraform_schema.json', import.meta.url)
-    )
-);
-*/
 
 function parseJson(cloud) {
-  // function readJSON(file, callback) {
-  //   var rawFile = new XMLHttpRequest();
-  //   rawFile.overrideMimeType('application/json');
-  //   rawFile.open('GET', file, true);
-  //   rawFile.onreadystatechange = function () {
-  //     if (rawFile.readyState === 4 && rawFile.status == '200') {
-  //       callback(rawFile.responseText);
-  //     }
-  //   };
-  //   rawFile.send(null);
-  // }
-
   function renameKey(obj, oldKey, newKey) {
     if (oldKey in obj) {
       obj[newKey] = obj[oldKey];
@@ -39,6 +19,15 @@ function parseJson(cloud) {
 
   function mergeKey2(obj, oldKey1, oldKey2, newKey) {
     Object.assign(obj[newKey], obj[oldKey1][oldKey2]);
+    delete obj[oldKey1][oldKey2];
+  }
+
+  function parseKey(obj, oldKey1, oldKey2, newKey) {
+    if (obj.hasOwnProperty(newKey)) {
+      Object.assign(obj[newKey], obj[oldKey1][oldKey2]);
+    } else {
+      obj[newKey] = obj[oldKey1][oldKey2];
+    }
     delete obj[oldKey1][oldKey2];
   }
 
@@ -74,31 +63,34 @@ function parseJson(cloud) {
       }
       if (
         schemaData.properties[k].hasOwnProperty('block') &&
-        schemaData.properties[k].block.hasOwnProperty('attributes')
+        schemaData.properties[k].hasOwnProperty('nesting_mode') &&
+        (schemaData.properties[k].block.hasOwnProperty('attributes') ||
+          schemaData.properties[k].block.hasOwnProperty('block_types'))
       ) {
-        renameKey2(
-          schemaData.properties[k],
-          'block',
-          'attributes',
-          'properties'
-        );
-
+        if (schemaData.properties[k].block.hasOwnProperty('attributes')) {
+          parseKey(
+            schemaData.properties[k],
+            'block',
+            'attributes',
+            'properties'
+          );
+        }
         if (schemaData.properties[k].block.hasOwnProperty('block_types')) {
-          mergeKey2(
+          parseKey(
             schemaData.properties[k],
             'block',
             'block_types',
             'properties'
           );
         }
+
+        delete schemaData.properties[k].block;
         return buildSchema(schemaData.properties[k]);
       }
     });
   }
 
   const schemaMap = new Map();
-
-  // readJSON('./json/terraform_schema.json', function (text) {
 
   const typeList = ['provider', 'resource', 'datasource'];
   let schemaList;
