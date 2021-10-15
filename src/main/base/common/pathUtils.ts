@@ -13,7 +13,7 @@ export const getAssetPath = (...paths: string[]): string => {
 };
 
 const CONFIGS_PATH = app.isPackaged
-  ? path.join(app.getPath('appData'), 'Config')
+  ? path.join(app.getPath('appData'), PRODUCT_NAME, 'Config')
   : path.join(__dirname, '../../../../TestMeta/Config');
 
 export const getConfigsPath = (...paths: string[]): string => {

@@ -6,11 +6,15 @@ import {
   TerraformStatusType,
   TerraformErrorData,
   TerraformGraphSuccessData,
+  TerraformVersionSuccessData,
 } from '../main/terraform-command/common/terraform';
 import {
   getTerraformGraph,
   doTerraformInit,
+  getTerraformVersion,
 } from './utils/ipc/terraformIpcUtils';
+import * as WorkspaceIpcUtils from './utils/ipc/workspaceIpcUtils';
+import * as ConfigIpcUtils from './utils/ipc/configIpcUtils';
 import MainLayout from './components/MainLayout';
 import WorkspacesListPage from './components/workspace/WorkspacesListPage';
 
@@ -29,6 +33,14 @@ const TestComponent = () => {
   const [folderToOpen, setFolderToOpen] = React.useState('');
 
   const getGraph = async () => {
+    const versionRes = await getTerraformVersion(workspaceUid);
+    console.log(
+      'Version? ',
+      (versionRes.data as TerraformVersionSuccessData).versionData.split(
+        '\n'
+      )[0]
+    );
+
     setData('terraform graph 그래프데이타 가져오는 중입니다..');
     const response = await getTerraformGraph(workspaceUid);
     if (response.status === TerraformStatusType.ERROR_GRAPH) {
@@ -97,11 +109,11 @@ const TestComponent = () => {
         <button
           type="button"
           onClick={async () => {
-            window.electron.ipcRenderer.send('studio:setAppConfigItem', {
+            ConfigIpcUtils.setAppConfigItem({
               key: 'test1',
               data: 'hello',
             });
-            window.electron.ipcRenderer.send('studio:setAppConfigItems', {
+            ConfigIpcUtils.setAppConfigItems({
               items: [
                 {
                   key: 'test1',
@@ -115,10 +127,9 @@ const TestComponent = () => {
               ],
             });
 
-            const item = await window.electron.ipcRenderer.invoke(
-              'studio:getAppConfigItem',
-              { key: 'test1' }
-            );
+            const item = await ConfigIpcUtils.getAppConfigItem({
+              key: 'test1',
+            });
             console.log('item?? ', item);
           }}
         >
@@ -150,13 +161,11 @@ const TestComponent = () => {
         <button
           type="button"
           onClick={async () => {
-            const response = await window.electron.ipcRenderer.invoke(
-              'studio:createNewFolderAndWorkspace',
-              {
+            const response =
+              await WorkspaceIpcUtils.createNewFolderAndWorkspace({
                 folderUri: folderPathToCreate,
                 workspaceName: workspaceNameToCreate,
-              }
-            );
+              });
             console.log('Response? ', response);
           }}
         >
@@ -176,13 +185,10 @@ const TestComponent = () => {
         <button
           type="button"
           onClick={async () => {
-            const response = await window.electron.ipcRenderer.invoke(
-              'studio:openExistFolder',
-              { folderUri: folderToOpen }
-            );
+            const response = await WorkspaceIpcUtils.openExistFolder({
+              folderUri: folderToOpen,
+            });
             console.log('Response? ', response);
-
-            // window.electron.ipcRenderer.send('studio:setWindowSize', {width: 150, height: 50})
           }}
         >
           Open folder test (console log 확인)
