@@ -1,36 +1,18 @@
 import React from 'react';
 import * as _ from 'lodash-es';
 
-import { utils, FieldProps } from '@rjsf/core';
+import { FieldProps } from '@rjsf/core';
 
-import { JSONSchema7 } from 'json-schema';
 import {
   Box,
   Divider,
   Typography,
   Grid,
-  Input,
   FormControl,
   TextField,
-  InputLabel,
 } from '@mui/material';
 import AddButton from '../AddButton';
 import IconButton from '../IconButton';
-
-const { ADDITIONAL_PROPERTY_FLAG } = utils;
-
-// type WrapIfAdditionalProps = {
-//   children: React.ReactElement;
-//   classNames: string;
-//   disabled: boolean;
-//   id: string;
-//   label: string;
-//   onDropPropertyClick: (index: string) => (event?: any) => void;
-//   onKeyChange: (index: string) => (event?: any) => void;
-//   readonly: boolean;
-//   required: boolean;
-//   schema: JSONSchema7;
-// };
 
 const MapField = (props: FieldProps) => {
   const {
@@ -40,12 +22,9 @@ const MapField = (props: FieldProps) => {
     readonly,
     required,
     name,
-    schema,
-    uiSchema,
     onChange,
     formData,
   } = props;
-  const keyLabel = `${name} Key`; // i18n ?
   const id = idSchema.$id;
   const additional = true;
   const btnStyle = {
@@ -88,7 +67,7 @@ const MapField = (props: FieldProps) => {
                       (() => {
                         const result = mapData.map((cur: any, i: number) => {
                           if (i === idx) {
-                            return { [e.target.value]: key };
+                            return { [e.target.value]: value };
                           }
                           return cur;
                         });
@@ -152,19 +131,22 @@ const MapField = (props: FieldProps) => {
           </Grid>
         );
       })}
-      <AddButton
-        className="array-item-add"
-        onClick={() => {
-          onChange(
-            (() => {
-              const result = mapData.concat({ '': '' });
-              setMapData(_.cloneDeep(result));
-              return result;
-            })()
-          );
-        }}
-        disabled={disabled || readonly}
-      />
+
+      <Box mb={1} mt={1}>
+        <AddButton
+          className="array-item-add"
+          onClick={() => {
+            onChange(
+              (() => {
+                const result = mapData.concat({ '': '' });
+                setMapData(_.cloneDeep(result));
+                return result;
+              })()
+            );
+          }}
+          disabled={disabled || readonly}
+        />
+      </Box>
     </>
   );
 };

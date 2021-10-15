@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 const isEmpty = (obj) => _.isEmpty(obj);
 const preDefinedData = (jsonSchema = {}, obj = {}) => {
-  console.log(isEmpty(obj));
   const type = !isEmpty(obj) && Object.keys(obj)[0]; // ['provider', 'resource', 'datasource']
   const name = !isEmpty(obj) && Object.keys(obj[type])[0]; //
   const displayName = !isEmpty(obj) && Object.keys(obj[type][name])[0];
@@ -122,6 +121,10 @@ const preDefinedData = (jsonSchema = {}, obj = {}) => {
         console.log(makePath(), _.get(jsonSchema, makePath() + '.type'));
         if (!_.get(jsonSchema, makePath() + '.type')) {
           if ('properties' in _.get(jsonSchema, makePath())) {
+            _.set(fixedSchema, makePath(), {
+              type: 'object',
+              ..._.get(jsonSchema, makePath()),
+            });
             makeFixedSchema2(makePath() + '.properties');
           }
         } else if (_.get(jsonSchema, makePath() + '.type') === 'map') {

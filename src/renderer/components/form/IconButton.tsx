@@ -1,11 +1,6 @@
 import React from 'react';
-
-import Button from '@material-ui/core/Button';
-import Add from '@material-ui/icons/Add';
-import ArrowUpward from '@material-ui/icons/ArrowUpward';
-import ArrowDownward from '@material-ui/icons/ArrowDownward';
-import Remove from '@material-ui/icons/Remove';
-import { IconButtonProps as MuiIconButtonProps } from '@material-ui/core/IconButton';
+import { Button } from '@mui/material';
+import { Add, ArrowUpward, ArrowDownward, Remove } from '@mui/icons-material';
 
 const mappings: any = {
   remove: Remove,
@@ -14,17 +9,17 @@ const mappings: any = {
   'arrow-down': ArrowDownward,
 };
 
-type IconButtonProps = MuiIconButtonProps & {
-  icon: string;
-  // eslint-disable-next-line react/require-default-props
-  iconProps?: any;
-};
+// type IconButtonProps = MuiIconButtonProps & {
+//   icon: string;
+//   // eslint-disable-next-line react/require-default-props
+//   iconProps?: any;
+// };
 
-const IconButton = (props: IconButtonProps) => {
-  const { icon, className, iconProps, ...otherProps } = props;
+const IconButton = (props: any) => {
+  const { icon, iconProps } = props;
   const IconComp = mappings[icon];
   return (
-    <Button {...otherProps} size="small">
+    <Button size="small">
       <IconComp {...iconProps} />
     </Button>
   );
