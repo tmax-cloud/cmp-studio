@@ -46,20 +46,22 @@ const TextFieldWidget = ({
   const displayLabel = getDisplayLabel(schema, uiSchema);
 
   return (
-    <TextField
-      id={id}
-      placeholder={placeholder}
-      label={displayLabel ? label || schema.title : false}
-      autoFocus={autofocus}
-      required={required}
-      disabled={disabled || readonly}
-      value={value || value === 0 ? value : ''}
-      error={rawErrors.length > 0}
-      onChange={_onChange}
-      onBlur={_onBlur}
-      onFocus={_onFocus}
-      {...(textFieldProps as TextFieldProps)}
-    />
+    <div>
+      <TextField
+        id={id}
+        placeholder={placeholder}
+        label={displayLabel ? label || schema.title : false}
+        autoFocus={autofocus}
+        required={required}
+        disabled={disabled || readonly}
+        value={value || value === 0 ? value : ''}
+        error={rawErrors.length > 0}
+        onChange={_onChange}
+        onBlur={_onBlur}
+        onFocus={_onFocus}
+        {...(textFieldProps as TextFieldProps)}
+      />
+    </div>
   );
 };
 
