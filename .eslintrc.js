@@ -33,6 +33,8 @@ module.exports = {
     'consistent-return': 'off',
     'no-else-return': 'off',
     'no-async-promise-executor': 'off',
+    'jsx-a11y/click-events-have-key-events': 'off',
+    'jsx-a11y/interactive-supports-focus': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

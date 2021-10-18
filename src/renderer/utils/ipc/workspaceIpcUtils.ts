@@ -20,3 +20,7 @@ export const createNewFolderAndWorkspace = (
     'studio:createNewFolderAndWorkspace',
     args
   );
+
+export const getProjectJson = (
+  args: WorkspaceTypes.WorkspaceGetProjectJsonArgs
+) => window.electron.ipcRenderer.invoke('studio:getProjectJson', args);
