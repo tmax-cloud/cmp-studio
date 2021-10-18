@@ -9,6 +9,10 @@ export type WorkspaceOpenProjectArgs = {
   folderUri: string;
 };
 
+export type WorkspaceGetProjectJsonArgs = {
+  folderUri: string;
+};
+
 export enum WorkspaceStatusType {
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR',
@@ -37,6 +41,13 @@ export type WorkspaceSuccessUidData = {
 
 export type MakeDefaultNameSuccessData = string;
 
+export type TerraformFileJsonMeta = {
+  filePath: string;
+  fileJson: any;
+};
+
+export type WorkspaceProjectJsonSuccessData = TerraformFileJsonMeta[];
+
 export type WorkspaceErrorData = {
   message: string;
 };
@@ -45,6 +56,7 @@ export type WorkspaceData =
   | WorkspaceSuccessUidData
   | MakeDefaultNameSuccessData
   | RecentWorkspacesDataArray
+  | WorkspaceProjectJsonSuccessData
   | WorkspaceErrorData;
 
 export type WorkspaceResponse = IPCResponse<WorkspaceStatus, WorkspaceData>;
@@ -76,6 +88,10 @@ export interface WorkspaceManagementServiceInterface {
 export interface WorkspacesHistoryServiceInterface {
   addWorkspaceToStorage(folderUri: string): void;
   getRecentlyOpenedWorkspaces(): RecentWorkspace[];
+}
+
+export interface WorkspaceConvertServiceInterface {
+  convertAllHclToJson(folderUri: string): WorkspaceProjectJsonSuccessData;
 }
 
 export interface WorkspaceMainServiceInterface {

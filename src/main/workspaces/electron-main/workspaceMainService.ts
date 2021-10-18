@@ -7,6 +7,7 @@ import * as WorkspaceTypes from '../common/workspace';
 import { WorkspaceManagementService } from './workspaceManagementService';
 import { WorkspacesHistoryService } from './workspacesHistoryService';
 import { StorageMainServiceInterface } from '../../storage/common/storage';
+import { WorkspaceConvertService } from './workspaceImportService';
 
 // TODO : history, management에 워크스페이스 지워주는 기능들도 구현해야 됨.
 export class WorkspaceMainService
@@ -16,6 +17,8 @@ export class WorkspaceMainService
 
   public workspacesHistoryService: WorkspaceTypes.WorkspacesHistoryServiceInterface;
 
+  public workspaceConvertService: WorkspaceTypes.WorkspaceConvertServiceInterface;
+
   constructor(
     private readonly storageMainService: StorageMainServiceInterface
   ) {
@@ -23,6 +26,7 @@ export class WorkspaceMainService
     this.workspacesHistoryService = new WorkspacesHistoryService(
       this.storageMainService
     );
+    this.workspaceConvertService = new WorkspaceConvertService();
     this.registerListeners();
   }
 
@@ -187,6 +191,35 @@ export class WorkspaceMainService
           status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
           data: this.workspaceManagementService.generateDefaultNewWorkspaceName(),
         };
+      }
+    );
+
+    ipcMain.handle(
+      'studio:getProjectJson',
+      (
+        event,
+        arg: WorkspaceTypes.WorkspaceGetProjectJsonArgs
+      ): WorkspaceTypes.WorkspaceResponse => {
+        const { folderUri } = arg;
+        try {
+          const result =
+            this.workspaceConvertService.convertAllHclToJson(folderUri);
+          return {
+            status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
+            data: result,
+          };
+        } catch (e: any) {
+          if (e === WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT) {
+            return {
+              status: WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT,
+              data: `[Error] Error occurred while converting terrafrom data into json : Cannot find the project.`,
+            };
+          }
+          return {
+            status: WorkspaceTypes.WorkspaceStatusType.ERROR,
+            data: `[Error] Error occurred while converting terrafrom data into json : ${e}`,
+          };
+        }
       }
     );
   }
