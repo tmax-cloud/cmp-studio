@@ -19,6 +19,8 @@ import { useHistory } from 'react-router-dom';
 import { OptionProperties } from '@main/dialog/common/dialog';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import { dummySchema } from './dummy';
+import Test from './Test';
+import TopologyLibrary from './TopologyLibrary';
 
 export const SIDEBAR_WIDTH = '300px';
 
@@ -91,6 +93,7 @@ function a11yProps(index: number) {
 }
 
 interface Item {
+  provider: string;
   title: string;
   displayName: string;
   type: string;
@@ -103,6 +106,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
   const [prjContextMenuOpen, setPrjContextMenuOpen] = React.useState(false);
   const [prjAnchorEl, setPrjAnchorEl] = React.useState(null);
   const [tabIndex, setTabIndex] = React.useState(0);
+  //const [type, setType] = React.useState('');
   const handleTabChange = (event: any, newValue: number) => {
     setTabIndex(newValue);
   };
@@ -115,6 +119,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
     const itemsList: Item[] = [];
     dummySchema.forEach((i: Item) => {
       itemsList.push({
+        provider: i.displayName.split('_')[0],
         title: i.title,
         displayName: i.displayName,
         type: i.type,
@@ -188,6 +193,8 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
       </TabPanel>
       <TabPanel value={tabIndex} index={1}>
         구현 예정
+        <TopologyLibrary items={items} />
+        <Test test="Test" />
       </TabPanel>
     </Box>
   );
