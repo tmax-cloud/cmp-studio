@@ -16,7 +16,10 @@ import {
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useHistory } from 'react-router-dom';
-import { OptionProperties } from '@main/dialog/common/dialog';
+import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
+import * as WorkspaceTypes from '@main/workspaces/common/workspace';
+import { openExistFolder } from '../../utils/ipc/workspaceIpcUtils';
+import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import { dummySchema } from './dummy';
 import Test from './Test';
@@ -133,9 +136,11 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
       'studio:dirPathToOpen',
       (res: { canceled: boolean; filePaths: string[] }) => {
         const { filePaths, canceled } = res;
+        const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
+          folderUri: filePaths[0],
+        };
         if (!canceled) {
-          window.electron.ipcRenderer
-            .invoke('studio:openExistFolder', { folderUri: filePaths[0] })
+          openExistFolder(args)
             .then((response: any) => {
               const uid = response?.data?.uid;
               if (uid) {
@@ -226,10 +231,11 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
                   onClick={() => {
                     setPrjContextMenuOpen(false);
                     const properties: OptionProperties = ['openDirectory'];
-                    window.electron.ipcRenderer.send('studio:openDialog', {
-                      openTo: 'OPEN_FOLDER',
+                    const args = {
+                      openTo: OpenType.OPEN_FOLDER,
                       properties,
-                    });
+                    };
+                    openDialog(args);
                   }}
                 >
                   <span className={classes.menuItemText}>열기</span>

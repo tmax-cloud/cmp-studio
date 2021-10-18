@@ -14,46 +14,32 @@ const AWS_ACM_CERTIFICATE_VALIDATION_OBJ = {
     aws_acm_certificate_validation: {
       example: {
         // eslint-disable-next-line no-template-curly-in-string
-        certificate_arn: '${aws_acm_certificate.example.arn}',
-        validation_record_fqdns:
-          // '${[for record in aws_route53_record.example : record.fqdn]}',
-          ['a', 'b'],
+        certificate_arn: '${test}',
+        // validation_record_fqdns: ['a', 'b'],
+        timeouts: {
+          create: 'true',
+        },
       },
     },
   },
 };
-
-// const setPredefinedData = (
-//   title: string
-// ): { uiSchema: any; formData: any; fixedSchema: any } => {
-//   let predefinedData = { uiSchema: {}, formData: {}, fixedSchema: {} };
-
-//   // text area 테스트
-//   if (title === 'textareaTest') {
-//     predefinedData = {
-//       uiSchema: {
-//         analyzer_name: {
-//           'ui:widget': 'textarea',
-//           classNames: 'pleasedoitagain',
-//         },
-//       },
-//       formData: {
-//         analyzer_name: `jsonencode({
-//         "Statement" = [{
-//           # This policy allows software running on the EC2 instance to
-//           # access the S3 API.
-//           "Action" = "s3:*",
-//           "Effect" = "Allow",
-//         }],
-//       })`,
-//       },
-//       fixedSchema: {},
-//     };
-//   }
-
-//   return predefinedData;
-// };
-
+const AWS_ACMPCA_CERTIFICATE_AUTHORITY = {
+  resource: {
+    aws_acmpca_certificate_authority: {
+      example: {
+        certificate_authority_configuration: {
+          key_algorithm: 'RSA_4096',
+          signing_algorithm: 'SHA512WITHRSA',
+          subject: {
+            common_name: 'example.com',
+          },
+        },
+        permanent_deletion_time_in_days: 7,
+        tags: [{ test: 'good' }, { test2: 'bad' }],
+      },
+    },
+  },
+};
 const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   open,
   toggleSidePanel,
@@ -69,10 +55,11 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   console.log('current schema: ', currentSchema);
   if (id === 'resource-aws_acm_certificate_validation') {
     formSample = AWS_ACM_CERTIFICATE_VALIDATION_OBJ;
+  } else if (id === 'resource-aws_acmpca_certificate_authority') {
+    formSample = AWS_ACMPCA_CERTIFICATE_AUTHORITY;
   }
-
   const {
-    uiSchema = {},
+    customUISchema = {},
     formData = {},
     fixedSchema = {},
   } = preDefinedData(currentSchema, formSample);
@@ -106,7 +93,7 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
           <DynamicForm
             schema={fixedSchema}
             formData={formData}
-            uiSchema={uiSchema}
+            uiSchema={customUISchema}
           />
         </div>
       </Drawer>
