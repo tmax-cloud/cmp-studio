@@ -1,9 +1,12 @@
 import * as React from 'react';
+import { useHistory } from 'react-router-dom';
 import { Theme, Paper, Typography, InputBase } from '@mui/material';
 import { PushPin, Search } from '@mui/icons-material';
 import { makeStyles, createStyles } from '@mui/styles';
-import { RecentWorkspaceData } from '@main/workspaces/common/workspace';
+import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { timeDifference } from '../../utils/timeUtils';
+import { openExistFolder } from '../../utils/ipc/workspaceIpcUtils';
+import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
 
 // TODO : 검색 구현하기
 
@@ -78,7 +81,7 @@ const WorkspacesSearchBar: React.FC = (props) => {
   );
 };
 
-const WorkspaceItem: React.FC<RecentWorkspaceData> = ({
+const WorkspaceItem: React.FC<WorkspaceTypes.RecentWorkspaceData> = ({
   labelTitle,
   labelUri,
   workspaceUid,
@@ -86,13 +89,45 @@ const WorkspaceItem: React.FC<RecentWorkspaceData> = ({
   lastOpenedTime,
   isPinned,
 }) => {
+  const history = useHistory();
   const classes = useStyles();
   const timestamp = timeDifference(
     Math.floor(+new Date() / 1000),
     lastOpenedTime
   );
+  const openWorkspace = () => {
+    const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
+      folderUri,
+    };
+    openExistFolder(args)
+      .then((response: WorkspaceTypes.WorkspaceResponse) => {
+        const { status, data } = response;
+        if (status === WorkspaceTypes.WorkspaceStatusType.SUCCESS) {
+          const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)?.uid;
+          if (uid) {
+            history.push(`/main/${uid}`);
+            maximizeWindowSize();
+          }
+          return response;
+        } else if (
+          status === WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT
+        ) {
+          console.log('[Error] Cannot find the project :', folderUri);
+          return response;
+        }
+        return response;
+      })
+      .catch((err: any) => {
+        console.log('[Error] Failed to open exists folder :', err);
+      });
+  };
+
   return (
-    <div className={classes.workspaceItemWrapper}>
+    <div
+      role="button"
+      className={classes.workspaceItemWrapper}
+      onClick={openWorkspace}
+    >
       <div
         style={{
           display: 'inline-flex',
@@ -150,11 +185,11 @@ const WorkspacesList: React.FC<WorkspacesListProps> = ({ items }) => {
 };
 
 type WorkspacesListContentProps = {
-  items: RecentWorkspaceData[];
+  items: WorkspaceTypes.RecentWorkspaceData[];
 };
 
 type WorkspacesListProps = {
-  items: RecentWorkspaceData[];
+  items: WorkspaceTypes.RecentWorkspaceData[];
 };
 
 export default WorkspacesList;
