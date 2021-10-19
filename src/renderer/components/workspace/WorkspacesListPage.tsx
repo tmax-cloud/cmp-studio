@@ -3,10 +3,16 @@ import { styled } from '@mui/material';
 import { useHistory } from 'react-router-dom';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import {
+  TERRAFORM_EXE_PATH_KEY,
+  ConfigResponse,
+  ConfigStatusType,
+} from '@main/configs/common/configuration';
+import {
   openExistFolder,
   getRecentlyOpenedWorkspaces,
 } from '../../utils/ipc/workspaceIpcUtils';
 import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
+import { getAppConfigItem } from '../../utils/ipc/configIpcUtils';
 import WorkspacesList from './WorkspacesList';
 import WorkspacesRightSection from './WorkspacesRightSection';
 import { WORKSPACE_ROOT_HEIGHT } from './enums';
@@ -97,6 +103,25 @@ const WorkspacesListPage: React.FC = (props) => {
       setHasToRefresh(false);
     }
   }, [history, hasToRefresh]);
+
+  React.useEffect(() => {
+    getAppConfigItem({
+      key: TERRAFORM_EXE_PATH_KEY,
+    })
+      .then((res: ConfigResponse) => {
+        const { status, data } = res;
+        if (status === ConfigStatusType.SUCCESS && data === 'EMPTY') {
+          // TODO : 초반에 terraformPath설정해주는 부분 구현하기
+          // TODO : terraform 명령어 사용할 때 에러나도 다시 설정해달라고 모달 띄워야 할듯
+          console.log('[INFO] terraform.exe 경로를 설정해주세요.');
+        }
+        return res;
+      })
+      .catch((e: any) => {
+        console.log(e);
+      });
+  }, []);
+
   return (
     <WorkspacesLayoutRoot>
       <WorkspaceListLeftContainer>
