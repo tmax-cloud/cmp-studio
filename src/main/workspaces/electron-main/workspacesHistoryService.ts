@@ -35,6 +35,21 @@ export class WorkspacesHistoryService {
     );
   }
 
+  removeWorkspaceHistoryItem(folderUri: string) {
+    const entries: RecentWorkspace[] = this.storageMainService.getItem(
+      WorkspacesHistoryService.workspaceHistoryStorageKey
+    );
+    const newEntries: RecentWorkspace[] = [];
+    entries.forEach((entry) => {
+      const { folderUri: entryFolderUri } = entry;
+      entryFolderUri !== folderUri && newEntries.push(entry);
+    });
+    this.storageMainService.setItem(
+      WorkspacesHistoryService.workspaceHistoryStorageKey,
+      newEntries
+    );
+  }
+
   serializeEntries(entries: RecentWorkspace[]): RecentWorkspace[] {
     // TODO : isPinned여부 체크해서 순서 정리해주는 로직 구현하기
     return entries;
