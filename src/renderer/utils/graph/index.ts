@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
-import { LinkData, ModulePath, NodeData, ROOT } from '../types/graph';
-import { getRawGraph } from './graph/dot';
-import { getRefinedGraph } from './graph/parse';
-import { traverseGraph } from './graph/traverse';
+import { LinkData, ModulePath, NodeData, ROOT } from '../../types/graph';
+import { getRawGraph } from './dot';
+import { getRefinedGraph } from './parse';
+import { traverseGraph } from './traverse';
 
 export const getRootNode = (gData: GraphData): NodeData | undefined =>
   gData.nodes.find(

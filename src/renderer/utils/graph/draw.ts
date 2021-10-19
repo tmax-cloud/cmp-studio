@@ -1,5 +1,5 @@
 import { NodeData, NodeKind } from 'renderer/types/graph';
-import NoImageIcon from '../../resources/images/noImage64.png';
+import NoImageIcon from '../../../../assets/images/noImage64.png';
 
 const drawRoundRect = (
   ctx: CanvasRenderingContext2D,
