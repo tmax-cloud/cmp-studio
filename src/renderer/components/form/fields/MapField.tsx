@@ -115,7 +115,7 @@ const MapField = (props: FieldProps) => {
                 style={btnStyle as any}
                 disabled={disabled || readonly}
                 onClick={() => {
-                  onChange(
+                  return onChange(
                     (() => {
                       const result = mapData.filter((cur: any, i: number) => {
                         if (idx === i) return false;

@@ -16,10 +16,10 @@ const mappings: any = {
 // };
 
 const IconButton = (props: any) => {
-  const { icon, iconProps } = props;
+  const { icon, onClick, iconProps } = props;
   const IconComp = mappings[icon];
   return (
-    <Button size="small">
+    <Button size="small" onClick={onClick}>
       <IconComp {...iconProps} />
     </Button>
   );
