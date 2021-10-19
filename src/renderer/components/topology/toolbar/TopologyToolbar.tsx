@@ -4,13 +4,22 @@ import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import ViewBreadcrumbs from './breadcrumb/ViewBreadcrumb';
-import SaveButton from './button/SaveButton';
-import ZoomInButton from './button/ZoomInButton';
-import ZoomOutButton from './button/ZoomOutButton';
-import FitScreenButton from './button/FitScreenButton';
+import {
+  FitScreenButton,
+  SaveButton,
+  SelectModuleButton,
+  ZoomInButton,
+  ZoomOutButton,
+} from './button';
+import { ModuleListModal } from '../modal';
 
 const TopologyToolbar = (props: TopologyToolbarProps) => {
   const { handlers } = props;
+  const [openModuleListModal, setOpenModuleListModal] = React.useState(false);
+
+  const handleModuleListModalOpen = () => setOpenModuleListModal(true);
+  const handleModuleListModalClose = () => setOpenModuleListModal(false);
+
   return (
     <Toolbar
       style={{ minHeight: 48, paddingLeft: 12, paddingRight: 12 }}
@@ -35,6 +44,11 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
             }}
           >
             <SaveButton disabled />
+            <SelectModuleButton onClick={handleModuleListModalOpen} />
+            <ModuleListModal
+              isOpen={openModuleListModal}
+              onClose={handleModuleListModalClose}
+            />
             <Divider
               orientation="vertical"
               variant="middle"

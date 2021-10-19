@@ -1,10 +1,10 @@
-/* eslint-disable  @typescript-eslint/ban-types */
-/* eslint-disable  import/extensions */
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable import/extensions */
 /* eslint-disable no-useless-escape */
 import Viz from 'viz.js';
 import { Module, render } from 'viz.js/full.render.js';
-import { GraphData, NodeObject, LinkObject } from 'react-force-graph-2d';
+import { GraphData } from 'react-force-graph-2d';
+import { LinkData, NodeData, ROOT } from '../../types/graph';
 
 // 임시 dot string
 const dot = `digraph {
@@ -70,40 +70,31 @@ const dot = `digraph {
 }
 `;
 
-export const parseDOTString = async (src?: string): Promise<object> => {
+const parseDOT = async (src?: string): Promise<object> => {
   const viz = new Viz({ Module, render });
   const jsonObj = await viz.renderJSONObject(src || dot);
-  // json format docs here: http://www.graphviz.org/docs/outputs/json/
+  // jsonObj format docs here: http://www.graphviz.org/docs/outputs/json/
   return jsonObj;
 };
 
-export const getNodeData = (jsonObject: any): NodeData[] => {
+const getRawNode = (jsonObject: any): NodeData[] => {
   return jsonObject.objects
-    ?.filter((node: any) => node.name !== 'root')
+    ?.filter((node: any) => node.name !== ROOT)
     .map((node: any) => {
-      const name = node.name.replace('[root] ', '');
-      return {
-        id: node._gvid,
-        name,
-        shape: name === 'root' ? 'text' : node.shape || 'circle',
-      };
+      const fullName = node.name.replace('[root] ', '');
+      return { id: node._gvid, fullName };
     });
 };
 
-export const getLinkData = (jsonObject: any): LinkObject[] => {
+const getRawLink = (jsonObject: any): LinkData[] => {
   return jsonObject.edges?.map((link: any) => {
     return { source: link.tail, target: link.head };
   });
 };
 
-export const getGraphData = async (src?: string): Promise<GraphData> => {
-  const jsonObj = await parseDOTString(src);
-  return { nodes: getNodeData(jsonObj), links: getLinkData(jsonObj) };
+export const getRawGraph = async (src?: string): Promise<GraphData> => {
+  const jsonObj = await parseDOT(src);
+  const nodes = getRawNode(jsonObj);
+  const links = getRawLink(jsonObj);
+  return { nodes, links };
 };
-
-export interface NodeExtraObject {
-  name?: string;
-  shape?: string;
-}
-
-export type NodeData = NodeObject & NodeExtraObject;
