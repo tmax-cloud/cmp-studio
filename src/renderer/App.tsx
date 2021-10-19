@@ -1,6 +1,7 @@
 import React from 'react';
 import { Switch, Route, BrowserRouter, Redirect } from 'react-router-dom';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material';
+import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import theme from './theme';
 import {
   TerraformStatusType,
@@ -31,6 +32,7 @@ const TestComponent = () => {
   const [folderPathToCreate, setFolderPathToCreate] = React.useState('');
   const [workspaceNameToCreate, setWorkspaceNameToCreate] = React.useState('');
   const [folderToOpen, setFolderToOpen] = React.useState('');
+  const [folderToConvert, setFolderToConvert] = React.useState('');
 
   const getGraph = async () => {
     const versionRes = await getTerraformVersion(workspaceUid);
@@ -73,12 +75,13 @@ const TestComponent = () => {
       <div>
         <div className="TestComponentBlock">
           <div id="workspace-uid-label">
-            워크스페이스 id를 입력해주세요.(워크스페이스 메타 workspace.json에
-            terraformExePath값 있어야 함)
+            워크스페이스 id를 입력해주세요.(시스템 환경변수로 테라폼 path
+            설정돼있어야 함. terraform 커맨드 실행가능한 상태로)
           </div>
           <input
             type="text"
             value={workspaceUid}
+            placeholder="워크스페이스 uid를 입력해주세요."
             id="workspace-uid"
             onChange={(event) => {
               setWorkspaceUid(event.target.value);
@@ -144,6 +147,7 @@ const TestComponent = () => {
           type="text"
           value={folderPathToCreate}
           id="new-folder-path"
+          placeholder="프로젝트 폴더 경로를 입력해주세요."
           onChange={(event) => {
             setFolderPathToCreate(event.target.value);
           }}
@@ -153,6 +157,7 @@ const TestComponent = () => {
           type="text"
           value={workspaceNameToCreate}
           id="new-project-name"
+          placeholder="새로 만들 프로젝트 이름를 입력해주세요."
           onChange={(event) => {
             setWorkspaceNameToCreate(event.target.value);
           }}
@@ -177,6 +182,7 @@ const TestComponent = () => {
           type="text"
           value={folderToOpen}
           id="folder-to-open"
+          placeholder="프로젝트 폴더 경로를 입력해주세요."
           onChange={(event) => {
             setFolderToOpen(event.target.value);
           }}
@@ -192,6 +198,30 @@ const TestComponent = () => {
           }}
         >
           Open folder test (console log 확인)
+        </button>
+      </div>
+      <div className="TestComponentBlock">
+        <input
+          type="text"
+          value={folderToConvert}
+          placeholder="프로젝트 폴더 경로를 입력해주세요."
+          id="folder-to-open"
+          onChange={(event) => {
+            setFolderToConvert(event.target.value);
+          }}
+          style={{ width: '800px' }}
+        />
+        <button
+          type="button"
+          onClick={async () => {
+            const args: WorkspaceTypes.WorkspaceGetProjectJsonArgs = {
+              folderUri: folderToConvert,
+            };
+            const response = await WorkspaceIpcUtils.getProjectJson(args);
+            console.log('terraform objects? ', response);
+          }}
+        >
+          Tf to Json Convert test (console log 확인)
         </button>
       </div>
     </div>

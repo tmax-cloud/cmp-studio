@@ -9,6 +9,20 @@ export type WorkspaceOpenProjectArgs = {
   folderUri: string;
 };
 
+export type WorkspaceGetProjectJsonArgs = {
+  folderUri: string;
+};
+
+export type WorkspaceSetConfigItemArgs = {
+  workspaceUid: string;
+  key: string;
+  data: any;
+};
+
+export type RemoveWorkspaceHistoryItemArgs = {
+  folderUri: string;
+};
+
 export enum WorkspaceStatusType {
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR',
@@ -37,6 +51,13 @@ export type WorkspaceSuccessUidData = {
 
 export type MakeDefaultNameSuccessData = string;
 
+export type TerraformFileJsonMeta = {
+  filePath: string;
+  fileJson: any;
+};
+
+export type WorkspaceProjectJsonSuccessData = TerraformFileJsonMeta[];
+
 export type WorkspaceErrorData = {
   message: string;
 };
@@ -45,6 +66,7 @@ export type WorkspaceData =
   | WorkspaceSuccessUidData
   | MakeDefaultNameSuccessData
   | RecentWorkspacesDataArray
+  | WorkspaceProjectJsonSuccessData
   | WorkspaceErrorData;
 
 export type WorkspaceResponse = IPCResponse<WorkspaceStatus, WorkspaceData>;
@@ -58,8 +80,8 @@ export type WorkspaceIdentifier = {
 
 export type RecentWorkspace = {
   folderUri: string;
-  labelTitle?: string;
-  labelUri?: string;
+  labelTitle: string;
+  labelUri: string;
   lastOpenedTime: number;
 };
 
@@ -72,10 +94,16 @@ export interface WorkspaceManagementServiceInterface {
   checkRealWorkspaceExists(workspaceRealPath: string): boolean;
   getWorkspaceConfig(uid: string): any;
   generateDefaultNewWorkspaceName(): string;
+  setWorkspaceConfigItem(uid: string, key: string, data: any): void;
 }
 export interface WorkspacesHistoryServiceInterface {
   addWorkspaceToStorage(folderUri: string): void;
   getRecentlyOpenedWorkspaces(): RecentWorkspace[];
+  removeWorkspaceHistoryItem(folderUri: string): void;
+}
+
+export interface WorkspaceConvertServiceInterface {
+  convertAllHclToJson(folderUri: string): WorkspaceProjectJsonSuccessData;
 }
 
 export interface WorkspaceMainServiceInterface {
