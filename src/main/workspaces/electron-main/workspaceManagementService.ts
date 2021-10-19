@@ -47,12 +47,25 @@ export class WorkspaceManagementService
     return fs.existsSync(path.join(getWorkspaceMetaFolderPath(), uid));
   }
 
+  writeWorkspaceConfig(uid: string, obj: any) {
+    const configPath = getWorkspaceConfigPath(uid);
+    if (fs.existsSync(configPath)) {
+      writeFileJson(configPath, obj);
+    }
+  }
+
   getWorkspaceConfig(uid: string) {
     const configPath = getWorkspaceConfigPath(uid);
     if (!fs.existsSync(configPath)) {
       throw new Error(`[Error] There is no workspace config : ${configPath}`);
     }
     return readFileJson(configPath);
+  }
+
+  setWorkspaceConfigItem(uid: string, key: string, data: any) {
+    const configJson = this.getWorkspaceConfig(uid);
+    configJson[key] = data;
+    this.writeWorkspaceConfig(uid, configJson);
   }
 
   createNewWorkspaceMeta(workspaceRealPath: string): Promise<string> {
