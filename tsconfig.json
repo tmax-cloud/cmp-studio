@@ -23,7 +23,10 @@
     "resolveJsonModule": true,
     "importHelpers": true,
     "skipLibCheck": true,
-    "allowJs": true
+    "allowJs": true,
+    "paths": {
+      "@main/*": ["main/*"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.jsx", "**/*.js"],
   "exclude": ["test", "build/release", "build/app/dist", ".erb/dll"]

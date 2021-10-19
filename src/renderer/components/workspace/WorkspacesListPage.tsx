@@ -1,7 +1,13 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { useHistory } from 'react-router-dom';
-import WorkspacesList, { WorkspaceItemProps } from './WorkspacesList';
+import * as WorkspaceTypes from '@main/workspaces/common/workspace';
+import {
+  openExistFolder,
+  getRecentlyOpenedWorkspaces,
+} from '../../utils/ipc/workspaceIpcUtils';
+import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
+import WorkspacesList from './WorkspacesList';
 import WorkspacesRightSection from './WorkspacesRightSection';
 import { WORKSPACE_ROOT_HEIGHT } from './enums';
 
@@ -28,75 +34,73 @@ const WorkspaceListRightContainer = styled('div')({
 
 const WorkspacesListPage: React.FC = (props) => {
   const history = useHistory();
-  const [items, setItems] = React.useState<WorkspaceItemProps[]>([]);
+  const [hasToRefresh, setHasToRefresh] = React.useState(true);
+  const [items, setItems] = React.useState<
+    WorkspaceTypes.RecentWorkspaceData[]
+  >([]);
 
   React.useEffect(() => {
-    window.electron.ipcRenderer.on(
-      'studio:dirPathToOpen',
-      (res: { canceled: boolean; filePaths: string[] }) => {
-        console.log('res?', res);
-        const { filePaths, canceled } = res;
-        if (!canceled) {
-          window.electron.ipcRenderer
-            .invoke('studio:openExistFolder', { folderUri: filePaths[0] })
-            .then((response: any) => {
-              console.log('Res? ', response);
-              const uid = response?.data?.uid;
-              if (uid) {
-                history.push(`/main/${uid}`);
-                window.electron.ipcRenderer.send('studio:maximizeWindowSize');
-              }
-              return response;
-            })
-            .catch((err: any) => {
-              console.log('[Error] Failed to open exists folder : ', err);
-            });
+    if (hasToRefresh) {
+      window.electron.ipcRenderer.on(
+        'studio:dirPathToOpen',
+        (res: Electron.OpenDialogReturnValue) => {
+          console.log('res?', res);
+          const { filePaths, canceled } = res;
+          if (!canceled) {
+            const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
+              folderUri: filePaths[0],
+            };
+            openExistFolder(args)
+              .then((response: WorkspaceTypes.WorkspaceResponse) => {
+                console.log('Res? ', response);
+                const { data } = response;
+                const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)
+                  ?.uid;
+                if (uid) {
+                  history.push(`/main/${uid}`);
+                  maximizeWindowSize();
+                }
+                return response;
+              })
+              .catch((err: any) => {
+                console.log('[Error] Failed to open exists folder : ', err);
+              });
+          }
         }
-      }
-    );
+      );
 
-    window.electron.ipcRenderer
-      .invoke('studio:getRecentlyOpenedWorkspaces')
-      .then(
-        (res: {
-          status: 'Success' | 'Error';
-          data: {
-            entries: {
-              folderUri: string;
-              labelTitle: string;
-              labelUri: string;
-              lastOpenedTime: number;
-              isPinned: boolean;
-              workspaceUid: string;
-            }[];
-          };
-        }) => {
+      getRecentlyOpenedWorkspaces()
+        .then((res: WorkspaceTypes.WorkspaceResponse) => {
           const { status, data } = res;
-          if (status === 'Success') {
-            const pinnedList: WorkspaceItemProps[] = [];
-            const workspacesList: WorkspaceItemProps[] = [];
-            data?.entries?.forEach((entry) => {
+          if (status === WorkspaceTypes.WorkspaceStatusType.SUCCESS) {
+            const pinnedList: WorkspaceTypes.RecentWorkspaceData[] = [];
+            const workspacesList: WorkspaceTypes.RecentWorkspaceData[] = [];
+            (
+              data as WorkspaceTypes.RecentWorkspacesDataArray
+            )?.entries?.forEach((entry) => {
               entry.isPinned
                 ? pinnedList.push(entry)
                 : workspacesList.push(entry);
             });
             setItems([...pinnedList.reverse(), ...workspacesList.reverse()]);
-          } else if (status === 'Error') {
+          } else if (status === WorkspaceTypes.WorkspaceStatusType.ERROR) {
             console.log(
-              '[Error] Failed to get recently opened workspaces list.'
+              '[Error] Failed to get recently opened workspaces list : ',
+              (data as WorkspaceTypes.WorkspaceErrorData).message
             );
           }
           return status;
-        }
-      )
-      .catch((err: any) => {
-        console.log('[Error] Failed to get workspaces history : ', err);
-      });
-  }, [history]);
+        })
+        .catch((err: any) => {
+          console.log('[Error] Failed to get workspaces history : ', err);
+        });
+      setHasToRefresh(false);
+    }
+  }, [history, hasToRefresh]);
   return (
     <WorkspacesLayoutRoot>
       <WorkspaceListLeftContainer>
-        <WorkspacesList items={items} />
+        <WorkspacesList items={items} setHasToRefresh={setHasToRefresh} />
       </WorkspaceListLeftContainer>
       <WorkspaceListRightContainer>
         <WorkspacesRightSection />

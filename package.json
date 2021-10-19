@@ -1,7 +1,7 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Fast Refresh for rapid application development",
+  "name": "cmp-studio",
+  "productName": "CmpStudio",
+  "description": "Studio for Terraform",
   "scripts": {
     "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
     "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.babel.js",
@@ -30,8 +30,8 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "CMP Studio",
+    "appId": "org.erb.CMPStudio",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -88,12 +88,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/tmax-cloud/cmp-studio.git"
   },
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "CMP Studio Maintainers",
+    "email": "",
+    "url": ""
   },
   "contributors": [
     {
@@ -109,7 +109,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/tmax-cloud/cmp-studio/issues"
   },
   "keywords": [
     "electron",
@@ -229,6 +229,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.1.0",
     "lint-staged": "^10.5.4",
+    "lodash-es": "^4.17.21",
     "mini-css-extract-plugin": "^1.6.0",
     "opencollective-postinstall": "^2.0.3",
     "prettier": "^2.2.1",

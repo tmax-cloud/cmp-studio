@@ -3,7 +3,9 @@ import * as ReactDOM from 'react-dom';
 import { Theme, Typography, ThemeProvider, Button } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import { useHistory } from 'react-router-dom';
+import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import project from '../../../../assets/images/project.png';
+import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { WORKSPACE_ROOT_HEIGHT } from './enums';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import StudioTheme from '../../theme';
@@ -66,9 +68,12 @@ const WorkspacesRightSection: React.FC = (props) => {
           className={classes.button}
           variant="contained"
           onClick={() => {
-            window.electron.ipcRenderer.send('studio:openDialog', {
-              openTo: 'OPEN_FOLDER',
-            });
+            const properties: OptionProperties = ['openDirectory'];
+            const args = {
+              openTo: OpenType.OPEN_FOLDER,
+              properties,
+            };
+            openDialog(args);
           }}
         >
           열기

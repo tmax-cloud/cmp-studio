@@ -13,6 +13,16 @@ import {
 import { Close, MoreHoriz } from '@mui/icons-material';
 import { makeStyles, createStyles } from '@mui/styles';
 import { History } from 'history';
+import {
+  WorkspaceStatusType,
+  WorkspaceResponse,
+  MakeDefaultNameSuccessData,
+  WorkspaceSuccessUidData,
+} from '@main/workspaces/common/workspace';
+import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
+import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
+import * as WorkspaceIpcUtils from '../../utils/ipc/workspaceIpcUtils';
+import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import StudioTheme from '../../theme';
 
 const useStyles = makeStyles<Theme>((theme) => {
@@ -96,11 +106,10 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
       }
     );
 
-    window.electron.ipcRenderer
-      .invoke('studio:getDefaultNewProjectName')
-      .then((res: { status: string; data: string }) => {
+    WorkspaceIpcUtils.getDefaultNewProjectName()
+      .then((res: WorkspaceResponse) => {
         if (res?.data) {
-          setNewProjectName(res.data);
+          setNewProjectName(res.data as MakeDefaultNameSuccessData);
         }
         return res;
       })
@@ -108,11 +117,10 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
         console.log('[Error] Failed to get default new project name : ', err);
       });
 
-    window.electron.ipcRenderer
-      .invoke('studio:getDefaultNewProjectsFolderPath')
-      .then((res: { status: string; data: string }) => {
+    WorkspaceIpcUtils.getDefaultNewProjectsFolderPath()
+      .then((res: WorkspaceResponse) => {
         if (res?.data) {
-          setNewProjectPath(res.data);
+          setNewProjectPath(res.data as MakeDefaultNameSuccessData);
         }
         return res;
       })
@@ -138,21 +146,20 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
   };
 
   const onClickCreate = () => {
-    window.electron.ipcRenderer
-      .invoke('studio:createNewFolderAndWorkspace', {
-        folderUri: newProjectPath,
-        workspaceName: newProjectName,
-      })
-      .then((res: { status: string; data: any }) => {
+    WorkspaceIpcUtils.createNewFolderAndWorkspace({
+      folderUri: newProjectPath,
+      workspaceName: newProjectName,
+    })
+      .then((res: WorkspaceResponse) => {
         const { status, data } = res;
-        if (status === 'Success') {
-          const uid = data?.uid;
+        if (status === WorkspaceStatusType.SUCCESS) {
+          const uid = (data as WorkspaceSuccessUidData)?.uid;
           if (uid) {
             setOpen(false);
             history.push(`/main/${uid}`);
-            window.electron.ipcRenderer.send('studio:maximizeWindowSize');
+            maximizeWindowSize();
           }
-        } else {
+        } else if (status === WorkspaceStatusType.ERROR_FILE_EXISTS) {
           setPrjNameErrMsg('이미 존재하는 프로젝트 이름입니다.');
         }
         return res;
@@ -228,9 +235,12 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
                   marginLeft: 5,
                 }}
                 onClick={() => {
-                  window.electron.ipcRenderer.send('studio:openDialog', {
-                    openTo: 'CREATE_NEW_PROJECT',
-                  });
+                  const properties: OptionProperties = ['openDirectory'];
+                  const args = {
+                    openTo: OpenType.CREATE_NEW_PROJECT,
+                    properties,
+                  };
+                  openDialog(args);
                 }}
               >
                 <MoreHoriz />
@@ -239,8 +249,8 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
           </div>
         </div>
         <div className={classes.footerContainer}>
-          <StyledButton variant="outlined">{'< 이전'}</StyledButton>
-          <StyledButton variant="outlined">{'다음 >'}</StyledButton>
+          {/* <StyledButton variant="outlined">{'< 이전'}</StyledButton>
+          <StyledButton variant="outlined">{'다음 >'}</StyledButton> */}
           <StyledButton variant="contained" onClick={onClickCreate}>
             생성
           </StyledButton>
