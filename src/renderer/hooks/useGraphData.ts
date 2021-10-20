@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { getGraphData } from '../utils/graph';
+import { getGraphData } from '@renderer/utils/graph';
 
 export const useGraphData = () => {
   const [data, setData] = React.useState({});

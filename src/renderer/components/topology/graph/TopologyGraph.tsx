@@ -6,7 +6,7 @@ import ForceGraph2D, {
 } from 'react-force-graph-2d';
 import { withResizeDetector } from 'react-resize-detector';
 import Box from '@mui/material/Box';
-import { useGraphData } from '../../../hooks/useGraphData';
+import { useGraphData } from '@renderer/hooks/useGraphData';
 
 const Error = () => <Box p={2}>Oh no! Something went wrong.</Box>;
 

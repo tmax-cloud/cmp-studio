@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
+import { useGraphProps } from '@renderer/hooks/useGraphProps';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 // import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import parseJson from '../form/utils/json2JsonSchemaParser';
 import TopologyToolbar from './toolbar/TopologyToolbar';
 import TopologyGraph from './graph/TopologyGraph';
-import { useGraphProps } from '../../hooks/useGraphProps';
 
 // MEMO : SIDEBAR_WIDTH + SIDEPANEL_WIDTH 값
 const sidebarAndPanelWidth = '800px';

@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
-import { LinkData, ModulePath, NodeData, ROOT } from '../../types/graph';
+import { LinkData, ModulePath, NodeData, ROOT } from '@renderer/types/graph';
 import { getRawGraph } from './dot';
 import { getRefinedGraph } from './parse';
 import { traverseGraph } from './traverse';

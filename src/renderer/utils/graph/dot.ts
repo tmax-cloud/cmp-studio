@@ -4,7 +4,7 @@
 import Viz from 'viz.js';
 import { Module, render } from 'viz.js/full.render.js';
 import { GraphData } from 'react-force-graph-2d';
-import { LinkData, NodeData, ROOT } from '../../types/graph';
+import { LinkData, NodeData, ROOT } from '@renderer/types/graph';
 
 // 임시 dot string
 const dot = `digraph {
