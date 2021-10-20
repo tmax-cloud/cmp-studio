@@ -290,10 +290,10 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({
     setTerraformModuleItems(moduleList);
 
     if (
-      localList.length &&
-      providerList.length &&
-      resourceList.length &&
-      datasourceList.length &&
+      localList.length ||
+      providerList.length ||
+      resourceList.length ||
+      datasourceList.length ||
       moduleList.length
     ) {
       setIsSearchResultEmpty(false);
