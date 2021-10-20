@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import currentDataReducer from '../features/form/currentDataSlice';
+import codeReducer from '../features/code';
 
 const rootReducer = {
-  currentData: currentDataReducer,
+  code: codeReducer,
 };
 
 const store: any = configureStore({

@@ -2,11 +2,10 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import { Drawer, IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { setObj } from '../../features/form/currentDataSlice';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import DynamicForm from '../form';
 import preDefinedData from '../form/utils/preDefinedData';
+import { createSelector } from '@reduxjs/toolkit';
 
 export const SIDEPANEL_WIDTH = 500;
 
@@ -49,27 +48,25 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   terraformSchemaMap,
 }) => {
   const id = data.id || 'testIdDummy';
-  const { obj } = useAppSelector((state) => state.currentData);
-  const dispatch = useAppDispatch();
-  // let formSample = {};
+  // const { obj } = useAppSelector((state) => state.currentData);
+  // const dispatch = useAppDispatch();
+  let formSample = {};
 
   // schema
   console.log('all schema: ', terraformSchemaMap);
   const currentSchema = terraformSchemaMap.get(id);
   console.log('current schema: ', currentSchema);
   if (id === 'resource-aws_acm_certificate_validation') {
-    dispatch(setObj(AWS_ACM_CERTIFICATE_VALIDATION_OBJ));
-    // formSample = AWS_ACM_CERTIFICATE_VALIDATION_OBJ;
+    formSample = AWS_ACM_CERTIFICATE_VALIDATION_OBJ;
   } else if (id === 'resource-aws_acmpca_certificate_authority') {
-    dispatch(setObj(AWS_ACMPCA_CERTIFICATE_AUTHORITY));
-    // formSample = AWS_ACMPCA_CERTIFICATE_AUTHORITY;
+    formSample = AWS_ACMPCA_CERTIFICATE_AUTHORITY;
   }
-  console.log('redux 확인:', obj);
+  console.log('redux 확인:', formSample);
   const {
     customUISchema = {},
     formData = {},
     fixedSchema = {},
-  } = preDefinedData(currentSchema, obj);
+  } = preDefinedData(currentSchema, formSample);
 
   return (
     <>
