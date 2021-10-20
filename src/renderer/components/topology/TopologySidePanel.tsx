@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import { Drawer, IconButton } from '@mui/material';
+// import { createSelector } from '@reduxjs/toolkit';
 import { Close } from '@mui/icons-material';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import DynamicForm from '../form';
 import preDefinedData from '../form/utils/preDefinedData';
-import { createSelector } from '@reduxjs/toolkit';
 
 export const SIDEPANEL_WIDTH = 500;
 

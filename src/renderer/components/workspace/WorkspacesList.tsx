@@ -14,7 +14,7 @@ import { makeStyles, createStyles } from '@mui/styles';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { timeDifference } from '../../utils/timeUtils';
 import * as WorkspaceIpcUtils from '../../utils/ipc/workspaceIpcUtils';
-import { setInitObjects } from '../../features/code';
+import { setInitObjects } from '../../features/codeSlice';
 import {
   openExistFolder,
   setWorkspaceConfigItem,
