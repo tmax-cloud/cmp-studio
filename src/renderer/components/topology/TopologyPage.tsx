@@ -3,10 +3,10 @@ import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
-import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
+// import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import parseJson from '../form/utils/json2JsonSchemaParser';
-import TopologyToolbar from './toolbar';
-import TopologyGraphLayout from './graph';
+import TopologyToolbar from './toolbar/TopologyToolbar';
+import TopologyGraph from './graph/TopologyGraph';
 import { useGraphProps } from '../../hooks/useGraphProps';
 
 // MEMO : SIDEBAR_WIDTH + SIDEPANEL_WIDTH 값
@@ -79,7 +79,7 @@ export const TopologyPage: React.FC = (props) => {
       <TopologySidebar openSidePanel={openSidePanel} />
       <div className={classes.topologyLayoutWrapper}>
         <TopologyToolbar handlers={graphHandler} />
-        <TopologyGraphLayout graphRef={graphRef} graphOptions={graphOption} />
+        <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
       </div>
       <TopologySidePanel
         open={isSidePanelOpen}
