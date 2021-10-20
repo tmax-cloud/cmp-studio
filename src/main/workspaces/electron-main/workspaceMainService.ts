@@ -140,6 +140,28 @@ export class WorkspaceMainService
     );
 
     ipcMain.handle(
+      'studio:setWorkspaceConfigItem',
+      (event, arg: WorkspaceTypes.WorkspaceSetConfigItemArgs) => {
+        const { workspaceUid, key, data } = arg;
+        if (workspaceUid && key) {
+          this.workspaceManagementService.setWorkspaceConfigItem(
+            workspaceUid,
+            key,
+            data
+          );
+          return {
+            status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
+            data: '',
+          };
+        }
+        return {
+          status: WorkspaceTypes.WorkspaceStatusType.ERROR,
+          data: `[Error] Failed to set workspace config item : ${workspaceUid}`,
+        };
+      }
+    );
+
+    ipcMain.handle(
       'studio:getRecentlyOpenedWorkspaces',
       async (event, arg): Promise<WorkspaceTypes.WorkspaceResponse> => {
         try {
@@ -220,6 +242,27 @@ export class WorkspaceMainService
             data: `[Error] Error occurred while converting terrafrom data into json : ${e}`,
           };
         }
+      }
+    );
+
+    ipcMain.handle(
+      'studio:removeWorkspaceHistoryItem',
+      (
+        event,
+        arg: WorkspaceTypes.RemoveWorkspaceHistoryItemArgs
+      ): WorkspaceTypes.WorkspaceResponse => {
+        const { folderUri } = arg;
+        if (folderUri) {
+          this.workspacesHistoryService.removeWorkspaceHistoryItem(folderUri);
+          return {
+            status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
+            data: '',
+          };
+        }
+        return {
+          status: WorkspaceTypes.WorkspaceStatusType.ERROR,
+          data: '[Error] Invalid folder uri.',
+        };
       }
     );
   }

@@ -24,3 +24,12 @@ export const createNewFolderAndWorkspace = (
 export const getProjectJson = (
   args: WorkspaceTypes.WorkspaceGetProjectJsonArgs
 ) => window.electron.ipcRenderer.invoke('studio:getProjectJson', args);
+
+export const setWorkspaceConfigItem = (
+  args: WorkspaceTypes.WorkspaceSetConfigItemArgs
+) => window.electron.ipcRenderer.invoke('studio:setWorkspaceConfigItem', args);
+
+export const removeWorkspaceHistoryItem = (
+  args: WorkspaceTypes.RemoveWorkspaceHistoryItemArgs
+) =>
+  window.electron.ipcRenderer.invoke('studio:removeWorkspaceHistoryItem', args);
