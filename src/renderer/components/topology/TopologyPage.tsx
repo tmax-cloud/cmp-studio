@@ -2,6 +2,7 @@ import * as React from 'react';
 import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import { useGraphProps } from '@renderer/hooks/useGraphProps';
+import { useGraphData } from '@renderer/hooks/useGraphData';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 // import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
@@ -52,7 +53,8 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
   })
 );
 
-export const TopologyPage: React.FC = (props) => {
+export const TopologyPage: React.FC<TopologyPageProps> = (props) => {
+  const { workspaceUid } = props;
   const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
   const [sidePanelData, setSidePanelData] = React.useState({});
   const [terraformSchema, setTerraformSchema] = React.useState(new Map());
@@ -65,6 +67,7 @@ export const TopologyPage: React.FC = (props) => {
   }, []);
 
   const { graphRef, graphOption, graphHandler } = useGraphProps();
+  const graphData = useGraphData(workspaceUid);
 
   const classes = useStyles({ isSidePanelOpen });
   const openSidePanel = (data: any) => {
@@ -79,7 +82,11 @@ export const TopologyPage: React.FC = (props) => {
       <TopologySidebar openSidePanel={openSidePanel} />
       <div className={classes.topologyLayoutWrapper}>
         <TopologyToolbar handlers={graphHandler} />
-        <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
+        <TopologyGraph
+          graphRef={graphRef}
+          graphOptions={graphOption}
+          graphData={graphData}
+        />
       </div>
       <TopologySidePanel
         open={isSidePanelOpen}
@@ -90,3 +97,7 @@ export const TopologyPage: React.FC = (props) => {
     </TopologyLayoutRoot>
   );
 };
+
+interface TopologyPageProps {
+  workspaceUid: string;
+}
