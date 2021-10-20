@@ -1,9 +1,29 @@
 /* eslint-disable import/prefer-default-export */
 export const dummySchema = [
   {
-    displayName: 'test_asdfasdfasdfasdfasdf',
+    displayName: 'test',
     title: 'provider-test',
     type: 'provider',
+  },
+  {
+    displayName: 'test_test_resource_1',
+    title: 'resource-test_test_resource_1',
+    type: 'resource',
+  },
+  {
+    displayName: 'test_test_datasource_1',
+    title: 'datasource-test_test_datasource_1',
+    type: 'datasource',
+  },
+  {
+    displayName: 'test_test_module_1',
+    title: 'module-test_test_module_1',
+    type: 'module',
+  },
+  {
+    displayName: 'aws_test_module_1',
+    title: 'module-aws_test_module_1',
+    type: 'module',
   },
   {
     displayName: 'aws',

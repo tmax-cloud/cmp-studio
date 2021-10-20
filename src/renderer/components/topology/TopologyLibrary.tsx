@@ -12,8 +12,17 @@ import {
   MenuItem,
   InputLabel,
   Select,
+  TextField,
 } from '@mui/material';
-import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
+import {
+  AcUnit,
+  FilterVintage,
+  Storage,
+  Mode,
+  Circle,
+  ArrowDownward,
+  ArrowUpward,
+} from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useHistory } from 'react-router-dom';
 import { OptionProperties } from '@main/dialog/common/dialog';
@@ -54,6 +63,8 @@ const getIcon = (type: string) => {
       return <FilterVintage />;
     case 'datasource':
       return <Storage />;
+    case 'module':
+      return <Mode />;
     default:
       return <Circle />;
   }
@@ -92,12 +103,55 @@ function a11yProps(index: number) {
   };
 }
 
+function seartchDisplayName(searchText: string, displayName: string) {
+  if (displayName.toUpperCase().indexOf(searchText.toUpperCase()) !== -1) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 interface Item {
-  provider: string;
+  provider?: string;
   title: string;
   displayName: string;
   type: string;
 }
+
+const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
+  const [isShow, setIsShow] = React.useState(true);
+  const testFunc = (displayName: string) => {
+    alert('Hi ' + displayName);
+  };
+  return (
+    <div>
+      <Button onClick={() => setIsShow(!isShow)} color="inherit" fullWidth>
+        {title}
+        <span style={{ marginRight: '10px', float: 'right' }}>
+          {isShow ? <ArrowUpward /> : <ArrowDownward />}
+        </span>
+      </Button>
+      <List>
+        {isShow &&
+          items.map((item, index) => {
+            return (
+              <Button
+                key={`button-${index}`}
+                startIcon={getIcon(item.type)}
+                onClick={() => testFunc(item.displayName)}
+              >
+                {item.displayName}
+              </Button>
+            );
+          })}
+      </List>
+    </div>
+  );
+};
+type ShowItemListProps = {
+  items: Item[];
+  title: string;
+};
 
 const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
   const classes = useStyles();
@@ -111,8 +165,19 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
     setTabIndex(newValue);
   };
   const [porvider, setPorvider] = React.useState('');
+  const [porviderItems, setPorviderItems] = React.useState<Item[]>([]);
+  const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
+  const [datasourceItems, setdatasourceItems] = React.useState<Item[]>([]);
   const porviderHandleChange = (event: any) => {
     setPorvider(event.target.value);
+  };
+  const [localModuleItems, setLocalModuleItems] = React.useState<Item[]>([]);
+  const [terraformModuleItems, setTerraformModuleItems] = React.useState<
+    Item[]
+  >([]);
+  const [searchText, setSearchText] = React.useState('');
+  const searchTextChange = (event: any) => {
+    setSearchText(event.target.value);
   };
 
   const clickAwayHandler = () => {
@@ -121,18 +186,62 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
 
   React.useEffect(() => {
     const filteredList: Item[] = [];
+    const providerList: Item[] = [];
+    const resourceList: Item[] = [];
+    const datasourceList: Item[] = [];
+    const moduleList: Item[] = [];
     items.forEach((i: Item) => {
       if (i.provider === porvider) {
-        filteredList.push({
-          provider: i.provider,
-          title: i.title,
-          displayName: i.displayName,
-          type: i.type,
-        });
+        if (seartchDisplayName(searchText, i.displayName)) {
+          if (i.type === 'provider') {
+            providerList.push({
+              provider: i.provider,
+              title: i.title,
+              displayName: i.displayName,
+              type: i.type,
+            });
+          }
+          if (i.type === 'resource') {
+            resourceList.push({
+              provider: i.provider,
+              title: i.title,
+              displayName: i.displayName,
+              type: i.type,
+            });
+          }
+          if (i.type === 'datasource') {
+            datasourceList.push({
+              provider: i.provider,
+              title: i.title,
+              displayName: i.displayName,
+              type: i.type,
+            });
+          }
+          if (i.type === 'module') {
+            moduleList.push({
+              provider: i.provider,
+              title: i.title,
+              displayName: i.displayName,
+              type: i.type,
+            });
+          }
+        }
       }
     });
+    const localList: Item[] = [];
+    localList.push({
+      title: 'module-local_module_1',
+      displayName: 'local_module_1',
+      type: 'module',
+    });
+    setLocalModuleItems(localList);
+
     setFilteredItems(filteredList);
-  }, [porvider]);
+    setPorviderItems(providerList);
+    setResourceItems(resourceList);
+    setdatasourceItems(datasourceList);
+    setTerraformModuleItems(moduleList);
+  }, [porvider, searchText]);
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on(
@@ -175,23 +284,24 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
           value={porvider}
           label="Porvider"
           onChange={porviderHandleChange}
+          placeholder="프로바이더 선택"
+          fullWidth
         >
           <MenuItem value="aws">AWS</MenuItem>
           <MenuItem value="test">TEST</MenuItem>
+          <MenuItem value="empty">EMPTY</MenuItem>
         </Select>
-        <List>
-          {filteredItems.map((item, index) => {
-            return (
-              <Button
-                key={`button-${index}`}
-                startIcon={getIcon(item.type)}
-                onClick={() => alert('Hi ' + item.displayName)}
-              >
-                {item.displayName}
-              </Button>
-            );
-          })}
-        </List>
+        <TextField
+          id="outlined-searchText"
+          label="SearchText"
+          value={searchText}
+          onChange={searchTextChange}
+        />
+        <ShowItemList items={localModuleItems} title="로컬 모듈" />
+        <ShowItemList items={porviderItems} title="테라폼 디폴트" />
+        <ShowItemList items={terraformModuleItems} title="테라폼 모듈" />
+        <ShowItemList items={resourceItems} title="테라폼 리소스" />
+        <ShowItemList items={datasourceItems} title="테라폼 데이터소스" />
       </Box>
     </>
   );
