@@ -118,53 +118,92 @@ interface Item {
   type: string;
 }
 
-const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
-  const [isShow, setIsShow] = React.useState(true);
-  const testFunc = (displayName: string) => {
-    alert('Hi ' + displayName);
-  };
+function testFunc(displayName: string) {
+  alert('Hi ' + displayName);
+}
+function clickLocalModule(afterAction: any, obj: { id: string }) {
+  alert('Local Module ' + obj.id);
+  afterAction(obj);
+}
+function clickDefault(afterAction: any, obj: { id: string }) {
+  alert('Default ' + obj.id);
+  afterAction(obj);
+}
+function clickModule(afterAction: any, obj: { id: string }) {
+  alert('Module ' + obj.id);
+  afterAction(obj);
+}
+function clickResource(afterAction: any, obj: { id: string }) {
+  alert('Resource ' + obj.id);
+  afterAction(obj);
+}
+function clickDatasource(afterAction: any, obj: { id: string }) {
+  alert('Data Source ' + obj.id);
+  afterAction(obj);
+}
+
+const ShowItemList: React.FC<ShowItemListProps> = ({
+  items,
+  title,
+  clickAction,
+  afterAction,
+}) => {
+  const [isShow, setIsShow] = React.useState(false);
+
   return (
-    <div>
-      <Button onClick={() => setIsShow(!isShow)} color="inherit" fullWidth>
-        {title}
-        <span style={{ marginRight: '10px', float: 'right' }}>
-          {isShow ? <ArrowUpward /> : <ArrowDownward />}
-        </span>
-      </Button>
-      <List>
-        {isShow &&
-          items.map((item, index) => {
-            return (
-              <Button
-                key={`button-${index}`}
-                startIcon={getIcon(item.type)}
-                onClick={() => testFunc(item.displayName)}
-              >
-                {item.displayName}
-              </Button>
-            );
-          })}
-      </List>
-    </div>
+    <>
+      {items.length > 0 && (
+        <>
+          <Button onClick={() => setIsShow(!isShow)} color="inherit" fullWidth>
+            {title}
+            {'(' + items.length + ')'}
+            <span style={{ marginRight: '10px', float: 'right' }}>
+              {isShow ? <ArrowUpward /> : <ArrowDownward />}
+            </span>
+          </Button>
+          <List>
+            {isShow &&
+              items.map((item, index) => {
+                return (
+                  <Button
+                    key={`button-${index}`}
+                    startIcon={getIcon(item.type)}
+                    onClick={() => {
+                      clickAction(afterAction, { id: item.title });
+                    }}
+                  >
+                    {item.displayName}
+                  </Button>
+                );
+              })}
+          </List>
+        </>
+      )}
+    </>
   );
 };
 type ShowItemListProps = {
   items: Item[];
   title: string;
+  clickAction: any;
+  afterAction: any;
 };
 
-const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
+const TopologyLibrary: React.FC<TopologyLibraryProps> = ({
+  items,
+  openSidePanel,
+}) => {
   const classes = useStyles();
   const history = useHistory();
   //const [items, setItems] = React.useState<Item[]>([]);
-  const [filteredItems, setFilteredItems] = React.useState<Item[]>([]);
+  //const [filteredItems, setFilteredItems] = React.useState<Item[]>([]);
   const [prjContextMenuOpen, setPrjContextMenuOpen] = React.useState(false);
   const [prjAnchorEl, setPrjAnchorEl] = React.useState(null);
   const [tabIndex, setTabIndex] = React.useState(0);
   const handleTabChange = (event: any, newValue: number) => {
     setTabIndex(newValue);
   };
-  const [porvider, setPorvider] = React.useState('');
+  const [porvider, setPorvider] = React.useState('aws');
   const [porviderItems, setPorviderItems] = React.useState<Item[]>([]);
   const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
   const [datasourceItems, setdatasourceItems] = React.useState<Item[]>([]);
@@ -179,13 +218,14 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
   const searchTextChange = (event: any) => {
     setSearchText(event.target.value);
   };
+  const [isSearchResultEmpty, setIsSearchResultEmpty] = React.useState(false);
 
   const clickAwayHandler = () => {
     setPrjContextMenuOpen(false);
   };
 
   React.useEffect(() => {
-    const filteredList: Item[] = [];
+    //const filteredList: Item[] = [];
     const providerList: Item[] = [];
     const resourceList: Item[] = [];
     const datasourceList: Item[] = [];
@@ -229,18 +269,37 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
       }
     });
     const localList: Item[] = [];
-    localList.push({
-      title: 'module-local_module_1',
-      displayName: 'local_module_1',
-      type: 'module',
+    const localItems = [
+      {
+        title: 'module-local_module_1',
+        displayName: 'local_module_1',
+        type: 'module',
+      },
+    ];
+    localItems.forEach((localItem: Item) => {
+      if (seartchDisplayName(searchText, localItem.displayName)) {
+        localList.push(localItem);
+      }
     });
     setLocalModuleItems(localList);
 
-    setFilteredItems(filteredList);
+    //setFilteredItems(filteredList);
     setPorviderItems(providerList);
     setResourceItems(resourceList);
     setdatasourceItems(datasourceList);
     setTerraformModuleItems(moduleList);
+
+    if (
+      localList.length &&
+      providerList.length &&
+      resourceList.length &&
+      datasourceList.length &&
+      moduleList.length
+    ) {
+      setIsSearchResultEmpty(false);
+    } else {
+      setIsSearchResultEmpty(true);
+    }
   }, [porvider, searchText]);
 
   React.useEffect(() => {
@@ -277,31 +336,64 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
   return (
     <>
       <Box sx={{ width: '100%' }}>
-        <InputLabel id="demo-simple-select-label">Porvider</InputLabel>
+        <InputLabel>Porvider</InputLabel>
         <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
           value={porvider}
-          label="Porvider"
           onChange={porviderHandleChange}
-          placeholder="프로바이더 선택"
+          defaultValue="aws"
           fullWidth
+          displayEmpty
+          style={{ marginTop: '10px' }}
         >
           <MenuItem value="aws">AWS</MenuItem>
           <MenuItem value="test">TEST</MenuItem>
           <MenuItem value="empty">EMPTY</MenuItem>
         </Select>
+        <InputLabel>Search Text</InputLabel>
         <TextField
-          id="outlined-searchText"
-          label="SearchText"
           value={searchText}
           onChange={searchTextChange}
+          style={{ marginTop: '10px' }}
         />
-        <ShowItemList items={localModuleItems} title="로컬 모듈" />
-        <ShowItemList items={porviderItems} title="테라폼 디폴트" />
-        <ShowItemList items={terraformModuleItems} title="테라폼 모듈" />
-        <ShowItemList items={resourceItems} title="테라폼 리소스" />
-        <ShowItemList items={datasourceItems} title="테라폼 데이터소스" />
+        {isSearchResultEmpty ? (
+          <div>
+            <InputLabel>{searchText}</InputLabel>
+            <InputLabel>검색 결과가 없습니다.</InputLabel>
+          </div>
+        ) : (
+          <>
+            <ShowItemList
+              items={localModuleItems}
+              title="로컬 모듈"
+              clickAction={clickLocalModule}
+              afterAction={openSidePanel}
+            />
+            <ShowItemList
+              items={porviderItems}
+              title="테라폼 디폴트"
+              clickAction={clickDefault}
+              afterAction={openSidePanel}
+            />
+            <ShowItemList
+              items={terraformModuleItems}
+              title="테라폼 모듈"
+              clickAction={clickModule}
+              afterAction={openSidePanel}
+            />
+            <ShowItemList
+              items={resourceItems}
+              title="테라폼 리소스"
+              clickAction={clickResource}
+              afterAction={openSidePanel}
+            />
+            <ShowItemList
+              items={datasourceItems}
+              title="테라폼 데이터소스"
+              clickAction={clickDatasource}
+              afterAction={openSidePanel}
+            />
+          </>
+        )}
       </Box>
     </>
   );
@@ -309,5 +401,6 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
 
 type TopologyLibraryProps = {
   items: any;
+  openSidePanel: any;
 };
 export default TopologyLibrary;

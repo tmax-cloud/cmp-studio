@@ -196,7 +196,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
         </List>
       </TabPanel>
       <TabPanel value={tabIndex} index={1}>
-        <TopologyLibrary items={items} />
+        <TopologyLibrary items={items} openSidePanel={openSidePanel} />
       </TabPanel>
     </Box>
   );
