@@ -132,21 +132,6 @@ function parseJson(cloud) {
       schemaMap.set(schemaData.title, schemaData);
     }
   }
-  //test provider
-  let schemaData = {};
-  const testType = 'provider';
-  const testKey = 'test';
-  const TestTmpPath = terraformSchema.provider_schemas[testKey].provider;
-  schemaData = TestTmpPath.block;
-
-  renameKey(schemaData, 'attributes', 'properties');
-  mergeKey(schemaData, 'block_types', 'properties');
-
-  buildSchema(schemaData);
-
-  schemaData.title = testType + '-' + testKey;
-  schemaArray.push(schemaData);
-  schemaMap.set(schemaData.title, schemaData);
   return schemaMap;
 }
 export default parseJson;
