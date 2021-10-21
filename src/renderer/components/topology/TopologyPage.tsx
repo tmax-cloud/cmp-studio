@@ -2,14 +2,15 @@ import * as React from 'react';
 import * as _ from 'lodash-es';
 import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
-import { setSchemaMap, getSchemaMap } from 'renderer/utils/storageAPI';
+import { setSchemaMap } from 'renderer/utils/storageAPI';
+import { useGraphProps } from '@renderer/hooks/useGraphProps';
+import { useGraphData } from '@renderer/hooks/useGraphData';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 // import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import parseJson from '../form/utils/json2JsonSchemaParser';
 import TopologyToolbar from './toolbar/TopologyToolbar';
 import TopologyGraph from './graph/TopologyGraph';
-import { useGraphProps } from '../../hooks/useGraphProps';
 
 // MEMO : SIDEBAR_WIDTH + SIDEPANEL_WIDTH 값
 const sidebarAndPanelWidth = '800px';
@@ -54,17 +55,8 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
   })
 );
 
-const stringify = (object: any) => {
-  for (const eachIdx in object) {
-    if (object[eachIdx] instanceof Map) {
-      object[eachIdx] = Array.from(object[eachIdx]);
-      stringify(object);
-    } else if (typeof object[eachIdx] === 'object') stringify(object[eachIdx]);
-  }
-  return JSON.stringify(object, null, 2);
-};
-
-export const TopologyPage = () => {
+export const TopologyPage: React.FC<TopologyPageProps> = (props) => {
+  const { workspaceUid } = props;
   const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
 
   if (!localStorage.getItem('schemaJson')) {
@@ -72,6 +64,7 @@ export const TopologyPage = () => {
     setSchemaMap(JSON.stringify(Array.from(schemaJson.entries())));
   }
   const { graphRef, graphOption, graphHandler } = useGraphProps();
+  const graphData = useGraphData(workspaceUid);
 
   const classes = useStyles({ isSidePanelOpen });
 
@@ -80,7 +73,11 @@ export const TopologyPage = () => {
       <TopologySidebar setIsSidePanelOpen={setIsSidePanelOpen} />
       <div className={classes.topologyLayoutWrapper}>
         <TopologyToolbar handlers={graphHandler} />
-        <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
+        <TopologyGraph
+          graphRef={graphRef}
+          graphOptions={graphOption}
+          graphData={graphData}
+        />
       </div>
       <TopologySidePanel
         isSidePanelOpen={isSidePanelOpen}
@@ -89,3 +86,7 @@ export const TopologyPage = () => {
     </TopologyLayoutRoot>
   );
 };
+
+interface TopologyPageProps {
+  workspaceUid: string;
+}

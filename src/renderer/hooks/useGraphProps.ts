@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { ForceGraphMethods, NodeObject } from 'react-force-graph-2d';
 import { forceManyBody, forceCollide, forceLink } from 'd3-force';
-import { NodeData, LinkData } from '../types/graph';
-import { drawNode } from '../utils/graph/draw';
+import { NodeData, LinkData } from '@renderer/types/graph';
+import { drawNode } from '@renderer/utils/graph/draw';
 
 const initialConfig: GraphConfig = {
   isMounted: false,

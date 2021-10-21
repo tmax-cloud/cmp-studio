@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
-import { LinkData, ModulePath, NodeData, ROOT } from '../../types/graph';
+import { LinkData, ModulePath, NodeData, ROOT } from '@renderer/types/graph';
 import { getRawGraph } from './dot';
 import { getRefinedGraph } from './parse';
 import { traverseGraph } from './traverse';
@@ -82,10 +82,10 @@ export const getModulePath = (gData: GraphData): ModulePath[] => {
   return modulePaths;
 };
 
-export const getGraphData = async (src?: string): Promise<GraphData> => {
+export const getGraphData = async (src: string): Promise<GraphData> => {
   const rawGraph = await getRawGraph(src);
   const graph = getRefinedGraph(rawGraph);
-  //console.log('data: ', graph);
+  console.log('graph data: ', graph);
   //console.log('path: ', getModulePath(graph));
   return graph;
 };
