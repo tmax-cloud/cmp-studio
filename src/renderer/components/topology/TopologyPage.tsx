@@ -1,6 +1,8 @@
 import * as React from 'react';
+import * as _ from 'lodash-es';
 import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
+import { setSchemaMap } from 'renderer/utils/storageAPI';
 import { useGraphProps } from '@renderer/hooks/useGraphProps';
 import { useGraphData } from '@renderer/hooks/useGraphData';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
@@ -56,30 +58,19 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
 export const TopologyPage: React.FC<TopologyPageProps> = (props) => {
   const { workspaceUid } = props;
   const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
-  const [sidePanelData, setSidePanelData] = React.useState({});
-  const [terraformSchema, setTerraformSchema] = React.useState(new Map());
 
-  React.useEffect(() => {
-    const schema = parseJson('aws');
-    // schema.set('arrayTest', testSchema.arrayTest);
-    // schema.set('textareaTest', testSchema.textareaTest);
-    setTerraformSchema(schema);
-  }, []);
-
+  if (!localStorage.getItem('schemaJson')) {
+    const schemaJson = parseJson('aws');
+    setSchemaMap(JSON.stringify(Array.from(schemaJson.entries())));
+  }
   const { graphRef, graphOption, graphHandler } = useGraphProps();
   const graphData = useGraphData(workspaceUid);
 
   const classes = useStyles({ isSidePanelOpen });
-  const openSidePanel = (data: any) => {
-    if (!isSidePanelOpen) {
-      setIsSidePanelOpen(true);
-    }
-    setSidePanelData(data);
-  };
 
   return (
     <TopologyLayoutRoot>
-      <TopologySidebar openSidePanel={openSidePanel} />
+      <TopologySidebar setIsSidePanelOpen={setIsSidePanelOpen} />
       <div className={classes.topologyLayoutWrapper}>
         <TopologyToolbar handlers={graphHandler} />
         <TopologyGraph
@@ -89,10 +80,8 @@ export const TopologyPage: React.FC<TopologyPageProps> = (props) => {
         />
       </div>
       <TopologySidePanel
-        open={isSidePanelOpen}
+        isSidePanelOpen={isSidePanelOpen}
         toggleSidePanel={setIsSidePanelOpen}
-        data={sidePanelData}
-        terraformSchemaMap={terraformSchema}
       />
     </TopologyLayoutRoot>
   );
