@@ -37,7 +37,7 @@ const useStyles = makeStyles<Theme>((theme) =>
   })
 );
 
-const WorkspacesRightSection: React.FC = (props) => {
+const WorkspacesRightSection: React.FC = () => {
   const history = useHistory();
   const classes = useStyles();
   return (

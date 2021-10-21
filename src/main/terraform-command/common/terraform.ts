@@ -34,6 +34,7 @@ export type TerraformErrorData = { message: string };
 type TerraformData =
   | TerraformGraphSuccessData
   | TerraformErrorData
-  | TerraformVersionSuccessData;
+  | TerraformVersionSuccessData
+  | string;
 
 export type TerraformResponse = IPCResponse<TerraformStatus, TerraformData>;

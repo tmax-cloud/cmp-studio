@@ -34,12 +34,13 @@ const useStyles = makeStyles<Theme>((theme) =>
       padding: '5px 5px 5px 0',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: '#e6e7f9',
+      backgroundColor: theme.palette.primary.main,
     },
     searchBarTitle: {
       display: 'inline-block',
-      paddingLeft: 10,
+      paddingLeft: 15,
       lineHeight: '45px',
+      color: theme.palette.primary.contrastText,
     },
     inputWrapper: {
       display: 'flex',
