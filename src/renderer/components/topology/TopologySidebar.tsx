@@ -25,6 +25,7 @@ import { RootState } from 'renderer/app/store';
 import { openExistFolder } from '../../utils/ipc/workspaceIpcUtils';
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
+import TopologyLibrary from './TopologyLibrary';
 import { setSelectedObjectInfo } from '../../features/codeSlice';
 
 export const SIDEBAR_WIDTH = '300px';
@@ -94,6 +95,7 @@ function a11yProps(index: number) {
 }
 
 interface Item {
+  provider?: string;
   title: string;
   displayName: string;
   type: string;
@@ -147,6 +149,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
       })
       .forEach((i: Item) => {
         itemsList.push({
+          provider: i.displayName.split('_')[0],
           title: i.title,
           displayName: i.displayName,
           type: i.type,
@@ -237,7 +240,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
         </List>
       </TabPanel>
       <TabPanel value={tabIndex} index={1}>
-        구현 예정
+        <TopologyLibrary items={items} />
       </TabPanel>
     </Box>
   );
