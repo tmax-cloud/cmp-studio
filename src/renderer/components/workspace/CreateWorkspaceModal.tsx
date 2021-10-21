@@ -130,6 +130,7 @@ const getStatusIcon = (status: VersionStatus) => {
         />
       );
     default:
+      return <></>;
   }
 };
 const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
@@ -143,7 +144,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
   const [versionStatus, setVersionStatus] = React.useState(
     VersionStatus.LOADING
   );
-  const [tfVersion, setTfVersion] = React.useState('');
+  const [tfVersion, setTfVersion] = React.useState('버전정보를 가져오는 중..');
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on(
@@ -178,7 +179,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
         console.log('[Error] Failed to get default new project path : ', err);
       });
 
-    getTerraformVersion('')
+    getTerraformVersion({ workspaceUid: '' })
       .then((res: TerraformTypes.TerraformResponse) => {
         const { status, data } = res;
         if (status === TerraformTypes.TerraformStatusType.SUCCESS) {

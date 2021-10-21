@@ -8,6 +8,11 @@ export interface StudioWindowInterface {
   close(): void;
 }
 
+export type WindowSetSizeArgs = {
+  width: number;
+  height: number;
+};
+
 export const WindowMinimumSize = {
   WIDTH: 400,
   WIDTH_WITH_VERTICAL_PANEL: 600,

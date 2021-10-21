@@ -2,28 +2,66 @@ import { spawn } from 'child_process';
 // MEMO : 한글 출력에 문제가 있어서 사용했던 iconv 라이브러리 주석처리. 추후에 다시 쓸 수도 있어서 남겨둠.
 // import iconv from 'iconv-lite';
 import { ipcMain } from 'electron';
+import path from 'path';
 import {
   TerraformResponse,
   TerraformStatusType,
   TerraformGraphArgs,
   TerraformInitArgs,
   TerraformVersionArgs,
+  TerraformCheckExeArgs,
 } from '../common/terraform';
 import {
   WorkspaceIdentifier,
   WorkspaceMainServiceInterface,
 } from '../../workspaces/common/workspace';
+import { TERRAFORM_EXE_PATH_KEY } from '../../configs/common/configuration';
+import { AppConfigurationMainService } from '../../configs/electron-main/appConfigurationMainService';
 
 export class TerraformMainService {
   constructor(
-    private readonly workspaceMainService: WorkspaceMainServiceInterface
+    private readonly workspaceMainService: WorkspaceMainServiceInterface,
+    private readonly appConfigurationMainService: AppConfigurationMainService
   ) {
     this.registerListeners();
   }
 
+  checkTerraformExe(tfExePath: string): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+      if (path.extname(tfExePath) === '.exe') {
+        const tfHelpCmd = spawn(`"${tfExePath}" -help`, { shell: true });
+
+        let tfHelpData = '';
+        for await (const chunk of tfHelpCmd.stdout) {
+          tfHelpData += chunk;
+        }
+
+        let tfHelpError = '';
+        for await (const chunk of tfHelpCmd.stderr) {
+          tfHelpError += chunk;
+        }
+
+        const tfVersionxitCode = await new Promise((resolve, reject) => {
+          tfHelpCmd.on('close', resolve);
+        });
+
+        if (tfVersionxitCode) {
+          reject(tfHelpError);
+        }
+
+        resolve(tfHelpData);
+      } else {
+        reject(new Error('Invalid Terraform.exe path.'));
+      }
+    });
+  }
+
   getTerraformVersion(tfExePath: string) {
     return new Promise(async (resolve, reject) => {
-      const tfVersionCmd = spawn('terraform version', { shell: true });
+      const appTfExePath = this.appConfigurationMainService.getItem(
+        TERRAFORM_EXE_PATH_KEY
+      );
+      const tfVersionCmd = spawn(`"${appTfExePath}" version`, { shell: true });
       // MEMO : 워크스페이스마다 다른 테라폼 exe경로로 커맨드 실행시켜줘야될 경우 아래 주석으로 대체하기
       /*
       const tfVersionCmd = spawn(`${tfExePath} version`);
@@ -54,7 +92,10 @@ export class TerraformMainService {
   doTerraformInit(folderUri: string, tfExePath: string) {
     return new Promise(async (resolve, reject) => {
       // TODO : windows 외의 os에서도 돌아가게 분기처리하기
-      const tfInitCmd = spawn(`terraform -chdir="${folderUri}" init`, {
+      const appTfExePath = this.appConfigurationMainService.getItem(
+        TERRAFORM_EXE_PATH_KEY
+      );
+      const tfInitCmd = spawn(`"${appTfExePath}" -chdir="${folderUri}" init`, {
         shell: true,
       });
       // MEMO : 워크스페이스마다 다른 테라폼 exe경로로 커맨드 실행시켜줘야될 경우 아래 주석으로 대체하기
@@ -90,7 +131,10 @@ export class TerraformMainService {
   doTerraformGraph(folderUri: string, tfExePath: string): Promise<string> {
     return new Promise(async (resolve, reject) => {
       // TODO : windows 외의 os에서도 돌아가게 분기처리하기
-      const graphCmd = spawn(`terraform -chdir="${folderUri}" graph`, {
+      const appTfExePath = this.appConfigurationMainService.getItem(
+        TERRAFORM_EXE_PATH_KEY
+      );
+      const graphCmd = spawn(`"${appTfExePath}" -chdir="${folderUri}" graph`, {
         shell: true,
       });
       // MEMO : 워크스페이스마다 다른 테라폼 exe경로로 커맨드 실행시켜줘야될 경우 아래 주석으로 대체하기
@@ -225,6 +269,24 @@ export class TerraformMainService {
             status: TerraformStatusType.ERROR,
             data: { message },
           };
+        }
+      }
+    );
+    ipcMain.handle(
+      'studio:checkTerraformExe',
+      async (
+        event,
+        args: TerraformCheckExeArgs
+      ): Promise<TerraformResponse> => {
+        try {
+          const { terraformExePath } = args;
+          const resultData = await this.checkTerraformExe(terraformExePath);
+          return {
+            status: TerraformStatusType.SUCCESS,
+            data: resultData,
+          };
+        } catch (message: any) {
+          return { status: TerraformStatusType.ERROR, data: { message } };
         }
       }
     );

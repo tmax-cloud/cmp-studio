@@ -72,6 +72,15 @@ const createWindow = async () => {
     await installExtensions();
   }
 
+  // TODO : 생성해놓은 service들을 어떻게 관리할 것인지 정하기
+  const storageMainService = new StorageMainService();
+  const configurationMainService = new AppConfigurationMainService();
+  const workspaceMainService = new WorkspaceMainService(storageMainService);
+  const terraformMainService = new TerraformMainService(
+    workspaceMainService,
+    configurationMainService
+  );
+
   const studioWindow = new StudioWindow({
     preloadPath: path.join(__dirname, 'preload.js'),
     state: {
@@ -79,15 +88,9 @@ const createWindow = async () => {
       height: 700,
     },
   });
-
   mainWindow = studioWindow.win;
 
-  // TODO : 생성해놓은 service들을 어떻게 관리할 것인지 정하기
   const windowMainService = new WindowMainService(studioWindow);
-  const storageMainService = new StorageMainService();
-  const configurationMainService = new AppConfigurationMainService();
-  const workspaceMainService = new WorkspaceMainService(storageMainService);
-  const terraformMainService = new TerraformMainService(workspaceMainService);
   const dialogMainService = new DialogMainService(studioWindow);
 
   const menuBuilder = new MenuBuilder(studioWindow.win);

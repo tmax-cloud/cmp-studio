@@ -12,6 +12,10 @@ export type TerraformVersionArgs = {
   workspaceUid: string;
 };
 
+export type TerraformCheckExeArgs = {
+  terraformExePath: string;
+};
+
 export enum TerraformStatusType {
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR',
