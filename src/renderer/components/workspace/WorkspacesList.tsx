@@ -8,10 +8,13 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
+import { useDispatch } from 'react-redux';
 import { PushPin, Search } from '@mui/icons-material';
 import { makeStyles, createStyles } from '@mui/styles';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { timeDifference } from '../../utils/timeUtils';
+import * as WorkspaceIpcUtils from '../../utils/ipc/workspaceIpcUtils';
+import { setInitObjects } from '../../features/codeSlice';
 import {
   openExistFolder,
   setWorkspaceConfigItem,
@@ -181,6 +184,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   lastOpenedTime,
   isPinned,
   handleContextMenu,
+  dispatch,
 }) => {
   const history = useHistory();
   const classes = useStyles();
@@ -192,10 +196,13 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   const handleMenuOpen = (e: React.MouseEvent) => {
     handleContextMenu(e, { isPinned, workspaceUid, folderUri });
   };
-  const openWorkspace = () => {
+  const openWorkspace = async () => {
     const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
       folderUri,
     };
+    const response = await WorkspaceIpcUtils.getProjectJson(args);
+
+    dispatch(setInitObjects(response.data));
     openExistFolder(args)
       .then((response: WorkspaceTypes.WorkspaceResponse) => {
         const { status, data } = response;
@@ -273,6 +280,8 @@ const WorkspacesListContent: React.FC<WorkspacesListContentProps> = ({
     mouseY: number;
   } | null>(null);
 
+  const dispatch = useDispatch();
+
   const [contextMenuArgs, setContextMenuArgs] = React.useState<ContextMenuArgs>(
     { isPinned: false, workspaceUid: '', folderUri: '' }
   );
@@ -299,6 +308,7 @@ const WorkspacesListContent: React.FC<WorkspacesListContentProps> = ({
       <WorkspaceItem
         key={item.workspaceUid}
         handleContextMenu={handleContextMenu}
+        dispatch={dispatch}
         {...item}
       />
     );
@@ -369,6 +379,7 @@ type WorkspacesListProps = {
 
 type WorkspaceItemProps = {
   handleContextMenu: any;
+  dispatch: any;
 } & WorkspaceTypes.RecentWorkspaceData;
 
 type ContextMenuProps = {

@@ -10,6 +10,7 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
+import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import path from 'path';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
@@ -112,6 +113,13 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+app
+  .whenReady()
+  .then(() => {
+    return installExtension(REDUX_DEVTOOLS);
+  })
+  .catch(console.log);
 
 app.whenReady().then(createWindow).catch(console.log);
 

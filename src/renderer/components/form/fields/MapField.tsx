@@ -47,9 +47,7 @@ const MapField = (props: FieldProps) => {
         <Divider />
       </Box>
 
-      {mapData.map((curData: any, idx: number) => {
-        const key = Object.keys(curData)[0];
-        const value = Object.values(curData)[0];
+      {_.toPairs(mapData).map(([key, value], idx) => {
         return (
           <Grid
             container
@@ -115,7 +113,7 @@ const MapField = (props: FieldProps) => {
                 style={btnStyle as any}
                 disabled={disabled || readonly}
                 onClick={() => {
-                  onChange(
+                  return onChange(
                     (() => {
                       const result = mapData.filter((cur: any, i: number) => {
                         if (idx === i) return false;
@@ -131,7 +129,6 @@ const MapField = (props: FieldProps) => {
           </Grid>
         );
       })}
-
       <Box mb={1} mt={1}>
         <AddButton
           className="array-item-add"

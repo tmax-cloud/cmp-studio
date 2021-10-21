@@ -22,7 +22,7 @@ export const MainLayout: React.FC<RouteComponentProps<{ uid: string }>> = ({
   return (
     <MainLayoutRoot>
       <MainNavbar />
-      <TopologyPage />
+      <TopologyPage workspaceUid={uid} />
     </MainLayoutRoot>
   );
 };

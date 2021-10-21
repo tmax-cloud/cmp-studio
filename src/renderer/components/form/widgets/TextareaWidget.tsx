@@ -1,14 +1,24 @@
 import React from 'react';
 
 import { WidgetProps } from '@rjsf/core';
+import { makeStyles } from '@mui/styles';
 
 import TextField from '@mui/material/TextField';
 
 type CustomWidgetProps = WidgetProps & {
   options: any;
 };
+const useStyles = makeStyles({
+  root: {
+    '& .css-1sqnrkk-MuiInputBase-input-MuiOutlinedInput-input': {
+      resize: 'auto',
+      minWidth: '222px',
+      minHeight: '23px',
+    },
+  },
+});
 
-const TextareaWidget = ({
+const TextWidget = ({
   id,
   placeholder,
   value,
@@ -24,6 +34,7 @@ const TextareaWidget = ({
   schema,
   rawErrors = [],
 }: CustomWidgetProps) => {
+  const classes = useStyles();
   const _onChange = ({
     target: { value },
   }: React.ChangeEvent<HTMLInputElement>) =>
@@ -37,6 +48,8 @@ const TextareaWidget = ({
   return (
     <TextField
       id={id}
+      sx={{ minWidth: '250px' }}
+      className={classes.root}
       label={label || schema.title}
       placeholder={placeholder}
       disabled={disabled || readonly}
@@ -44,7 +57,7 @@ const TextareaWidget = ({
       required={required}
       autoFocus={autofocus}
       multiline
-      rows={options.rows || 5}
+      rows={1}
       error={rawErrors.length > 0}
       onChange={_onChange}
       onBlur={_onBlur}
@@ -53,4 +66,4 @@ const TextareaWidget = ({
   );
 };
 
-export default TextareaWidget;
+export default TextWidget;
