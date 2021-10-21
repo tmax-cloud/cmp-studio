@@ -1,5 +1,5 @@
 import { GraphData } from 'react-force-graph-2d';
-import { LinkData, NodeData, NodeKind, ROOT } from '../../types/graph';
+import { LinkData, NodeData, NodeKind, ROOT } from '@renderer/types/graph';
 import { nodesById } from './traverse';
 
 const parseNodeSimpleName = (str: string, status?: string) =>

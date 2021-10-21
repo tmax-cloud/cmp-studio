@@ -6,14 +6,15 @@ import ForceGraph2D, {
 } from 'react-force-graph-2d';
 import { withResizeDetector } from 'react-resize-detector';
 import Box from '@mui/material/Box';
-import { useGraphData } from '../../../hooks/useGraphData';
-
-const Error = () => <Box p={2}>Oh no! Something went wrong.</Box>;
+import Error from './Error';
 
 const TopologyGraph = (props: TopologyGraphProps) => {
-  const { width, height, graphRef, graphOptions } = props;
-  const graphData = useGraphData();
-  const isError = !width || !height || graphData.error !== '';
+  const { width, height, graphRef, graphOptions, graphData } = props;
+  const isError = !width || !height || graphData.error;
+
+  React.useEffect(() => {
+    graphRef.current?.zoomToFit();
+  }, [graphRef, width, height]);
 
   return (
     <Box
@@ -25,7 +26,7 @@ const TopologyGraph = (props: TopologyGraphProps) => {
       }}
     >
       {isError ? (
-        <Error />
+        <Error message={graphData.error} />
       ) : (
         <ForceGraph2D
           ref={graphRef}
@@ -47,6 +48,10 @@ export interface GraphSizeProps {
 export interface GraphProps {
   graphRef: React.MutableRefObject<ForceGraphMethods | undefined>;
   graphOptions: ForceGraphProps;
+  graphData: {
+    data: GraphData;
+    error?: string;
+  };
 }
 
 export type TopologyGraphProps = GraphSizeProps & GraphProps;

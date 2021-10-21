@@ -13,7 +13,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Link from '@mui/material/Link';
-import { ModulePath } from 'renderer/types/graph';
+import { ModulePath } from '@renderer/types/graph';
 
 const Error = () => <caption>구현 예정</caption>;
 
