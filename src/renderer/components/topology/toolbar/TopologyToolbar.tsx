@@ -7,7 +7,6 @@ import ViewBreadcrumbs from './breadcrumb/ViewBreadcrumb';
 import {
   FitScreenButton,
   SaveButton,
-  SelectModuleButton,
   ZoomInButton,
   ZoomOutButton,
 } from './button';
@@ -17,7 +16,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
   const { handlers } = props;
   const [openModuleListModal, setOpenModuleListModal] = React.useState(false);
 
-  const handleModuleListModalOpen = () => setOpenModuleListModal(true);
+  //const handleModuleListModalOpen = () => setOpenModuleListModal(true);
   const handleModuleListModalClose = () => setOpenModuleListModal(false);
 
   return (
@@ -44,7 +43,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
             }}
           >
             <SaveButton disabled />
-            <SelectModuleButton onClick={handleModuleListModalOpen} />
+            {/* <SelectModuleButton onClick={handleModuleListModalOpen} /> */}
             <ModuleListModal
               isOpen={openModuleListModal}
               onClose={handleModuleListModalClose}
