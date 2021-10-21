@@ -21,6 +21,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import { useSelector, useDispatch } from 'react-redux';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
+import { RootState } from 'renderer/app/store';
 import { openExistFolder } from '../../utils/ipc/workspaceIpcUtils';
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
@@ -102,7 +103,8 @@ interface Item {
   type: string;
 }
 
-const TopologySidebar = () => {
+const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
+  const { setIsSidePanelOpen } = props;
   const classes = useStyles();
   const history = useHistory();
   const [items, setItems] = React.useState<Item[]>([]);
@@ -119,13 +121,15 @@ const TopologySidebar = () => {
   };
 
   const selectObjects = createSelector(
-    (state: any) => state.code.objects,
+    (state: RootState) => state.code.objects,
     (objects) => {
       return objects;
     }
   );
 
   const objResult: any[] = [];
+
+  // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
   useSelector(selectObjects).forEach(
     (file: { filePath: string; fileJson: any[] }) => {
       objResult.push(
@@ -224,10 +228,10 @@ const TopologySidebar = () => {
                   const object = {
                     id: item.title,
                     content: content[0],
-                    isSelected: true,
                   };
 
                   dispatch(setSelectedObjectInfo(object));
+                  setIsSidePanelOpen((currState: boolean) => !currState);
                 }}
               >
                 {item.displayName}
@@ -330,6 +334,9 @@ const TopologySidebar = () => {
       </Drawer>
     </>
   );
+};
+type TopologySidebarProps = {
+  setIsSidePanelOpen: any;
 };
 
 export default TopologySidebar;

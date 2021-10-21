@@ -4,7 +4,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface ObjcectInfo {
   id: string;
   content: any;
-  isSelected: boolean;
 }
 interface CodeSlice {
   objects: any;
@@ -16,7 +15,6 @@ const initialState: CodeSlice = {
   selectedObjectInfo: {
     id: 'id',
     content: [],
-    isSelected: false,
   },
 };
 

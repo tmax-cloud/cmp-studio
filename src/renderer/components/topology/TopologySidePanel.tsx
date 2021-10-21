@@ -13,8 +13,9 @@ import preDefinedData from '../form/utils/preDefinedData';
 export const SIDEPANEL_WIDTH = 500;
 
 const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
-  data,
   terraformSchemaMap,
+  isSidePanelOpen,
+  toggleSidePanel,
 }) => {
   const selectObject = createSelector(
     [(state: RootState) => _.defaultsDeep(state.code)],
@@ -34,7 +35,6 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
     customUISchema = {},
     formData = {},
     fixedSchema = {},
-    // } = preDefinedData(currentSchema, _.get(object.fileJson, 'provider.aws'));
   } = preDefinedData(currentSchema, content);
 
   return (
@@ -48,7 +48,7 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
             height: `calc(100% - ${TOP_NAVBAR_HEIGHT}px)`,
           },
         }}
-        open={selectedObjectInfo?.isSelected}
+        open={isSidePanelOpen}
         anchor="right"
         variant="persistent"
       >
@@ -56,7 +56,7 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
           <IconButton
             aria-label="Close"
             onClick={() => {
-              // toggleSidePanel(false);
+              toggleSidePanel(false);
             }}
           >
             <Close />
@@ -75,8 +75,9 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
 };
 
 type TopologySidePanelProps = {
-  data: any;
   terraformSchemaMap: any;
+  isSidePanelOpen: boolean;
+  toggleSidePanel: any;
 };
 
 export default TopologySidePanel;

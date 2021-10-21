@@ -54,36 +54,28 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
 
 export const TopologyPage: React.FC = (props) => {
   const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
-  const [sidePanelData, setSidePanelData] = React.useState({});
   const [terraformSchema, setTerraformSchema] = React.useState(new Map());
 
   React.useEffect(() => {
     const schema = parseJson('aws');
-    // schema.set('arrayTest', testSchema.arrayTest);
-    // schema.set('textareaTest', testSchema.textareaTest);
     setTerraformSchema(schema);
   }, []);
 
   const { graphRef, graphOption, graphHandler } = useGraphProps();
 
   const classes = useStyles({ isSidePanelOpen });
-  // const openSidePanel = (data: any) => {
-  //   if (!isSidePanelOpen) {
-  //     setIsSidePanelOpen(true);
-  //   }
-  //   setSidePanelData(data);
-  // };
 
   return (
     <TopologyLayoutRoot>
-      <TopologySidebar />
+      <TopologySidebar setIsSidePanelOpen={setIsSidePanelOpen} />
       <div className={classes.topologyLayoutWrapper}>
         <TopologyToolbar handlers={graphHandler} />
         <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
       </div>
       <TopologySidePanel
-        data={sidePanelData}
         terraformSchemaMap={terraformSchema}
+        isSidePanelOpen={isSidePanelOpen}
+        toggleSidePanel={setIsSidePanelOpen}
       />
     </TopologyLayoutRoot>
   );
