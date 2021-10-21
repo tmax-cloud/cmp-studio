@@ -85,7 +85,7 @@ export const getModulePath = (gData: GraphData): ModulePath[] => {
 export const getGraphData = async (src: string): Promise<GraphData> => {
   const rawGraph = await getRawGraph(src);
   const graph = getRefinedGraph(rawGraph);
-  //console.log('data: ', graph);
+  console.log('graph data: ', graph);
   //console.log('path: ', getModulePath(graph));
   return graph;
 };

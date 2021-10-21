@@ -13,7 +13,7 @@ const TopologyGraph = (props: TopologyGraphProps) => {
   const isError = !width || !height || graphData.error;
 
   React.useEffect(() => {
-    graphRef.current?.zoomToFit(500);
+    graphRef.current?.zoomToFit();
   }, [graphRef, width, height]);
 
   return (
