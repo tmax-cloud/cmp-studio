@@ -185,7 +185,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
     );
   }, [history]);
 
-  const onProjectTabClick = (event: any) => {
+  const onObjectTabClick = (event: any) => {
     // Mouse Right Click
     if (event.button === 2) {
       setPrjAnchorEl(event.currentTarget);
@@ -205,7 +205,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
             className={classes.tab}
             label="Object"
             {...a11yProps(0)}
-            onMouseDown={onProjectTabClick}
+            onMouseDown={onObjectTabClick}
           />
           <Tab className={classes.tab} label="Library" {...a11yProps(1)} />
         </Tabs>
