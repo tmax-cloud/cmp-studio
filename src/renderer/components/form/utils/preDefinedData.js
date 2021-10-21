@@ -1,11 +1,14 @@
 import * as _ from 'lodash';
-const isEmpty = (obj) => _.isEmpty(obj);
-const preDefinedData = (jsonSchema = {}, obj = {}) => {
-  const type = !isEmpty(obj) && Object.keys(obj)[0]; // ['provider', 'resource', 'datasource']
-  const name = !isEmpty(obj) && Object.keys(obj[type])[0]; //
-  const displayName = !isEmpty(obj) && Object.keys(obj[type][name])[0];
+// const isEmpty = (obj) => _.isEmpty(obj);
+const preDefinedData = (jsonSchema, object) => {
+  if (!jsonSchema) {
+    return { customUISchema: {}, formData: {}, fixedSchema: {} };
+  }
+  const type = !_.isEmpty(object) && Object.keys(object)[0]; // ['provider', 'resource', 'datasource']
+  const name = !_.isEmpty(object) && Object.keys(object[type])[0]; //
+  const displayName = !_.isEmpty(object) && Object.keys(object[type][name])[0];
   const formData =
-    (!isEmpty(obj) && _.cloneDeep(obj[type][name][displayName])) || {};
+    (!_.isEmpty(object) && _.cloneDeep(object[type][name][displayName])) || {};
   // const filterdList = Object.keys(formData).filter((key) => formData[key]);
 
   const makePath = () => {};
@@ -25,10 +28,9 @@ const preDefinedData = (jsonSchema = {}, obj = {}) => {
         }
         return `${currKey}`;
       };
-      console.log(
-        makeSchemaPath(),
-        _.get(jsonSchema, makeSchemaPath() + '.type')
-      );
+      if (!_.get(jsonSchema, makeSchemaPath())) {
+        return;
+      }
       if (
         !_.get(jsonSchema, makeSchemaPath() + '.type') &&
         'properties' in _.get(jsonSchema, makeSchemaPath())
@@ -50,6 +52,9 @@ const preDefinedData = (jsonSchema = {}, obj = {}) => {
         }
         return `properties.${currKey}`;
       };
+      if (!_.get(jsonSchema, makePath())) {
+        return;
+      }
       console.log(makePath(), _.get(jsonSchema, makePath() + '.type'));
       if (
         !_.get(jsonSchema, makePath() + '.type') &&
@@ -89,10 +94,10 @@ const preDefinedData = (jsonSchema = {}, obj = {}) => {
           }
           return `${currKey}`;
         };
-        console.log(
-          makeSchemaPath(),
-          _.get(jsonSchema, makeSchemaPath() + '.type')
-        );
+        // console.log(
+        //   makeSchemaPath(),
+        //   _.get(jsonSchema, makeSchemaPath() + '.type')
+        // );
         if (
           !_.get(jsonSchema, makeSchemaPath() + '.type') &&
           'properties' in _.get(jsonSchema, makeSchemaPath())
@@ -118,7 +123,7 @@ const preDefinedData = (jsonSchema = {}, obj = {}) => {
           }
           return `properties.${currKey}`;
         };
-        console.log(makePath(), _.get(jsonSchema, makePath() + '.type'));
+        // console.log(makePath(), _.get(jsonSchema, makePath() + '.type'));
         if (!_.get(jsonSchema, makePath() + '.type')) {
           if ('properties' in _.get(jsonSchema, makePath())) {
             _.set(fixedSchema, makePath(), {

@@ -67,23 +67,21 @@ export const TopologyPage: React.FC = (props) => {
   const { graphRef, graphOption, graphHandler } = useGraphProps();
 
   const classes = useStyles({ isSidePanelOpen });
-  const openSidePanel = (data: any) => {
-    if (!isSidePanelOpen) {
-      setIsSidePanelOpen(true);
-    }
-    setSidePanelData(data);
-  };
+  // const openSidePanel = (data: any) => {
+  //   if (!isSidePanelOpen) {
+  //     setIsSidePanelOpen(true);
+  //   }
+  //   setSidePanelData(data);
+  // };
 
   return (
     <TopologyLayoutRoot>
-      <TopologySidebar openSidePanel={openSidePanel} />
+      <TopologySidebar />
       <div className={classes.topologyLayoutWrapper}>
         <TopologyToolbar handlers={graphHandler} />
         <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
       </div>
       <TopologySidePanel
-        open={isSidePanelOpen}
-        toggleSidePanel={setIsSidePanelOpen}
         data={sidePanelData}
         terraformSchemaMap={terraformSchema}
       />
