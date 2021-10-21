@@ -18,10 +18,10 @@ export const useGraphData = (workspaceUid: string) => {
   React.useEffect(() => {
     const getTerraformGraphData = async () => {
       let graphData;
-      const response = await getTerraformGraph(workspaceUid);
+      const response = await getTerraformGraph({ workspaceUid });
       if (response.status === TerraformStatusType.ERROR_GRAPH) {
         setError('terraform graph 커맨드에 에러가 있어 init 시도중입니다...');
-        const response2 = await doTerraformInit(workspaceUid);
+        const response2 = await doTerraformInit({ workspaceUid });
         if (response2.status === TerraformStatusType.ERROR_INIT) {
           throw new Error(
             'terraform init에 실패했습니다. 에러 내용 : ' +
@@ -29,7 +29,7 @@ export const useGraphData = (workspaceUid: string) => {
           );
         } else if (response2.status === TerraformStatusType.SUCCESS) {
           setError('init 성공 후 다시 graph 가져오는중...');
-          const response3 = await getTerraformGraph(workspaceUid);
+          const response3 = await getTerraformGraph({ workspaceUid });
           if (response3.status === TerraformStatusType.ERROR_GRAPH) {
             throw new Error(
               'terraform graph 커맨드 실행에 문제가 있습니다. ' +
