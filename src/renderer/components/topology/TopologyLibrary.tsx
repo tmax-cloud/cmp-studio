@@ -2,13 +2,7 @@ import * as React from 'react';
 import {
   Box,
   Button,
-  Drawer,
   List,
-  Typography,
-  Popper,
-  Paper,
-  ClickAwayListener,
-  MenuList,
   MenuItem,
   InputLabel,
   Select,
@@ -22,38 +16,9 @@ import {
   Circle,
   ArrowDownward,
   ArrowUpward,
+  Delete,
+  Explore,
 } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
-import { useHistory } from 'react-router-dom';
-import { OptionProperties } from '@main/dialog/common/dialog';
-import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
-import { dummySchema } from './dummy';
-//import InputLabel from '@mui/material/InputLabel';
-//import Select from '@mui/material/Select';
-
-export const SIDEBAR_WIDTH = '300px';
-
-const useStyles = makeStyles({
-  tab: {
-    width: '50%',
-  },
-  popperPaper: {
-    // specZ: The maximum height of a simple menu should be one or more rows less than the view
-    // height. This ensures a tapable area outside of the simple menu with which to dismiss
-    // the menu.
-    maxHeight: 'calc(100% - 96px)',
-    // Add iOS momentum scrolling.
-    WebkitOverflowScrolling: 'touch',
-  },
-  contextMenuList: {
-    // We disable the focus ring for mouse, touch and keyboard users.
-    outline: 0,
-  },
-  menuItem: {
-    fontSize: '12px',
-  },
-  menuItemText: { width: '120px', textAlign: 'start' },
-});
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -65,43 +30,12 @@ const getIcon = (type: string) => {
       return <Storage />;
     case 'module':
       return <Mode />;
+    case 'localModule':
+      return <Explore />;
     default:
       return <Circle />;
   }
 };
-
-const TabPanel: React.FC<TabPanelProps> = (props) => {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-};
-
-type TabPanelProps = {
-  children: React.ReactNode;
-  index: number;
-  value: number;
-};
-
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
 
 function seartchDisplayName(searchText: string, displayName: string) {
   if (displayName.toUpperCase().indexOf(searchText.toUpperCase()) !== -1) {
@@ -111,16 +45,21 @@ function seartchDisplayName(searchText: string, displayName: string) {
   }
 }
 
-interface Item {
-  provider?: string;
+const Modal: React.FC<ModalProps> = ({ title, confirmText, cancelText }) => {
+  return (
+    <div>
+      <InputLabel>{title || 'Title'}</InputLabel>
+      <InputLabel>{confirmText || 'Confirm'}</InputLabel>
+      <InputLabel>{cancelText || 'Cancel'}</InputLabel>
+    </div>
+  );
+};
+type ModalProps = {
   title: string;
-  displayName: string;
-  type: string;
-}
+  confirmText: string;
+  cancelText: string;
+};
 
-function testFunc(displayName: string) {
-  alert('Hi ' + displayName);
-}
 function clickLocalModule(afterAction: any, obj: { id: string }) {
   alert('Local Module ' + obj.id);
   afterAction(obj);
@@ -171,8 +110,10 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
                     onClick={() => {
                       clickAction(afterAction, { id: item.title });
                     }}
+                    fullWidth
+                    style={{ textAlign: 'left' }}
                   >
-                    {item.displayName}
+                    {item.type === 'localModule' ? item.path : item.displayName}
                   </Button>
                 );
               })}
@@ -189,20 +130,18 @@ type ShowItemListProps = {
   afterAction: any;
 };
 
+interface Item {
+  path?: string;
+  objectCount?: number;
+  provider?: string;
+  title: string;
+  displayName: string;
+  type: string;
+}
 const TopologyLibrary: React.FC<TopologyLibraryProps> = ({
   items,
   openSidePanel,
 }) => {
-  const classes = useStyles();
-  const history = useHistory();
-  //const [items, setItems] = React.useState<Item[]>([]);
-  //const [filteredItems, setFilteredItems] = React.useState<Item[]>([]);
-  const [prjContextMenuOpen, setPrjContextMenuOpen] = React.useState(false);
-  const [prjAnchorEl, setPrjAnchorEl] = React.useState(null);
-  const [tabIndex, setTabIndex] = React.useState(0);
-  const handleTabChange = (event: any, newValue: number) => {
-    setTabIndex(newValue);
-  };
   const [porvider, setPorvider] = React.useState('aws');
   const [porviderItems, setPorviderItems] = React.useState<Item[]>([]);
   const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
@@ -218,14 +157,12 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({
   const searchTextChange = (event: any) => {
     setSearchText(event.target.value);
   };
+  const deleteSearchText = (event: any) => {
+    setSearchText('');
+  };
   const [isSearchResultEmpty, setIsSearchResultEmpty] = React.useState(false);
 
-  const clickAwayHandler = () => {
-    setPrjContextMenuOpen(false);
-  };
-
   React.useEffect(() => {
-    //const filteredList: Item[] = [];
     const providerList: Item[] = [];
     const resourceList: Item[] = [];
     const datasourceList: Item[] = [];
@@ -271,9 +208,32 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({
     const localList: Item[] = [];
     const localItems = [
       {
-        title: 'module-local_module_1',
-        displayName: 'local_module_1',
-        type: 'module',
+        path: '/',
+        title: 'localModule-Project_Root',
+        objectCount: 20,
+        displayName: 'Project_root',
+        type: 'localModule',
+      },
+      {
+        path: '/Network-config',
+        title: 'localModule-Network-config',
+        objectCount: 12,
+        displayName: 'Network-config',
+        type: 'localModule',
+      },
+      {
+        path: '/Network-config2',
+        title: 'localModule-Network-config-2',
+        objectCount: 3,
+        displayName: 'Network-config 2',
+        type: 'localModule',
+      },
+      {
+        path: '/Network-config/defaultName',
+        title: 'localModule-defaultName',
+        objectCount: 13,
+        displayName: 'defaultName',
+        type: 'localModule',
       },
     ];
     localItems.forEach((localItem: Item) => {
@@ -302,41 +262,10 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({
     }
   }, [porvider, searchText]);
 
-  React.useEffect(() => {
-    window.electron.ipcRenderer.on(
-      'studio:dirPathToOpen',
-      (res: { canceled: boolean; filePaths: string[] }) => {
-        const { filePaths, canceled } = res;
-        if (!canceled) {
-          window.electron.ipcRenderer
-            .invoke('studio:openExistFolder', { folderUri: filePaths[0] })
-            .then((response: any) => {
-              const uid = response?.data?.uid;
-              if (uid) {
-                history.push(`/main/${uid}`);
-              }
-              return response;
-            })
-            .catch((err: any) => {
-              console.log('[Error] Failed to open exist folder : ', err);
-            });
-        }
-      }
-    );
-  }, [history]);
-
-  const onProjectTabClick = (event: any) => {
-    // Mouse Right Click
-    if (event.button === 2) {
-      setPrjAnchorEl(event.currentTarget);
-      setPrjContextMenuOpen(true);
-    }
-  };
-
   return (
     <>
       <Box sx={{ width: '100%' }}>
-        <InputLabel>Porvider</InputLabel>
+        <InputLabel>프로바이더 선택</InputLabel>
         <Select
           value={porvider}
           onChange={porviderHandleChange}
@@ -346,15 +275,30 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({
           style={{ marginTop: '10px' }}
         >
           <MenuItem value="aws">AWS</MenuItem>
+          <MenuItem value="azure">Microsoft Azure</MenuItem>
+          <MenuItem value="gcp">Google Cloud Platform</MenuItem>
+          <MenuItem value="openstack">OpenStack</MenuItem>
+          <MenuItem value="vmware">Vmware vSphere</MenuItem>
           <MenuItem value="test">TEST</MenuItem>
-          <MenuItem value="empty">EMPTY</MenuItem>
         </Select>
-        <InputLabel>Search Text</InputLabel>
-        <TextField
-          value={searchText}
-          onChange={searchTextChange}
-          style={{ marginTop: '10px' }}
-        />
+        <div>
+          <TextField
+            value={searchText}
+            placeholder="검색"
+            onChange={searchTextChange}
+            style={{ marginTop: '10px' }}
+            fullWidth
+          />
+          <Delete
+            onClick={deleteSearchText}
+            style={{
+              marginTop: '25px',
+              position: 'absolute',
+              right: '25px',
+              color: 'gray',
+            }}
+          />
+        </div>
         {isSearchResultEmpty ? (
           <div>
             <InputLabel>{searchText}</InputLabel>
