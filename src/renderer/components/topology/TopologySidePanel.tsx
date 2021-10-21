@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { Drawer, IconButton } from '@mui/material';
 // import { createSelector } from '@reduxjs/toolkit';
 import { Close } from '@mui/icons-material';
+import { getSchemaMap } from 'renderer/utils/storageAPI';
 import { RootState } from 'renderer/app/store';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import DynamicForm from '../form';
@@ -13,7 +14,6 @@ import preDefinedData from '../form/utils/preDefinedData';
 export const SIDEPANEL_WIDTH = 500;
 
 const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
-  terraformSchemaMap,
   isSidePanelOpen,
   toggleSidePanel,
 }) => {
@@ -29,13 +29,14 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   console.log('selected redux object info: ', selectedObjectInfo);
 
   // schema
+  const terraformSchemaMap = getSchemaMap();
   const currentSchema = terraformSchemaMap.get(id);
   console.log('current schema: ', currentSchema);
   const {
     customUISchema = {},
     formData = {},
     fixedSchema = {},
-  } = preDefinedData(currentSchema, content);
+  } = id && preDefinedData(currentSchema, content);
 
   return (
     <>
@@ -75,7 +76,6 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
 };
 
 type TopologySidePanelProps = {
-  terraformSchemaMap: any;
   isSidePanelOpen: boolean;
   toggleSidePanel: any;
 };

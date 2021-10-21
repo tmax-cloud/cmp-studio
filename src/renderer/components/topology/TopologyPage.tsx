@@ -1,6 +1,8 @@
 import * as React from 'react';
+import * as _ from 'lodash-es';
 import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
+import { setSchemaMap, getSchemaMap } from 'renderer/utils/storageAPI';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 // import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
@@ -52,15 +54,23 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
   })
 );
 
-export const TopologyPage: React.FC = (props) => {
+const stringify = (object: any) => {
+  for (const eachIdx in object) {
+    if (object[eachIdx] instanceof Map) {
+      object[eachIdx] = Array.from(object[eachIdx]);
+      stringify(object);
+    } else if (typeof object[eachIdx] === 'object') stringify(object[eachIdx]);
+  }
+  return JSON.stringify(object, null, 2);
+};
+
+export const TopologyPage = () => {
   const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
-  const [terraformSchema, setTerraformSchema] = React.useState(new Map());
 
-  React.useEffect(() => {
-    const schema = parseJson('aws');
-    setTerraformSchema(schema);
-  }, []);
-
+  if (!localStorage.getItem('schemaJson')) {
+    const schemaJson = parseJson('aws');
+    setSchemaMap(JSON.stringify(Array.from(schemaJson.entries())));
+  }
   const { graphRef, graphOption, graphHandler } = useGraphProps();
 
   const classes = useStyles({ isSidePanelOpen });
@@ -73,7 +83,6 @@ export const TopologyPage: React.FC = (props) => {
         <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
       </div>
       <TopologySidePanel
-        terraformSchemaMap={terraformSchema}
         isSidePanelOpen={isSidePanelOpen}
         toggleSidePanel={setIsSidePanelOpen}
       />

@@ -13,7 +13,7 @@ interface CodeSlice {
 const initialState: CodeSlice = {
   objects: {},
   selectedObjectInfo: {
-    id: 'id',
+    id: '',
     content: [],
   },
 };
