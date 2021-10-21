@@ -59,7 +59,9 @@ type ModalProps = {
   confirmText: string;
   cancelText: string;
 };
-
+function openSidePanel(obj: { id: string }) {
+  alert('OpenForm ' + obj.id);
+}
 function clickLocalModule(afterAction: any, obj: { id: string }) {
   alert('Local Module ' + obj.id);
   afterAction(obj);
@@ -138,10 +140,7 @@ interface Item {
   displayName: string;
   type: string;
 }
-const TopologyLibrary: React.FC<TopologyLibraryProps> = ({
-  items,
-  openSidePanel,
-}) => {
+const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
   const [porvider, setPorvider] = React.useState('aws');
   const [porviderItems, setPorviderItems] = React.useState<Item[]>([]);
   const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
@@ -345,6 +344,5 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({
 
 type TopologyLibraryProps = {
   items: any;
-  openSidePanel: any;
 };
 export default TopologyLibrary;

@@ -25,7 +25,8 @@
     "skipLibCheck": true,
     "allowJs": true,
     "paths": {
-      "@main/*": ["main/*"]
+      "@main/*": ["main/*"],
+      "@renderer/*": ["renderer/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.jsx", "**/*.js"],

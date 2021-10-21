@@ -1,5 +1,5 @@
 import { GraphData } from 'react-force-graph-2d';
-import { LinkData, NodeData } from '../../types/graph';
+import { LinkData, NodeData } from '@renderer/types/graph';
 
 export const nodesById = (gData: GraphData) =>
   Object.fromEntries(gData.nodes.map((node) => [node.id, node]));

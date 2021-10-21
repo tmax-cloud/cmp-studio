@@ -1,4 +1,5 @@
 import * as React from 'react';
+import _ from 'lodash';
 import {
   Box,
   Button,
@@ -16,13 +17,16 @@ import {
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useHistory } from 'react-router-dom';
+import { createSelector } from '@reduxjs/toolkit';
+import { useSelector, useDispatch } from 'react-redux';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
+import { RootState } from 'renderer/app/store';
 import { openExistFolder } from '../../utils/ipc/workspaceIpcUtils';
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
-import { dummySchema } from './dummy';
 import TopologyLibrary from './TopologyLibrary';
+import { setSelectedObjectInfo } from '../../features/codeSlice';
 
 export const SIDEBAR_WIDTH = '300px';
 
@@ -72,11 +76,7 @@ const TabPanel: React.FC<TabPanelProps> = (props) => {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 };
@@ -101,14 +101,15 @@ interface Item {
   type: string;
 }
 
-const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
+const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
+  const { setIsSidePanelOpen } = props;
   const classes = useStyles();
   const history = useHistory();
   const [items, setItems] = React.useState<Item[]>([]);
   const [prjContextMenuOpen, setPrjContextMenuOpen] = React.useState(false);
   const [prjAnchorEl, setPrjAnchorEl] = React.useState(null);
   const [tabIndex, setTabIndex] = React.useState(0);
-  //const [type, setType] = React.useState('');
+  const dispatch = useDispatch();
   const handleTabChange = (event: any, newValue: number) => {
     setTabIndex(newValue);
   };
@@ -117,17 +118,45 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
     setPrjContextMenuOpen(false);
   };
 
+  const selectObjects = createSelector(
+    (state: RootState) => state.code.objects,
+    (objects) => {
+      return objects;
+    }
+  );
+
+  const objResult: any[] = [];
+
+  // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
+  useSelector(selectObjects).forEach(
+    (file: { filePath: string; fileJson: any[] }) => {
+      objResult.push(
+        ..._.entries(file.fileJson).map((object) => ({
+          [object[0]]: object[1],
+        }))
+      );
+    }
+  );
+
   React.useEffect(() => {
     const itemsList: Item[] = [];
-    dummySchema.forEach((i: Item) => {
-      itemsList.push({
-        provider: i.displayName.split('_')[0],
-        title: i.title,
-        displayName: i.displayName,
-        type: i.type,
+    objResult
+      .map((result) => {
+        const type = Object.keys(result)[0];
+        const displayName = Object.keys(result[type])[0];
+        const title = type + '-' + displayName;
+        return { type, displayName, title };
+      })
+      .forEach((i: Item) => {
+        itemsList.push({
+          provider: i.displayName.split('_')[0],
+          title: i.title,
+          displayName: i.displayName,
+          type: i.type,
+        });
       });
-    });
     setItems(itemsList);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
@@ -155,7 +184,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
     );
   }, [history]);
 
-  const onProjectTabClick = (event: any) => {
+  const onObjectTabClick = (event: any) => {
     // Mouse Right Click
     if (event.button === 2) {
       setPrjAnchorEl(event.currentTarget);
@@ -173,9 +202,9 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
         >
           <Tab
             className={classes.tab}
-            label="Project"
+            label="Object"
             {...a11yProps(0)}
-            onMouseDown={onProjectTabClick}
+            onMouseDown={onObjectTabClick}
           />
           <Tab className={classes.tab} label="Library" {...a11yProps(1)} />
         </Tabs>
@@ -187,7 +216,22 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
               <Button
                 key={`button-${index}`}
                 startIcon={getIcon(item.type)}
-                onClick={() => openSidePanel({ id: item.title })}
+                onClick={() => {
+                  const content = objResult.filter((cur: any) => {
+                    const type = Object.keys(cur)[0];
+                    const name = Object.keys(cur[type])[0];
+                    if (item.title === type + '-' + name) {
+                      return cur;
+                    }
+                  });
+                  const object = {
+                    id: item.title,
+                    content: content[0],
+                  };
+
+                  dispatch(setSelectedObjectInfo(object));
+                  setIsSidePanelOpen((currState: boolean) => !currState);
+                }}
               >
                 {item.displayName}
               </Button>
@@ -196,7 +240,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
         </List>
       </TabPanel>
       <TabPanel value={tabIndex} index={1}>
-        <TopologyLibrary items={items} openSidePanel={openSidePanel} />
+        <TopologyLibrary items={items} />
       </TabPanel>
     </Box>
   );
@@ -290,8 +334,8 @@ const TopologySidebar: React.FC<TopologySidebarProps> = ({ openSidePanel }) => {
     </>
   );
 };
-
 type TopologySidebarProps = {
-  openSidePanel: any;
+  setIsSidePanelOpen: any;
 };
+
 export default TopologySidebar;

@@ -10,7 +10,7 @@ export type TerraformNodeKind =
   | 'var';
 export type NodeKind = TerraformNodeKind | string;
 
-export interface NodeExtraObject {
+export interface NodeData extends NodeObject {
   fullName: string;
   simpleName: string;
   type?: NodeKind;
@@ -21,14 +21,9 @@ export interface NodeExtraObject {
   parentLinks?: Set<LinkData>;
   childLinks?: Set<LinkData>;
 }
-
-export type NodeData = NodeObject & NodeExtraObject;
-
-export interface LinkExtraObject {
+export interface LinkData extends LinkObject {
   id?: string | number;
 }
-
-export type LinkData = LinkObject & LinkExtraObject;
 
 export interface ModulePath {
   id?: string | number;

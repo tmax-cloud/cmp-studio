@@ -41,6 +41,7 @@ export default {
     modules: [webpackPaths.srcPath, 'node_modules'],
     alias: {
       '@main': webpackPaths.srcMainPath,
+      '@renderer': webpackPaths.srcRendererPath,
     },
     fallback: {
       path: require.resolve('path-browserify'),

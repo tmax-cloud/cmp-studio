@@ -1,4 +1,4 @@
-import { NodeData, NodeKind } from 'renderer/types/graph';
+import { NodeData, NodeKind } from '@renderer/types/graph';
 import NoImageIcon from '../../../../assets/images/noImage64.png';
 
 const drawRoundRect = (
