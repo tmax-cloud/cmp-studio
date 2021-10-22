@@ -6,7 +6,13 @@ import {
   readFileJson,
 } from '../../base/common/fileUtils';
 import { getConfigsPath } from '../../base/common/pathUtils';
-import { AppConfigurationMainServiceInterface } from '../common/configuration';
+import {
+  AppConfigurationMainServiceInterface,
+  TERRAFORM_EXE_PATH_KEY,
+  AppConfigGetItemArgs,
+  ConfigResponse,
+  ConfigStatusType,
+} from '../common/configuration';
 
 const APP_SETTING_PATH = getConfigsPath('AppSettings.json');
 
@@ -21,7 +27,7 @@ export class AppConfigurationMainService
   init(): void {
     if (!fs.existsSync(APP_SETTING_PATH)) {
       createFile(APP_SETTING_PATH);
-      writeFileJson(APP_SETTING_PATH, { initialAppSettingTest: 'test' });
+      writeFileJson(APP_SETTING_PATH, { [TERRAFORM_EXE_PATH_KEY]: 'EMPTY' });
     }
   }
 
@@ -71,8 +77,14 @@ export class AppConfigurationMainService
       }
     );
 
-    ipcMain.handle('studio:getAppConfigItem', (event, arg: { key: string }) => {
-      return this.getItem(arg.key);
-    });
+    ipcMain.handle(
+      'studio:getAppConfigItem',
+      (event, arg: AppConfigGetItemArgs): ConfigResponse => {
+        return {
+          status: ConfigStatusType.SUCCESS,
+          data: this.getItem(arg.key),
+        };
+      }
+    );
   }
 }

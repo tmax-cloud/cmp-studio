@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 
 interface ObjcectInfo {
   id: string;
   content: any;
 }
 interface CodeSlice {
-  objects: any;
+  objects: WorkspaceTypes.TerraformFileJsonMeta[];
   selectedObjectInfo: ObjcectInfo;
 }
 

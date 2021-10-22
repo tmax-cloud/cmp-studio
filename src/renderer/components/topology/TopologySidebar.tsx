@@ -21,12 +21,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { RootState } from '@renderer/app/store';
-import { TerraformFileJsonMeta } from '@main/workspaces/common/workspace';
-import { openExistFolder } from '../../utils/ipc/workspaceIpcUtils';
+import {
+  openExistFolder,
+  getProjectJson,
+} from '../../utils/ipc/workspaceIpcUtils';
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import TopologyLibrary from './TopologyLibrary';
-import { setSelectedObjectInfo } from '../../features/codeSlice';
+import {
+  setSelectedObjectInfo,
+  setInitObjects,
+} from '../../features/codeSlice';
 
 export const SIDEBAR_WIDTH = '300px';
 
@@ -120,7 +125,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
 
   const selectObjects = createSelector(
     (state: RootState) => state.code.objects,
-    (objects: TerraformFileJsonMeta[]) => {
+    (objects: WorkspaceTypes.TerraformFileJsonMeta[]) => {
       return objects;
     }
   );
@@ -169,9 +174,11 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
         };
         if (!canceled) {
           openExistFolder(args)
-            .then((response: any) => {
+            .then(async (response: any) => {
               const uid = response?.data?.uid;
               if (uid) {
+                const response = await getProjectJson(args);
+                dispatch(setInitObjects(response.data));
                 history.push(`/main/${uid}`);
               }
               return response;
