@@ -16,6 +16,20 @@ export const useGraphData = (workspaceUid: string) => {
   const [error, setError] = React.useState<string>();
 
   React.useEffect(() => {
+    window.electron.ipcRenderer.on(
+      'studio:terraformInitStdout',
+      (res: string) => {
+        // TODO : string에 포함된 색표시 태그들 어떻게 처리 할 것인지 정하기
+        const prettyRes = res
+          .replaceAll('[0m', '')
+          .replaceAll('[1m', '')
+          .replaceAll('[32m', '');
+        setError(prettyRes);
+      }
+    );
+  }, []);
+
+  React.useEffect(() => {
     const getTerraformGraphData = async () => {
       let graphData;
       const response = await getTerraformGraph({ workspaceUid });

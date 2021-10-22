@@ -89,7 +89,11 @@ export class TerraformMainService {
     });
   }
 
-  doTerraformInit(folderUri: string, tfExePath: string) {
+  doTerraformInit(
+    folderUri: string,
+    tfExePath: string,
+    event: Electron.IpcMainInvokeEvent
+  ): Promise<string> {
     return new Promise(async (resolve, reject) => {
       // TODO : windows 외의 os에서도 돌아가게 분기처리하기
       const appTfExePath = this.appConfigurationMainService.getItem(
@@ -107,6 +111,8 @@ export class TerraformMainService {
       let tfInitData = '';
       for await (const chunk of tfInitCmd.stdout) {
         tfInitData += chunk;
+        const chunkString = Buffer.from(chunk).toString();
+        event.sender.send('studio:terraformInitStdout', chunkString);
         // tfInitData += iconv.decode(chunk, 'euc-kr');
       }
 
@@ -188,10 +194,10 @@ export class TerraformMainService {
         const folderUri = workspaceConfig.workspaceRealPath;
         try {
           // MEMO : 현재는 tfExePath 값은 사용안하고있어서 그냥 공백으로 넘겨줌.
-          await this.doTerraformInit(folderUri, '');
+          await this.doTerraformInit(folderUri, '', event);
           return {
             status: TerraformStatusType.SUCCESS,
-            data: { message: TerraformStatusType.SUCCESS },
+            data: TerraformStatusType.SUCCESS,
           };
         } catch (message: any) {
           return {
