@@ -32,6 +32,7 @@ import {
   setSelectedObjectInfo,
   setInitObjects,
 } from '../../features/codeSlice';
+import { setWorkspaceUid } from '../../features/commonSlice';
 
 export const SIDEBAR_WIDTH = '300px';
 
@@ -180,6 +181,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                 const response = await getProjectJson(args);
                 dispatch(setInitObjects(response.data));
                 history.push(`/main/${uid}`);
+                dispatch(setWorkspaceUid(uid));
               }
               return response;
             })

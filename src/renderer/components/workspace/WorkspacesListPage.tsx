@@ -16,6 +16,7 @@ import {
   getProjectJson,
 } from '../../utils/ipc/workspaceIpcUtils';
 import { setInitObjects } from '../../features/codeSlice';
+import { setWorkspaceUid } from '../../features/commonSlice';
 import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
 import { getAppConfigItem } from '../../utils/ipc/configIpcUtils';
 import { checkTerraformExe } from '../../utils/ipc/terraformIpcUtils';
@@ -155,6 +156,7 @@ const WorkspacesListPage: React.FC = (props) => {
           if (uid) {
             history.push(`/main/${uid}`);
             maximizeWindowSize();
+            dispatch(setWorkspaceUid(uid));
           }
           return response;
         } else if (
