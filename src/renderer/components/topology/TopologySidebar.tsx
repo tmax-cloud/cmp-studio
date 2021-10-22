@@ -163,7 +163,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
       });
     setItems(itemsList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items]);
+  }, [history.location.pathname]);
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on(
