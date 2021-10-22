@@ -25,6 +25,9 @@ export class DialogMainService {
               case OpenType.CREATE_NEW_PROJECT:
                 event.reply('studio:dirPathToCreateProject', result);
                 break;
+              case OpenType.SELECT_TF_EXE:
+                event.reply('studio:terraformExePath', result);
+                break;
               default:
                 event.reply('studio:dirPathToOpen', result);
                 break;
