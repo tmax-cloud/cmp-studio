@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
 import {
   Theme,
   Paper,
@@ -13,14 +12,10 @@ import { PushPin, Search } from '@mui/icons-material';
 import { makeStyles, createStyles } from '@mui/styles';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { timeDifference } from '../../utils/timeUtils';
-import * as WorkspaceIpcUtils from '../../utils/ipc/workspaceIpcUtils';
-import { setInitObjects } from '../../features/codeSlice';
 import {
-  openExistFolder,
   setWorkspaceConfigItem,
   removeWorkspaceHistoryItem,
 } from '../../utils/ipc/workspaceIpcUtils';
-import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
 
 // TODO : 검색 구현하기
 

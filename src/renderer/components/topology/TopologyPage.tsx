@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as _ from 'lodash-es';
 import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
-import { setSchemaMap } from 'renderer/utils/storageAPI';
+import { setSchemaMap } from '@renderer/utils/storageAPI';
 import { useGraphProps } from '@renderer/hooks/useGraphProps';
 import { useGraphData } from '@renderer/hooks/useGraphData';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
