@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import codeReducer from '../features/codeSlice';
+import commonReducer from '../features/commonSlice';
 
 const persistConfig = {
   key: 'root',
@@ -11,6 +12,7 @@ const persistConfig = {
 
 const rootReducer: any = combineReducers({
   code: codeReducer,
+  common: commonReducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

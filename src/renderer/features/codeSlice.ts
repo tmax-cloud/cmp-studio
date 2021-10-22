@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-// import * as _ from 'lodash-es';
 
 interface ObjcectInfo {
   id: string;
