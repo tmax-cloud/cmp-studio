@@ -177,8 +177,8 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
             .then(async (response: any) => {
               const uid = response?.data?.uid;
               if (uid) {
-                const response = await getProjectJson(args);
-                dispatch(setInitObjects(response.data));
+                const projectJsonRes = await getProjectJson(args);
+                dispatch(setInitObjects(projectJsonRes.data));
                 history.push(`/main/${uid}`);
               }
               return response;

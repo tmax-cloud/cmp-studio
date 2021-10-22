@@ -145,8 +145,8 @@ const WorkspacesListPage: React.FC = (props) => {
     const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
       folderUri,
     };
-    const response = await getProjectJson(args);
-    dispatch(setInitObjects(response.data));
+    const projectJsonRes = await getProjectJson(args);
+    dispatch(setInitObjects(projectJsonRes.data));
     openExistFolder(args)
       .then((response: WorkspaceTypes.WorkspaceResponse) => {
         const { status, data } = response;
