@@ -53,6 +53,35 @@ const WorkspacesListPage: React.FC = (props) => {
     WorkspaceTypes.RecentWorkspaceData[]
   >([]);
 
+  const openWorkspace = async (folderUri: string) => {
+    const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
+      folderUri,
+    };
+    const projectJsonRes = await getProjectJson(args);
+    dispatch(setInitObjects(projectJsonRes.data));
+    openExistFolder(args)
+      .then((response: WorkspaceTypes.WorkspaceResponse) => {
+        const { status, data } = response;
+        if (status === WorkspaceTypes.WorkspaceStatusType.SUCCESS) {
+          const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)?.uid;
+          if (uid) {
+            history.push(`/main/${uid}`);
+            maximizeWindowSize();
+          }
+          return response;
+        } else if (
+          status === WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT
+        ) {
+          console.log('[Error] Cannot find the project :', folderUri);
+          return response;
+        }
+        return response;
+      })
+      .catch((err: any) => {
+        console.log('[Error] Failed to open exists folder :', err);
+      });
+  };
+
   React.useEffect(() => {
     if (hasToRefresh) {
       window.electron.ipcRenderer.on(
@@ -61,24 +90,7 @@ const WorkspacesListPage: React.FC = (props) => {
           console.log('dirPathToOpen res?', res);
           const { filePaths, canceled } = res;
           if (!canceled) {
-            const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
-              folderUri: filePaths[0],
-            };
-            openExistFolder(args)
-              .then((response: WorkspaceTypes.WorkspaceResponse) => {
-                console.log('openExistFolder res? ', response);
-                const { data } = response;
-                const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)
-                  ?.uid;
-                if (uid) {
-                  history.push(`/main/${uid}`);
-                  maximizeWindowSize();
-                }
-                return response;
-              })
-              .catch((err: any) => {
-                console.log('[Error] Failed to open exists folder : ', err);
-              });
+            openWorkspace(filePaths[0]);
           }
         }
       );
@@ -140,35 +152,6 @@ const WorkspacesListPage: React.FC = (props) => {
         console.log(e);
       });
   }, []);
-
-  const openWorkspace = async (folderUri: string) => {
-    const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
-      folderUri,
-    };
-    const projectJsonRes = await getProjectJson(args);
-    dispatch(setInitObjects(projectJsonRes.data));
-    openExistFolder(args)
-      .then((response: WorkspaceTypes.WorkspaceResponse) => {
-        const { status, data } = response;
-        if (status === WorkspaceTypes.WorkspaceStatusType.SUCCESS) {
-          const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)?.uid;
-          if (uid) {
-            history.push(`/main/${uid}`);
-            maximizeWindowSize();
-          }
-          return response;
-        } else if (
-          status === WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT
-        ) {
-          console.log('[Error] Cannot find the project :', folderUri);
-          return response;
-        }
-        return response;
-      })
-      .catch((err: any) => {
-        console.log('[Error] Failed to open exists folder :', err);
-      });
-  };
 
   return (
     <WorkspacesLayoutRoot>
