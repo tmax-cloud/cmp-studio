@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 // import * as _ from 'lodash-es';
 
 interface ObjcectInfo {
@@ -6,12 +7,12 @@ interface ObjcectInfo {
   content: any;
 }
 interface CodeSlice {
-  objects: any;
+  objects: WorkspaceTypes.TerraformFileJsonMeta[];
   selectedObjectInfo: ObjcectInfo;
 }
 
 const initialState: CodeSlice = {
-  objects: {},
+  objects: [],
   selectedObjectInfo: {
     id: '',
     content: [],

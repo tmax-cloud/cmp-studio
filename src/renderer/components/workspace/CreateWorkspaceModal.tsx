@@ -9,8 +9,14 @@ import {
   Button,
   styled,
   Input,
+  CircularProgress,
 } from '@mui/material';
-import { Close, MoreHoriz } from '@mui/icons-material';
+import {
+  Close,
+  MoreHoriz,
+  CheckCircleOutline,
+  ErrorOutline,
+} from '@mui/icons-material';
 import { makeStyles, createStyles } from '@mui/styles';
 import { History } from 'history';
 import {
@@ -19,9 +25,11 @@ import {
   MakeDefaultNameSuccessData,
   WorkspaceSuccessUidData,
 } from '@main/workspaces/common/workspace';
+import * as TerraformTypes from '@main/terraform-command/common/terraform';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
 import * as WorkspaceIpcUtils from '../../utils/ipc/workspaceIpcUtils';
+import { getTerraformVersion } from '../../utils/ipc/terraformIpcUtils';
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import StudioTheme from '../../theme';
 
@@ -65,7 +73,14 @@ const useStyles = makeStyles<Theme>((theme) => {
       padding: 35,
     },
     fieldSection: {
-      minHeight: 150,
+      minHeight: 110,
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    versionSection: {
+      minHeight: 100,
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
@@ -86,14 +101,51 @@ const StyledButton = styled(Button)(({ theme }) => ({
   margin: 5,
 }));
 
+enum VersionStatus {
+  LOADING = 'LOADING',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+}
+
+const getStatusIcon = (status: VersionStatus) => {
+  switch (status) {
+    case VersionStatus.SUCCESS:
+      return (
+        <CheckCircleOutline
+          style={{ color: '#0095ff', fontSize: 17, marginRight: 3 }}
+        />
+      );
+    case VersionStatus.LOADING:
+      return (
+        <CircularProgress
+          color="primary"
+          size={13}
+          style={{ marginRight: 6 }}
+        />
+      );
+    case VersionStatus.FAILED:
+      return (
+        <ErrorOutline
+          style={{ color: 'red', fontSize: 17, marginRight: 3, marginTop: -2 }}
+        />
+      );
+    default:
+      return <></>;
+  }
+};
 const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
   history,
+  openWorkspace,
 }) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const [prjNameErrMsg, setPrjNameErrMsg] = React.useState('');
   const [newProjectName, setNewProjectName] = React.useState('');
   const [newProjectPath, setNewProjectPath] = React.useState('');
+  const [versionStatus, setVersionStatus] = React.useState(
+    VersionStatus.LOADING
+  );
+  const [tfVersion, setTfVersion] = React.useState('버전정보를 가져오는 중..');
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on(
@@ -128,6 +180,24 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
         console.log('[Error] Failed to get default new project path : ', err);
       });
 
+    getTerraformVersion({ workspaceUid: '' })
+      .then((res: TerraformTypes.TerraformResponse) => {
+        const { status, data } = res;
+        if (status === TerraformTypes.TerraformStatusType.SUCCESS) {
+          setVersionStatus(VersionStatus.SUCCESS);
+          const version = (data as TerraformTypes.TerraformVersionSuccessData)
+            .versionData;
+          setTfVersion(version.split('\n')[0]);
+        } else {
+          setVersionStatus(VersionStatus.FAILED);
+          setTfVersion('버전 정보를 가져오지 못했습니다.');
+        }
+        return res;
+      })
+      .catch((e: any) => {
+        console.log(e);
+      });
+
     return () => {
       setOpen(false);
     };
@@ -156,8 +226,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
           const uid = (data as WorkspaceSuccessUidData)?.uid;
           if (uid) {
             setOpen(false);
-            history.push(`/main/${uid}`);
-            maximizeWindowSize();
+            openWorkspace(newProjectPath);
           }
         } else if (status === WorkspaceStatusType.ERROR_FILE_EXISTS) {
           setPrjNameErrMsg('이미 존재하는 프로젝트 이름입니다.');
@@ -181,6 +250,29 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
           </IconButton>
         </div>
         <div className={classes.contentContainer}>
+          <div className={classes.versionSection}>
+            <Typography
+              variant="h5"
+              className={classes.fieldTitle}
+              style={{ marginBottom: 3 }}
+            >
+              테라폼 버전
+            </Typography>
+            <div
+              className={classes.fieldTitle}
+              style={{
+                color: 'grey',
+                marginTop: 5,
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              {getStatusIcon(versionStatus)}
+              <Typography variant="h6" style={{ display: 'inline-block' }}>
+                {tfVersion}
+              </Typography>
+            </div>
+          </div>
           <div className={classes.fieldSection}>
             <Typography
               variant="h5"
@@ -265,5 +357,6 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
 
 type CreateWorkspaceModalProps = {
   history: History;
+  openWorkspace: any;
 };
 export default CreateWorkspaceModal;

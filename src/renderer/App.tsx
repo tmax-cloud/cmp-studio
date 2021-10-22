@@ -8,11 +8,13 @@ import {
   TerraformErrorData,
   TerraformGraphSuccessData,
   TerraformVersionSuccessData,
+  TerraformResponse,
 } from '../main/terraform-command/common/terraform';
 import {
   getTerraformGraph,
   doTerraformInit,
   getTerraformVersion,
+  checkTerraformExe,
 } from './utils/ipc/terraformIpcUtils';
 import * as WorkspaceIpcUtils from './utils/ipc/workspaceIpcUtils';
 import * as ConfigIpcUtils from './utils/ipc/configIpcUtils';
@@ -35,19 +37,19 @@ const TestComponent = () => {
   const [folderToConvert, setFolderToConvert] = React.useState('');
 
   const getGraph = async () => {
-    const versionRes = await getTerraformVersion(workspaceUid);
+    const versionRes = await getTerraformVersion({ workspaceUid });
     console.log(
       'Version? ',
-      (versionRes.data as TerraformVersionSuccessData).versionData.split(
+      (versionRes.data as TerraformVersionSuccessData).versionData?.split(
         '\n'
       )[0]
     );
 
     setData('terraform graph 그래프데이타 가져오는 중입니다..');
-    const response = await getTerraformGraph(workspaceUid);
+    const response = await getTerraformGraph({ workspaceUid });
     if (response.status === TerraformStatusType.ERROR_GRAPH) {
       setData('terraform graph 커맨드에 에러가 있어 init 시도중입니다...');
-      const response2 = await doTerraformInit(workspaceUid);
+      const response2 = await doTerraformInit({ workspaceUid });
       if (response2.status === TerraformStatusType.ERROR_INIT) {
         setData(
           'terraform init에 실패했습니다. 에러 내용 :' +
@@ -55,7 +57,7 @@ const TestComponent = () => {
         );
       } else if (response2.status === TerraformStatusType.SUCCESS) {
         setData('init 성공 후 다시 graph가져오는중..');
-        const response3 = await getTerraformGraph(workspaceUid);
+        const response3 = await getTerraformGraph({ workspaceUid });
         if (response3.status === TerraformStatusType.ERROR_GRAPH) {
           setData(
             'terraform graph 커맨드 실행에 문제가 있습니다. ' +
