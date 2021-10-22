@@ -60,7 +60,9 @@ const useStyles = makeStyles<Theme>((theme) =>
   })
 );
 
-const WorkspacesRightSection: React.FC = () => {
+const WorkspacesRightSection: React.FC<WorkspacesRightSectionProps> = ({
+  openWorkspace,
+}) => {
   const history = useHistory();
   const classes = useStyles();
   return (
@@ -80,7 +82,10 @@ const WorkspacesRightSection: React.FC = () => {
             onClick={() => {
               ReactDOM.render(
                 <ThemeProvider theme={StudioTheme}>
-                  <CreateWorkspaceModal history={history} />
+                  <CreateWorkspaceModal
+                    history={history}
+                    openWorkspace={openWorkspace}
+                  />
                 </ThemeProvider>,
                 document.getElementById('modal-container')
               );
@@ -122,6 +127,10 @@ const WorkspacesRightSection: React.FC = () => {
       </div>
     </div>
   );
+};
+
+type WorkspacesRightSectionProps = {
+  openWorkspace: any;
 };
 
 export default WorkspacesRightSection;

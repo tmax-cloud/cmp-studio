@@ -185,8 +185,8 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   isPinned,
   handleContextMenu,
   dispatch,
+  openWorkspace,
 }) => {
-  const history = useHistory();
   const classes = useStyles();
   const timestamp = timeDifference(
     Math.floor(+new Date() / 1000),
@@ -196,41 +196,14 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   const handleMenuOpen = (e: React.MouseEvent) => {
     handleContextMenu(e, { isPinned, workspaceUid, folderUri });
   };
-  const openWorkspace = async () => {
-    const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
-      folderUri,
-    };
-    const response = await WorkspaceIpcUtils.getProjectJson(args);
-
-    dispatch(setInitObjects(response.data));
-    openExistFolder(args)
-      .then((response: WorkspaceTypes.WorkspaceResponse) => {
-        const { status, data } = response;
-        if (status === WorkspaceTypes.WorkspaceStatusType.SUCCESS) {
-          const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)?.uid;
-          if (uid) {
-            history.push(`/main/${uid}`);
-            maximizeWindowSize();
-          }
-          return response;
-        } else if (
-          status === WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT
-        ) {
-          console.log('[Error] Cannot find the project :', folderUri);
-          return response;
-        }
-        return response;
-      })
-      .catch((err: any) => {
-        console.log('[Error] Failed to open exists folder :', err);
-      });
-  };
 
   return (
     <div
       role="button"
       className={classes.workspaceItemWrapper}
-      onClick={openWorkspace}
+      onClick={() => {
+        openWorkspace(folderUri);
+      }}
       onContextMenu={handleMenuOpen}
     >
       <div
@@ -273,6 +246,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
 const WorkspacesListContent: React.FC<WorkspacesListContentProps> = ({
   items,
   setHasToRefresh,
+  openWorkspace,
 }) => {
   const classes = useStyles();
   const [contextMenu, setContextMenu] = React.useState<{
@@ -308,6 +282,7 @@ const WorkspacesListContent: React.FC<WorkspacesListContentProps> = ({
       <WorkspaceItem
         key={item.workspaceUid}
         handleContextMenu={handleContextMenu}
+        openWorkspace={openWorkspace}
         dispatch={dispatch}
         {...item}
       />
@@ -337,6 +312,7 @@ const doFilter = (
 const WorkspacesList: React.FC<WorkspacesListProps> = ({
   items,
   setHasToRefresh,
+  openWorkspace,
 }) => {
   const [filteredItems, setFilteredItems] = React.useState(items);
   const handleInputChange = (e: any) => {
@@ -362,6 +338,7 @@ const WorkspacesList: React.FC<WorkspacesListProps> = ({
       <WorkspacesListContent
         items={filteredItems}
         setHasToRefresh={setHasToRefresh}
+        openWorkspace={openWorkspace}
       />
     </>
   );
@@ -370,16 +347,19 @@ const WorkspacesList: React.FC<WorkspacesListProps> = ({
 type WorkspacesListContentProps = {
   items: WorkspaceTypes.RecentWorkspaceData[];
   setHasToRefresh: any;
+  openWorkspace: any;
 };
 
 type WorkspacesListProps = {
   items: WorkspaceTypes.RecentWorkspaceData[];
   setHasToRefresh: any;
+  openWorkspace: any;
 };
 
 type WorkspaceItemProps = {
   handleContextMenu: any;
   dispatch: any;
+  openWorkspace: any;
 } & WorkspaceTypes.RecentWorkspaceData;
 
 type ContextMenuProps = {

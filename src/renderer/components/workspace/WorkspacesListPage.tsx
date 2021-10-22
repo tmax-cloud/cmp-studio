@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { styled, ThemeProvider } from '@mui/material';
 import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import * as TerraformTypes from '@main/terraform-command/common/terraform';
 import {
@@ -12,7 +13,9 @@ import {
 import {
   openExistFolder,
   getRecentlyOpenedWorkspaces,
+  getProjectJson,
 } from '../../utils/ipc/workspaceIpcUtils';
+import { setInitObjects } from '../../features/codeSlice';
 import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
 import { getAppConfigItem } from '../../utils/ipc/configIpcUtils';
 import { checkTerraformExe } from '../../utils/ipc/terraformIpcUtils';
@@ -44,6 +47,7 @@ const WorkspaceListRightContainer = styled('div')({
 
 const WorkspacesListPage: React.FC = (props) => {
   const history = useHistory();
+  const dispatch = useDispatch();
   const [hasToRefresh, setHasToRefresh] = React.useState(true);
   const [items, setItems] = React.useState<
     WorkspaceTypes.RecentWorkspaceData[]
@@ -137,13 +141,46 @@ const WorkspacesListPage: React.FC = (props) => {
       });
   }, []);
 
+  const openWorkspace = async (folderUri: string) => {
+    const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
+      folderUri,
+    };
+    const response = await getProjectJson(args);
+    dispatch(setInitObjects(response.data));
+    openExistFolder(args)
+      .then((response: WorkspaceTypes.WorkspaceResponse) => {
+        const { status, data } = response;
+        if (status === WorkspaceTypes.WorkspaceStatusType.SUCCESS) {
+          const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)?.uid;
+          if (uid) {
+            history.push(`/main/${uid}`);
+            maximizeWindowSize();
+          }
+          return response;
+        } else if (
+          status === WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT
+        ) {
+          console.log('[Error] Cannot find the project :', folderUri);
+          return response;
+        }
+        return response;
+      })
+      .catch((err: any) => {
+        console.log('[Error] Failed to open exists folder :', err);
+      });
+  };
+
   return (
     <WorkspacesLayoutRoot>
       <WorkspaceListLeftContainer>
-        <WorkspacesList items={items} setHasToRefresh={setHasToRefresh} />
+        <WorkspacesList
+          items={items}
+          setHasToRefresh={setHasToRefresh}
+          openWorkspace={openWorkspace}
+        />
       </WorkspaceListLeftContainer>
       <WorkspaceListRightContainer>
-        <WorkspacesRightSection />
+        <WorkspacesRightSection openWorkspace={openWorkspace} />
       </WorkspaceListRightContainer>
     </WorkspacesLayoutRoot>
   );

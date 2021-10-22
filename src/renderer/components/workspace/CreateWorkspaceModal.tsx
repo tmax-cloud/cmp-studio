@@ -135,6 +135,7 @@ const getStatusIcon = (status: VersionStatus) => {
 };
 const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
   history,
+  openWorkspace,
 }) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
@@ -225,8 +226,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
           const uid = (data as WorkspaceSuccessUidData)?.uid;
           if (uid) {
             setOpen(false);
-            history.push(`/main/${uid}`);
-            maximizeWindowSize();
+            openWorkspace(newProjectPath);
           }
         } else if (status === WorkspaceStatusType.ERROR_FILE_EXISTS) {
           setPrjNameErrMsg('이미 존재하는 프로젝트 이름입니다.');
@@ -357,5 +357,6 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
 
 type CreateWorkspaceModalProps = {
   history: History;
+  openWorkspace: any;
 };
 export default CreateWorkspaceModal;
