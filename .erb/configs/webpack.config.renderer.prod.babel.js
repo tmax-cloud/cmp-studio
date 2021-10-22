@@ -21,7 +21,7 @@ deleteSourceMaps();
 const devtoolsConfig =
   process.env.DEBUG_PROD === 'true'
     ? {
-        devtool: 'source-map',
+        devtool: 'inline-source-map',
       }
     : {};
 

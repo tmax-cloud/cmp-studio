@@ -5,7 +5,6 @@ import {
   Button,
   Drawer,
   List,
-  Typography,
   Tabs,
   Tab,
   Popper,
@@ -22,6 +21,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { RootState } from '@renderer/app/store';
+import { TerraformFileJsonMeta } from '@main/workspaces/common/workspace';
 import { openExistFolder } from '../../utils/ipc/workspaceIpcUtils';
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
@@ -120,7 +120,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
 
   const selectObjects = createSelector(
     (state: RootState) => state.code.objects,
-    (objects) => {
+    (objects: TerraformFileJsonMeta[]) => {
       return objects;
     }
   );
