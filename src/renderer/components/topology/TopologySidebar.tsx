@@ -239,7 +239,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                   };
 
                   dispatch(setSelectedObjectInfo(object));
-                  setIsSidePanelOpen((currState: boolean) => !currState);
+                  setIsSidePanelOpen((currState: boolean) => true);
                 }}
               >
                 {item.displayName}
