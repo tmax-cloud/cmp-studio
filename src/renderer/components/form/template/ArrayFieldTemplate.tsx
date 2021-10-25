@@ -83,7 +83,7 @@ const DefaultArrayItem = (props: any) => {
 
       {hasToolbar && (
         <Grid item>
-          {(hasMoveUp || hasMoveDown) && (
+          {/* {(hasMoveUp || hasMoveDown) && (
             <IconButton
               icon="arrow-up"
               className="array-item-move-up"
@@ -104,7 +104,7 @@ const DefaultArrayItem = (props: any) => {
               disabled={disabled || readonly || !hasMoveDown}
               onClick={onReorderClick(index, index + 1)}
             />
-          )}
+          )} */}
 
           {hasRemove && (
             <IconButton
