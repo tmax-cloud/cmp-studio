@@ -21,11 +21,13 @@ import {
   ConfigResponse,
 } from '@main/configs/common/configuration';
 import * as TerraformTypes from '@main/terraform-command/common/terraform';
+import { MediumWindowSize } from '@main/windows/common/windows';
 import { checkTerraformExe } from '../../../utils/ipc/terraformIpcUtils';
 import {
   setAppConfigItem,
   getAppConfigItem,
 } from '../../../utils/ipc/configIpcUtils';
+import { setWindowSize } from '../../../utils/ipc/windowIpcUtils';
 import StudioTheme from '../../../theme';
 import { openDialog } from '../../../utils/ipc/dialogIpcUtils';
 
@@ -92,7 +94,7 @@ const TerraformVersionSettingContent: React.FC<TerraformVersionSettingContentPro
 
     return (
       <>
-        <Typography sx={{ height: '40px', padding: '20px' }} variant="h5">
+        <Typography sx={{ height: '30px', padding: '15px' }} variant="h5">
           CMP 스튜디오 설정
         </Typography>
         <div>
@@ -145,6 +147,7 @@ const TerraformVersionSettingContent: React.FC<TerraformVersionSettingContentPro
               marginBottom: 10,
               color: 'red',
               padding: '10px 20px 0px 20px',
+              minHeight: '23px',
             }}
           >
             {errorMsg}
@@ -222,6 +225,10 @@ export const TerraformVersionSettingPage: React.FC = () => {
 
   const handleClose = () => {
     history.push('/home');
+    setWindowSize({
+      width: MediumWindowSize.WIDTH,
+      height: MediumWindowSize.HEIGHT,
+    });
   };
 
   return (

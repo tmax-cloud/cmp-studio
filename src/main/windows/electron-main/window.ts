@@ -73,7 +73,7 @@ export class StudioWindow implements StudioWindowInterface {
   setWindowSize(width: number, height: number): void {
     if (this.win) {
       this.win.setResizable(true);
-      this.win.setSize(width, height);
+      this.win.setSize(width, height, true);
     }
   }
 

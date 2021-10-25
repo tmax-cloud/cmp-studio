@@ -191,7 +191,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
         }
       }
     );
-  }, [history]);
+  }, []);
 
   const onObjectTabClick = (event: any) => {
     // Mouse Right Click
