@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import * as FileUtils from '../../base/common/fileUtils';
 import * as WorkspaceTypes from '../common/workspace';
 const Converter = require('../../utils/hcljsonconverter');
 
@@ -29,5 +30,19 @@ export class WorkspaceConvertService
       }
     });
     return resultArray;
+  }
+
+  convertAllJsonToHcl(objList: WorkspaceTypes.TerraformFileJsonMeta[]) {
+    objList.forEach((obj) => {
+      const { filePath, fileJson } = obj;
+      const buf = Buffer.from(JSON.stringify(fileJson));
+      const result = Converter.JsonToHcl(buf);
+      const resultStr = Buffer.from(result).toString();
+      if (!fs.existsSync(FileUtils.getDirName(filePath))) {
+        fs.mkdirSync(FileUtils.getDirName(filePath), { recursive: true });
+      }
+      fs.writeFileSync(filePath, resultStr);
+    });
+    console.log('[INFO] File Export Finished.');
   }
 }

@@ -7,7 +7,7 @@ import * as WorkspaceTypes from '../common/workspace';
 import { WorkspaceManagementService } from './workspaceManagementService';
 import { WorkspacesHistoryService } from './workspacesHistoryService';
 import { StorageMainServiceInterface } from '../../storage/common/storage';
-import { WorkspaceConvertService } from './workspaceImportService';
+import { WorkspaceConvertService } from './workspaceConvertService';
 
 // TODO : history, management에 워크스페이스 지워주는 기능들도 구현해야 됨.
 export class WorkspaceMainService
@@ -240,6 +240,28 @@ export class WorkspaceMainService
           return {
             status: WorkspaceTypes.WorkspaceStatusType.ERROR,
             data: `[Error] Error occurred while converting terrafrom data into json : ${e}`,
+          };
+        }
+      }
+    );
+
+    ipcMain.handle(
+      'studio:exportProject',
+      (
+        event,
+        arg: WorkspaceTypes.WorkspaceExportProjectArgs
+      ): WorkspaceTypes.WorkspaceResponse => {
+        const { objects } = arg;
+        try {
+          this.workspaceConvertService.convertAllJsonToHcl(objects);
+          return {
+            status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
+            data: 'Project saved successfully.',
+          };
+        } catch (e: any) {
+          return {
+            status: WorkspaceTypes.WorkspaceStatusType.ERROR,
+            data: `[Error] Error occured while saving the project : ${e}`,
           };
         }
       }
