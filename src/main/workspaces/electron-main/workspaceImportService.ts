@@ -21,7 +21,7 @@ export class WorkspaceConvertService
       } else if (path.extname(currPath) === '.tf') {
         const fileBuffer = fs.readFileSync(currPath);
         const result = Converter.HclToJson(fileBuffer, currPath);
-        const resultStr = Buffer.from(result[0]?.buffer).toString();
+        const resultStr = Buffer.from(result[0]).toString();
         resultArray.push({
           filePath: currPath,
           fileJson: JSON.parse(resultStr),

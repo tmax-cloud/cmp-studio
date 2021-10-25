@@ -40,7 +40,8 @@ export class StudioWindow implements StudioWindowInterface {
     // TODO : 초기화면에서만 크기조정 못하게 할 것인지 정하기.
     this.win.setResizable(false);
     this.win.loadURL(resolveHtmlPath('index.html'));
-    this.win.webContents.openDevTools();
+    // MEMO : prod모드에서도 개발자툴 켤 때 아래주석 풀기
+    // this.win.webContents.openDevTools();
 
     // Eventing
     this.registerListeners();
@@ -72,7 +73,7 @@ export class StudioWindow implements StudioWindowInterface {
   setWindowSize(width: number, height: number): void {
     if (this.win) {
       this.win.setResizable(true);
-      this.win.setSize(width, height);
+      this.win.setSize(width, height, true);
     }
   }
 

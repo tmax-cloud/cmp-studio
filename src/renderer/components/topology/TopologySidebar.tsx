@@ -5,7 +5,6 @@ import {
   Button,
   Drawer,
   List,
-  Typography,
   Tabs,
   Tab,
   Popper,
@@ -21,12 +20,19 @@ import { createSelector } from '@reduxjs/toolkit';
 import { useSelector, useDispatch } from 'react-redux';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
-import { RootState } from 'renderer/app/store';
-import { openExistFolder } from '../../utils/ipc/workspaceIpcUtils';
+import { RootState } from '@renderer/app/store';
+import {
+  openExistFolder,
+  getProjectJson,
+} from '../../utils/ipc/workspaceIpcUtils';
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import TopologyLibrary from './TopologyLibrary';
-import { setSelectedObjectInfo } from '../../features/codeSlice';
+import {
+  setSelectedObjectInfo,
+  setInitObjects,
+} from '../../features/codeSlice';
+import { setWorkspaceUid } from '../../features/commonSlice';
 
 export const SIDEBAR_WIDTH = '300px';
 
@@ -120,7 +126,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
 
   const selectObjects = createSelector(
     (state: RootState) => state.code.objects,
-    (objects) => {
+    (objects: WorkspaceTypes.TerraformFileJsonMeta[]) => {
       return objects;
     }
   );
@@ -157,7 +163,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
       });
     setItems(itemsList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [history.location.pathname]);
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on(
@@ -169,10 +175,13 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
         };
         if (!canceled) {
           openExistFolder(args)
-            .then((response: any) => {
+            .then(async (response: any) => {
               const uid = response?.data?.uid;
               if (uid) {
+                const projectJsonRes = await getProjectJson(args);
+                dispatch(setInitObjects(projectJsonRes.data));
                 history.push(`/main/${uid}`);
+                dispatch(setWorkspaceUid(uid));
               }
               return response;
             })
@@ -182,7 +191,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
         }
       }
     );
-  }, [history]);
+  }, []);
 
   const onObjectTabClick = (event: any) => {
     // Mouse Right Click

@@ -7,11 +7,13 @@ import {
   readFileJson,
 } from '../../base/common/fileUtils';
 import { getUserDataFolderPath } from '../../base/common/pathUtils';
-import { StorageMainServiceInterface } from '../common/storage';
+import * as StorageTypes from '../common/storage';
 
 const STORAGE_PATH = path.join(getUserDataFolderPath(), 'storage.json');
 
-export class StorageMainService implements StorageMainServiceInterface {
+export class StorageMainService
+  implements StorageTypes.StorageMainServiceInterface
+{
   constructor() {
     this.init();
     this.registerListeners();
@@ -54,8 +56,8 @@ export class StorageMainService implements StorageMainServiceInterface {
   private registerListeners(): void {
     ipcMain.on(
       'studio:setStorageItem',
-      (event, arg: { key: string; data: any }) => {
-        if (!!arg.key && !!arg.data) {
+      (event, arg: StorageTypes.StorageSetItemArgs) => {
+        if (!!arg.key) {
           this.setItem(arg.key, arg.data);
         }
       }
@@ -63,15 +65,18 @@ export class StorageMainService implements StorageMainServiceInterface {
 
     ipcMain.on(
       'studio:setStorageItems',
-      (event, arg: { items: { key: string; data: any }[] }) => {
+      (event, arg: StorageTypes.StorageSetItemsArgs) => {
         if (Array.isArray(arg.items)) {
           this.setItems(arg.items);
         }
       }
     );
 
-    ipcMain.handle('studio:getStorageItem', (event, arg: { key: string }) => {
-      return this.getItem(arg.key);
-    });
+    ipcMain.handle(
+      'studio:getStorageItem',
+      (event, arg: StorageTypes.StorageGetItemArgs) => {
+        return this.getItem(arg.key);
+      }
+    );
   }
 }

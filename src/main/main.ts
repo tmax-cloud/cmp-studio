@@ -17,6 +17,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { StudioWindow } from './windows/electron-main/window';
+import { MediumWindowSize } from './windows/common/windows';
 import { StorageMainService } from './storage/electron-main/storageMainService';
 import { AppConfigurationMainService } from './configs/electron-main/appConfigurationMainService';
 import { WorkspaceMainService } from './workspaces/electron-main/workspaceMainService';
@@ -85,8 +86,8 @@ const createWindow = async () => {
   const studioWindow = new StudioWindow({
     preloadPath: path.join(__dirname, 'preload.js'),
     state: {
-      width: 1024,
-      height: 700,
+      width: MediumWindowSize.WIDTH,
+      height: MediumWindowSize.HEIGHT,
     },
   });
   mainWindow = studioWindow.win;

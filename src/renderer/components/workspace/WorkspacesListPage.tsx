@@ -1,7 +1,10 @@
 import * as React from 'react';
-import { styled } from '@mui/material';
+import * as ReactDOM from 'react-dom';
+import { styled, ThemeProvider } from '@mui/material';
 import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
+import * as TerraformTypes from '@main/terraform-command/common/terraform';
 import {
   TERRAFORM_EXE_PATH_KEY,
   ConfigResponse,
@@ -10,14 +13,19 @@ import {
 import {
   openExistFolder,
   getRecentlyOpenedWorkspaces,
+  getProjectJson,
 } from '../../utils/ipc/workspaceIpcUtils';
+import { setInitObjects } from '../../features/codeSlice';
+import { setWorkspaceUid } from '../../features/commonSlice';
 import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
 import { getAppConfigItem } from '../../utils/ipc/configIpcUtils';
+import { checkTerraformExe } from '../../utils/ipc/terraformIpcUtils';
 import WorkspacesList from './WorkspacesList';
 import WorkspacesRightSection from './WorkspacesRightSection';
 import { WORKSPACE_ROOT_HEIGHT } from './enums';
+import { TerraformVersionSettingModal } from '../settings/terraform';
+import StudioTheme from '../../theme';
 
-// TODO : 우클릭 시 나오는 목록고정 팝업 구현하기
 // TODO : 앱버전 연동하기
 const WorkspacesLayoutRoot = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -40,37 +48,50 @@ const WorkspaceListRightContainer = styled('div')({
 
 const WorkspacesListPage: React.FC = (props) => {
   const history = useHistory();
+  const dispatch = useDispatch();
   const [hasToRefresh, setHasToRefresh] = React.useState(true);
   const [items, setItems] = React.useState<
     WorkspaceTypes.RecentWorkspaceData[]
   >([]);
+
+  const openWorkspace = async (folderUri: string) => {
+    const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
+      folderUri,
+    };
+    const projectJsonRes = await getProjectJson(args);
+    dispatch(setInitObjects(projectJsonRes.data));
+    openExistFolder(args)
+      .then((response: WorkspaceTypes.WorkspaceResponse) => {
+        const { status, data } = response;
+        if (status === WorkspaceTypes.WorkspaceStatusType.SUCCESS) {
+          const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)?.uid;
+          if (uid) {
+            history.push(`/main/${uid}`);
+            maximizeWindowSize();
+          }
+          return response;
+        } else if (
+          status === WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT
+        ) {
+          console.log('[Error] Cannot find the project :', folderUri);
+          return response;
+        }
+        return response;
+      })
+      .catch((err: any) => {
+        console.log('[Error] Failed to open exists folder :', err);
+      });
+  };
 
   React.useEffect(() => {
     if (hasToRefresh) {
       window.electron.ipcRenderer.on(
         'studio:dirPathToOpen',
         (res: Electron.OpenDialogReturnValue) => {
-          console.log('res?', res);
+          console.log('dirPathToOpen res?', res);
           const { filePaths, canceled } = res;
           if (!canceled) {
-            const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
-              folderUri: filePaths[0],
-            };
-            openExistFolder(args)
-              .then((response: WorkspaceTypes.WorkspaceResponse) => {
-                console.log('Res? ', response);
-                const { data } = response;
-                const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)
-                  ?.uid;
-                if (uid) {
-                  history.push(`/main/${uid}`);
-                  maximizeWindowSize();
-                }
-                return response;
-              })
-              .catch((err: any) => {
-                console.log('[Error] Failed to open exists folder : ', err);
-              });
+            openWorkspace(filePaths[0]);
           }
         }
       );
@@ -108,12 +129,23 @@ const WorkspacesListPage: React.FC = (props) => {
     getAppConfigItem({
       key: TERRAFORM_EXE_PATH_KEY,
     })
-      .then((res: ConfigResponse) => {
+      .then(async (res: ConfigResponse) => {
         const { status, data } = res;
-        if (status === ConfigStatusType.SUCCESS && data === 'EMPTY') {
+        if (status === ConfigStatusType.SUCCESS) {
           // TODO : 초반에 terraformPath설정해주는 부분 구현하기
           // TODO : terraform 명령어 사용할 때 에러나도 다시 설정해달라고 모달 띄워야 할듯
           console.log('[INFO] terraform.exe 경로를 설정해주세요.');
+          const response: TerraformTypes.TerraformResponse =
+            await checkTerraformExe({ terraformExePath: data });
+          const { status } = response;
+          if (status !== TerraformTypes.TerraformStatusType.SUCCESS) {
+            ReactDOM.render(
+              <ThemeProvider theme={StudioTheme}>
+                <TerraformVersionSettingModal />
+              </ThemeProvider>,
+              document.getElementById('modal-container')
+            );
+          }
         }
         return res;
       })
@@ -125,10 +157,14 @@ const WorkspacesListPage: React.FC = (props) => {
   return (
     <WorkspacesLayoutRoot>
       <WorkspaceListLeftContainer>
-        <WorkspacesList items={items} setHasToRefresh={setHasToRefresh} />
+        <WorkspacesList
+          items={items}
+          setHasToRefresh={setHasToRefresh}
+          openWorkspace={openWorkspace}
+        />
       </WorkspaceListLeftContainer>
       <WorkspaceListRightContainer>
-        <WorkspacesRightSection />
+        <WorkspacesRightSection openWorkspace={openWorkspace} />
       </WorkspaceListRightContainer>
     </WorkspacesLayoutRoot>
   );

@@ -2,27 +2,28 @@ import React from 'react';
 import { Switch, Route, BrowserRouter, Redirect } from 'react-router-dom';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
-import theme from './theme';
+import { SmallWindowSize } from '@main/windows/common/windows';
 import {
   TerraformStatusType,
   TerraformErrorData,
   TerraformGraphSuccessData,
   TerraformVersionSuccessData,
-  TerraformResponse,
-} from '../main/terraform-command/common/terraform';
+} from '@main/terraform-command/common/terraform';
 import {
   getTerraformGraph,
   doTerraformInit,
   getTerraformVersion,
-  checkTerraformExe,
 } from './utils/ipc/terraformIpcUtils';
 import * as WorkspaceIpcUtils from './utils/ipc/workspaceIpcUtils';
 import * as ConfigIpcUtils from './utils/ipc/configIpcUtils';
+import * as WindowIpcUtils from './utils/ipc/windowIpcUtils';
 import MainLayout from './components/MainLayout';
 import WorkspacesListPage from './components/workspace/WorkspacesListPage';
+import theme from './theme';
 
 // MEMO : boilerplate에 있던 global css 관리해주는 파일인데 현재는 TestComponent 보여줄때만 사용중
 import './App.global.scss';
+import { TerraformVersionSettingPage } from './components/settings/terraform';
 declare global {
   interface Window {
     electron?: any;
@@ -230,18 +231,41 @@ const TestComponent = () => {
   );
 };
 
-export default function App() {
+const App: React.FC<AppProps> = ({ showTerraformSetting }) => {
+  if (showTerraformSetting) {
+    WindowIpcUtils.setWindowSize({
+      width: SmallWindowSize.WIDTH,
+      height: SmallWindowSize.HEIGHT,
+    });
+  }
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <BrowserRouter>
           <Switch>
             <Route path="/home" exact component={WorkspacesListPage} />
+            <Route
+              path="/terraformsetting"
+              exact
+              component={TerraformVersionSettingPage}
+            />
             <Route path="/main/:uid" exact component={MainLayout} />
-            <Route render={() => <Redirect to="/home" />} />
+            <Route
+              render={() => (
+                <Redirect
+                  to={showTerraformSetting ? '/terraformsetting' : '/home'}
+                />
+              )}
+            />
           </Switch>
         </BrowserRouter>
       </ThemeProvider>
     </StyledEngineProvider>
   );
-}
+};
+
+export default App;
+
+type AppProps = {
+  showTerraformSetting: boolean;
+};
