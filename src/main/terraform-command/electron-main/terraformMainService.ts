@@ -15,6 +15,7 @@ import {
   WorkspaceIdentifier,
   WorkspaceMainServiceInterface,
 } from '../../workspaces/common/workspace';
+import { isWindows, isLinux } from '../../base/common/platform';
 import { TERRAFORM_EXE_PATH_KEY } from '../../configs/common/configuration';
 import { AppConfigurationMainService } from '../../configs/electron-main/appConfigurationMainService';
 
@@ -28,7 +29,10 @@ export class TerraformMainService {
 
   checkTerraformExe(tfExePath: string): Promise<string> {
     return new Promise(async (resolve, reject) => {
-      if (path.extname(tfExePath) === '.exe') {
+      if (
+        (isWindows && path.extname(tfExePath) === '.exe') ||
+        (isLinux && tfExePath.includes('terraform'))
+      ) {
         const tfHelpCmd = spawn(`"${tfExePath}" -help`, { shell: true });
 
         let tfHelpData = '';
