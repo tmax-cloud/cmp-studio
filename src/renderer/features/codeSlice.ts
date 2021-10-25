@@ -14,7 +14,7 @@ const initialState: CodeSlice = {
   objects: [],
   selectedObjectInfo: {
     id: '',
-    content: [],
+    content: {},
   },
 };
 
@@ -28,9 +28,13 @@ const codeSlice = createSlice({
     setSelectedObjectInfo: (state, action: PayloadAction<any>) => {
       state.selectedObjectInfo = action.payload;
     },
+    addSelectedField: (state, action: PayloadAction<any>) => {
+      state.selectedObjectInfo.content = action.payload;
+    },
   },
 });
 
-export const { setInitObjects, setSelectedObjectInfo } = codeSlice.actions;
+export const { setInitObjects, setSelectedObjectInfo, addSelectedField } =
+  codeSlice.actions;
 
 export default codeSlice.reducer;
