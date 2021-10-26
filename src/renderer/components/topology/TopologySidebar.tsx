@@ -58,7 +58,7 @@ const useStyles = makeStyles({
   menuItemText: { width: '120px', textAlign: 'start' },
 });
 
-const getIcon = (type: string) => {
+export const getIcon = (type: string) => {
   switch (type) {
     case 'provider':
       return <AcUnit />;

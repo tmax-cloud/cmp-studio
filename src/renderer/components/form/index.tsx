@@ -22,7 +22,9 @@ const DynamicForm = (props: FormProps<any>) => {
         schema={schema}
         uiSchema={uiSchema}
         onSubmit={(data) => console.log('result: ', data)}
-      />
+      >
+        {true}
+      </Form>
     </>
   );
 };
