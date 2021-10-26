@@ -41,8 +41,25 @@ export class WorkspaceConvertService
       if (!fs.existsSync(FileUtils.getDirName(filePath))) {
         fs.mkdirSync(FileUtils.getDirName(filePath), { recursive: true });
       }
-      fs.writeFileSync(filePath, resultStr);
+      // TODO : 지금은 jsonToHcl결과물을 그대로 파일 write해주고 있지만,
+      // 이렇게 구현할 시 기존 tf파일에 있는 주석정보들이 다 날라감.
+      // 이후 오리지널tf와 새로변환된tf 파일을 비교해 변경점들만 합쳐주는 go모듈 개발되면(js라이브러리화하고) 그거 사용하는 로직 추가 구현하기
+      fs.writeFileSync(filePath, this.getPrettyString(resultStr));
     });
     console.log('[INFO] File Export Finished.');
+  }
+
+  getPrettyString(str: string): string {
+    return str
+      .replace(/"\${/g, '')
+      .replace(/}"/g, '')
+      .replace(/\\"/g, '"')
+      .replace(/@@@{/g, '${')
+      .replace(/}@@@/g, '}')
+      .replace(
+        /\\n/g,
+        `
+    `
+      );
   }
 }
