@@ -13,6 +13,10 @@ export type WorkspaceGetProjectJsonArgs = {
   folderUri: string;
 };
 
+export type WorkspaceExportProjectArgs = {
+  objects: TerraformFileJsonMeta[];
+};
+
 export type WorkspaceSetConfigItemArgs = {
   workspaceUid: string;
   key: string;
@@ -104,6 +108,7 @@ export interface WorkspacesHistoryServiceInterface {
 
 export interface WorkspaceConvertServiceInterface {
   convertAllHclToJson(folderUri: string): WorkspaceProjectJsonSuccessData;
+  convertAllJsonToHcl(objList: TerraformFileJsonMeta[]): void;
 }
 
 export interface WorkspaceMainServiceInterface {
