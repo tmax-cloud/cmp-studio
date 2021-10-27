@@ -25,6 +25,10 @@ export const getProjectJson = (
   args: WorkspaceTypes.WorkspaceGetProjectJsonArgs
 ) => window.electron.ipcRenderer.invoke('studio:getProjectJson', args);
 
+export const exportProject = (args: {
+  objects: WorkspaceTypes.TerraformFileJsonMeta[];
+}) => window.electron.ipcRenderer.invoke('studio:exportProject', args);
+
 export const setWorkspaceConfigItem = (
   args: WorkspaceTypes.WorkspaceSetConfigItemArgs
 ) => window.electron.ipcRenderer.invoke('studio:setWorkspaceConfigItem', args);

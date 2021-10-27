@@ -19,6 +19,8 @@ import {
   Delete,
   Explore,
 } from '@mui/icons-material';
+import terraformSchema from '../form/terraform_schema.json';
+import parseJson from '../form/utils/json2JsonSchemaParser';
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -141,12 +143,12 @@ interface Item {
   type: string;
 }
 const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
-  const [porvider, setPorvider] = React.useState('aws');
-  const [porviderItems, setPorviderItems] = React.useState<Item[]>([]);
+  const [provider, setProvider] = React.useState('aws');
+  const [providerItems, setProviderItems] = React.useState<Item[]>([]);
   const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
   const [datasourceItems, setdatasourceItems] = React.useState<Item[]>([]);
-  const porviderHandleChange = (event: any) => {
-    setPorvider(event.target.value);
+  const providerHandleChange = (event: any) => {
+    setProvider(event.target.value);
   };
   const [localModuleItems, setLocalModuleItems] = React.useState<Item[]>([]);
   const [terraformModuleItems, setTerraformModuleItems] = React.useState<
@@ -162,12 +164,33 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
   const [isSearchResultEmpty, setIsSearchResultEmpty] = React.useState(false);
 
   React.useEffect(() => {
+    let schemaMap;
+    if (provider === 'aws') {
+      schemaMap = parseJson('aws');
+    } else {
+      schemaMap = new Map();
+    }
+
+    const items2: Item[] = [];
+    schemaMap.forEach((schema) => {
+      const schemaProvider = provider;
+      const schemaTitle = schema.title;
+      const schemaDisplayName = schema.title.split('-')[1];
+      const schemaType = schema.title.split('-')[0];
+      items2.push({
+        provider: schemaProvider,
+        title: schemaTitle,
+        displayName: schemaDisplayName,
+        type: schemaType,
+      });
+    });
+
     const providerList: Item[] = [];
     const resourceList: Item[] = [];
     const datasourceList: Item[] = [];
     const moduleList: Item[] = [];
-    items.forEach((i: Item) => {
-      if (i.provider === porvider) {
+    items2.forEach((i: Item) => {
+      if (i.provider === provider) {
         if (seartchDisplayName(searchText, i.displayName)) {
           if (i.type === 'provider') {
             providerList.push({
@@ -243,7 +266,7 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
     setLocalModuleItems(localList);
 
     //setFilteredItems(filteredList);
-    setPorviderItems(providerList);
+    setProviderItems(providerList);
     setResourceItems(resourceList);
     setdatasourceItems(datasourceList);
     setTerraformModuleItems(moduleList);
@@ -259,15 +282,15 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
     } else {
       setIsSearchResultEmpty(true);
     }
-  }, [porvider, searchText]);
+  }, [provider, searchText]);
 
   return (
     <>
       <Box sx={{ width: '100%' }}>
         <InputLabel>프로바이더 선택</InputLabel>
         <Select
-          value={porvider}
-          onChange={porviderHandleChange}
+          value={provider}
+          onChange={providerHandleChange}
           defaultValue="aws"
           fullWidth
           displayEmpty
@@ -312,7 +335,7 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
               afterAction={openSidePanel}
             />
             <ShowItemList
-              items={porviderItems}
+              items={providerItems}
               title="테라폼 디폴트"
               clickAction={clickDefault}
               afterAction={openSidePanel}

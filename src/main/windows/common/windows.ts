@@ -1,5 +1,14 @@
 import { BrowserWindow } from 'electron';
 
+export const SmallWindowSize = {
+  WIDTH: 500,
+  HEIGHT: 300,
+};
+
+export const MediumWindowSize = {
+  WIDTH: 1024,
+  HEIGHT: 700,
+};
 export interface StudioWindowInterface {
   readonly id: number;
   readonly win: BrowserWindow | null /* `null` after being disposed */;

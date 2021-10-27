@@ -1,7 +1,7 @@
 {
   "name": "cmp-studio",
   "productName": "cmp-studio",
-  "version": "3.0.2",
+  "version": "0.0.0",
   "description": "Studio for Terraform",
   "main": "./dist/main/main.js",
   "author": {
