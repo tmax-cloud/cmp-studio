@@ -1,4 +1,5 @@
 import * as _ from 'lodash-es';
+import { setSelectedSourceSchema } from '@renderer/features/codeSlice';
 
 export const addSchemaBasedField = (
   content: any,
@@ -18,16 +19,57 @@ export const addSchemaBasedField = (
   return result;
 };
 
-export const addCustomField = (content: any, object: any, input: any) => {
+const setAdditionalSchemaByType = (key: string, type: string) => {
+  let newSchema = {};
+  switch (type) {
+    case 'string': {
+      newSchema = { type: 'string' };
+      break;
+    }
+    case 'object': {
+      newSchema = {
+        type: 'map',
+        items: {
+          type: 'string',
+        },
+      };
+      break;
+    }
+    case 'array': {
+      newSchema = {
+        type: 'array',
+        items: {
+          type: 'string',
+        },
+      };
+      break;
+    }
+    case 'boolean': {
+      newSchema = {
+        type: 'boolean',
+      };
+      break;
+    }
+    default:
+  }
+  console.log({ properties: { [key]: newSchema } });
+  return { properties: { [key]: newSchema } };
+};
+
+export const addCustomField = (content: any, input: any, sourceSchema: any) => {
   const type = Object.keys(content)[0]; // ['provider', 'resource', 'datasource']
   const name = type && Object.keys(content[type])[0];
   const displayName = name && Object.keys(content[type][name])[0];
-  const result = _.merge(
+  const object = _.assign(
     {
       [type]: { [name]: { [displayName]: { [input.key]: '' } } },
     },
     content
   );
-  console.log(result);
-  return result;
+  const schema = _.defaultsDeep(
+    sourceSchema,
+    setAdditionalSchemaByType(input.key, input.type)
+  );
+
+  return { object, schema };
 };

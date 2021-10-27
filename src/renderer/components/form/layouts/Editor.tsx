@@ -46,7 +46,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
     (code) => _.defaultsDeep(code)
   );
   const {
-    selectedObjectInfo: { id, content },
+    selectedObjectInfo: { id, content, sourceSchema },
   } = useSelector(selectObject);
 
   const terraformSchemaMap: Map<any, any> = React.useMemo(
@@ -57,7 +57,9 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
     () => terraformSchemaMap.get(id),
     [terraformSchemaMap, id]
   );
-  dispatch(setSelectedSourceSchema(currentSchema));
+  React.useEffect(() => {
+    dispatch(setSelectedSourceSchema(currentSchema));
+  }, []);
   return (
     <div>
       <Accordion>
@@ -140,11 +142,16 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
             />
             <Button
               onClick={() => {
-                const result = addCustomField(content, formData, {
-                  type: customFieldType,
-                  key: customFieldKey,
-                });
-                dispatch(addSelectedField(result));
+                const { object, schema } = addCustomField(
+                  content,
+                  {
+                    type: customFieldType,
+                    key: customFieldKey,
+                  },
+                  sourceSchema
+                );
+                dispatch(addSelectedField(object));
+                dispatch(setSelectedSourceSchema(schema));
                 setAdditionalSchema('');
               }}
             >
@@ -159,6 +166,20 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 
 type AddFieldSectionProps = {
   formData: any;
+};
+const SaveSection = (props: SaveSectionProps) => {
+  const { saveLabel, cancelLabel } = props;
+  return (
+    <div style={{ textAlign: 'end', padding: '20px 10px' }}>
+      <Button variant="outlined">{cancelLabel || '취소'}</Button>
+      <Button variant="contained">{saveLabel || '저장'}</Button>
+    </div>
+  );
+};
+
+type SaveSectionProps = {
+  saveLabel: string;
+  cancelLabel: string;
 };
 
 const EditorTab = (props: EditorTabProps) => {
@@ -176,6 +197,7 @@ const EditorTab = (props: EditorTabProps) => {
         <DynamicForm schema={schema} formData={formData} uiSchema={uiSchema} />
       </div>
       <AddFieldSection formData={formData} />
+      <SaveSection saveLabel="저장" cancelLabel="취소" />
     </>
   );
 };

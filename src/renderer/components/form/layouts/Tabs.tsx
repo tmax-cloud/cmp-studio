@@ -54,6 +54,12 @@ const FormTabs = (props: FormTabsProps) => {
       <TabPanel value={value} index={0}>
         <EditorTab schema={schema} formData={formData} uiSchema={uiSchema} />
       </TabPanel>
+      <TabPanel value={value} index={1}>
+        상태 (구현 예정...)
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        Diff (구현 예정...)
+      </TabPanel>
     </>
   );
 };
