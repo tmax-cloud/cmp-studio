@@ -23,10 +23,11 @@ const preDefinedData = (jsonSchema, object) => {
         }
         return `properties.${currKey}`;
       };
+      console.log(makePath(), _.get(jsonSchema, makePath() + '.type'));
       if (!_.get(jsonSchema, makePath())) {
+        _.set(fixedSchema, makePath(), { type: 'string' });
         return;
       }
-      console.log(makePath(), _.get(jsonSchema, makePath() + '.type'));
       if (
         !_.get(jsonSchema, makePath() + '.type') &&
         'properties' in _.get(jsonSchema, makePath())
