@@ -1,35 +1,27 @@
 import * as React from 'react';
-import * as _ from 'lodash';
-import { createSelector } from '@reduxjs/toolkit';
+import * as _ from 'lodash-es';
 import { useSelector } from 'react-redux';
-import { Drawer, IconButton } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Drawer } from '@mui/material';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
-import { RootState } from '@renderer/app/store';
+import { selectCode } from '@renderer/features/codeSliceInputSelectors';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
-import DynamicForm from '../form';
+import FormHeader from '../form/layouts/Header';
+import FormTabs from '../form/layouts/Tabs';
 import preDefinedData from '../form/utils/preDefinedData';
 
 export const SIDEPANEL_WIDTH = 500;
-
+// 저장 버튼 누르면 redux objects에 content 덮어씌우기나이ㅓㄻ
 const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   isSidePanelOpen,
   toggleSidePanel,
 }) => {
-  const selectObject = createSelector(
-    [(state: RootState) => _.defaultsDeep(state.code)],
-    (code) => _.defaultsDeep(code)
-  );
   const {
     selectedObjectInfo: { id, content },
-    selectedObjectInfo,
-  } = useSelector(selectObject);
-
-  console.log('selected redux object info: ', selectedObjectInfo);
+  } = useSelector(selectCode);
 
   // schema
   const terraformSchemaMap = getSchemaMap();
-  const currentSchema = terraformSchemaMap.get(id);
+  const currentSchema: any = terraformSchemaMap.get(id);
   console.log('current schema: ', currentSchema);
   const {
     customUISchema = {},
@@ -52,23 +44,12 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
         anchor="right"
         variant="persistent"
       >
-        <div style={{ textAlign: 'end' }}>
-          <IconButton
-            aria-label="Close"
-            onClick={() => {
-              toggleSidePanel(false);
-            }}
-          >
-            <Close />
-          </IconButton>
-        </div>
-        <div style={{ padding: '50px' }}>
-          <DynamicForm
-            schema={fixedSchema}
-            formData={formData}
-            uiSchema={customUISchema}
-          />
-        </div>
+        <FormHeader title={id} toggleSidePanel={toggleSidePanel} />
+        <FormTabs
+          schema={fixedSchema}
+          formData={formData}
+          uiSchema={customUISchema}
+        />
       </Drawer>
     </>
   );

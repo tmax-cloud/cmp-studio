@@ -11,8 +11,8 @@ type CustomWidgetProps = WidgetProps & {
 const useStyles = makeStyles({
   root: {
     '& .css-1sqnrkk-MuiInputBase-input-MuiOutlinedInput-input': {
-      resize: 'auto',
-      minWidth: '222px',
+      resize: 'vertical',
+      width: '222px',
       minHeight: '23px',
     },
   },
@@ -48,7 +48,7 @@ const TextWidget = ({
   return (
     <TextField
       id={id}
-      sx={{ minWidth: '250px' }}
+      sx={{ width: '250px' }}
       className={classes.root}
       label={label || schema.title}
       placeholder={placeholder}
