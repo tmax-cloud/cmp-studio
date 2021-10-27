@@ -68,6 +68,7 @@ const WorkspacesListPage: React.FC = (props) => {
           if (uid) {
             history.push(`/main/${uid}`);
             maximizeWindowSize();
+            dispatch(setWorkspaceUid(uid));
           }
           return response;
         } else if (
