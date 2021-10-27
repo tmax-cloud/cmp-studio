@@ -77,5 +77,6 @@ export const getRefinedGraph = (gData: GraphData) => {
   const nodes = gData.nodes.map((node) => {
     return { ...node, ...parseNodeFullName((node as NodeData).fullName) };
   });
-  return setNeighborElements({ nodes, links: gData.links });
+  return { nodes, links: gData.links };
+  //return setNeighborElements({ nodes, links: gData.links });
 };
