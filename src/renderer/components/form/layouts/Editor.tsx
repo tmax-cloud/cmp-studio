@@ -1,7 +1,5 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '@renderer/app/store';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { useSelector, useDispatch } from 'react-redux';
 import { ArrowDropDown } from '@mui/icons-material';
@@ -14,6 +12,7 @@ import {
   TextField,
   MenuItem,
 } from '@mui/material';
+import { selectCode } from '@renderer/features/codeSliceInputSelectors';
 import DynamicForm from '../index';
 import { addSchemaBasedField, addCustomField } from '../utils/addInputField';
 import {
@@ -43,7 +42,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 
   const {
     selectedObjectInfo: { id, content, sourceSchema },
-  } = useSelector((state: RootState) => state.code);
+  } = useSelector(selectCode);
 
   const terraformSchemaMap: Map<any, any> = React.useMemo(
     () => getSchemaMap(),

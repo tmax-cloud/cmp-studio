@@ -1,10 +1,9 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import { createSelector } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
 import { Drawer } from '@mui/material';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
-import { RootState } from '@renderer/app/store';
+import { selectCode } from '@renderer/features/codeSliceInputSelectors';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import FormHeader from '../form/layouts/Header';
 import FormTabs from '../form/layouts/Tabs';
@@ -18,7 +17,7 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
 }) => {
   const {
     selectedObjectInfo: { id, content },
-  } = useSelector((state: RootState) => state.code);
+  } = useSelector(selectCode);
 
   // schema
   const terraformSchemaMap = getSchemaMap();

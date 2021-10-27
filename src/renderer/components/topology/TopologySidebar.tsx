@@ -16,11 +16,10 @@ import {
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useHistory } from 'react-router-dom';
-import { createSelector } from '@reduxjs/toolkit';
 import { useSelector, useDispatch } from 'react-redux';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
-import { RootState } from '@renderer/app/store';
+import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
 import {
   openExistFolder,
   getProjectJson,
@@ -127,7 +126,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
   const objResult: any[] = [];
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
-  useSelector((state: RootState) => state.code.fileObjects).forEach(
+  useSelector(selectCodeFileObjects).forEach(
     (file: { filePath: string; fileJson: any[] }) => {
       objResult.push(
         ..._.entries(file.fileJson).map((object) => ({
