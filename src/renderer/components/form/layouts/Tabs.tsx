@@ -3,7 +3,7 @@ import * as _ from 'lodash-es';
 import { Tabs, Tab, Box } from '@mui/material';
 import EditorTab from './Editor';
 
-function TabPanel(props: TabPanelProps) {
+const TabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props;
 
   return (
@@ -17,7 +17,7 @@ function TabPanel(props: TabPanelProps) {
       {value === index && <Box sx={{ p: 1 }}>{children}</Box>}
     </div>
   );
-}
+};
 
 type TabPanelProps = {
   children: any;
