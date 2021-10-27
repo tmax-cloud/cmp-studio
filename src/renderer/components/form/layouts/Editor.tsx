@@ -4,6 +4,8 @@ import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '@renderer/app/store';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { useSelector, useDispatch } from 'react-redux';
+import { ArrowDropDown } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import {
   Accordion,
   AccordionSummary,
@@ -12,11 +14,12 @@ import {
   TextField,
   MenuItem,
 } from '@mui/material';
-import { ArrowDropDown } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import DynamicForm from '../index';
-import { addSelectedField } from '../../../features/codeSlice';
 import { addSchemaBasedField, addCustomField } from '../utils/addInputField';
+import {
+  addSelectedField,
+  setSelectedSourceSchema,
+} from '../../../features/codeSlice';
 
 const useStyles = makeStyles({
   root: {
@@ -31,7 +34,7 @@ const useStyles = makeStyles({
 const AddFieldSection = (props: AddFieldSectionProps) => {
   const { formData } = props;
   const classes = useStyles();
-  const inputTypeList = ['string', 'map', 'boolean'];
+  const inputTypeList = ['string', 'object', 'array', 'boolean'];
   const dispatch = useDispatch();
 
   const [additionalSchema, setAdditionalSchema] = React.useState('');
@@ -46,8 +49,15 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
     selectedObjectInfo: { id, content },
   } = useSelector(selectObject);
 
-  const terraformSchemaMap = getSchemaMap();
-  const currentSchema: any = terraformSchemaMap.get(id);
+  const terraformSchemaMap: Map<any, any> = React.useMemo(
+    () => getSchemaMap(),
+    []
+  );
+  const currentSchema = React.useMemo(
+    () => terraformSchemaMap.get(id),
+    [terraformSchemaMap, id]
+  );
+  dispatch(setSelectedSourceSchema(currentSchema));
   return (
     <div>
       <Accordion>
@@ -72,7 +82,6 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                 setAdditionalSchema(e.target.value);
               }}
               defaultValue={currentSchema?.properties[0]}
-              // value={value || value === 0 ? value : ''}
             >
               {currentSchema &&
                 Object.keys(currentSchema?.properties).map((cur) => (
@@ -111,7 +120,6 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               onChange={(e) => {
                 setCustomFieldType(e.target.value);
               }}
-              // value={value || value === 0 ? value : ''}
             >
               {currentSchema &&
                 inputTypeList.map((cur) => (
