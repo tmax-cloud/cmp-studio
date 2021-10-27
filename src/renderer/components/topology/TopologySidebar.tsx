@@ -125,9 +125,9 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
   };
 
   const selectObjects = createSelector(
-    (state: RootState) => state.code.objects,
-    (objects: WorkspaceTypes.TerraformFileJsonMeta[]) => {
-      return objects;
+    (state: RootState) => state.code.fileObjects,
+    (fileObjects: WorkspaceTypes.TerraformFileJsonMeta[]) => {
+      return fileObjects;
     }
   );
 

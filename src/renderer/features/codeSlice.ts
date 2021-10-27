@@ -6,12 +6,12 @@ interface ObjcectInfo {
   content: any;
 }
 interface CodeSlice {
-  objects: WorkspaceTypes.TerraformFileJsonMeta[];
+  fileObjects: WorkspaceTypes.TerraformFileJsonMeta[];
   selectedObjectInfo: ObjcectInfo;
 }
 
 const initialState: CodeSlice = {
-  objects: [],
+  fileObjects: [],
   selectedObjectInfo: {
     id: '',
     content: {},
