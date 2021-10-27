@@ -124,17 +124,10 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
     setPrjContextMenuOpen(false);
   };
 
-  const selectObjects = createSelector(
-    (state: RootState) => state.code.fileObjects,
-    (fileObjects: WorkspaceTypes.TerraformFileJsonMeta[]) => {
-      return fileObjects;
-    }
-  );
-
   const objResult: any[] = [];
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
-  useSelector(selectObjects).forEach(
+  useSelector((state: RootState) => state.code.fileObjects).forEach(
     (file: { filePath: string; fileJson: any[] }) => {
       objResult.push(
         ..._.entries(file.fileJson).map((object) => ({

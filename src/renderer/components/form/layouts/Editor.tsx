@@ -41,13 +41,9 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   const [customFieldType, setCustomFieldType] = React.useState('');
   const [customFieldKey, setCustomFieldKey] = React.useState('');
 
-  const selectObject = createSelector(
-    [(state: RootState) => _.defaultsDeep(state.code)],
-    (code) => _.defaultsDeep(code)
-  );
   const {
     selectedObjectInfo: { id, content, sourceSchema },
-  } = useSelector(selectObject);
+  } = useSelector((state: RootState) => state.code);
 
   const terraformSchemaMap: Map<any, any> = React.useMemo(
     () => getSchemaMap(),

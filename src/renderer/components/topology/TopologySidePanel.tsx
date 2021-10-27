@@ -16,13 +16,9 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   isSidePanelOpen,
   toggleSidePanel,
 }) => {
-  const selectObject = createSelector(
-    [(state: RootState) => _.defaultsDeep(state.code)],
-    (code) => _.defaultsDeep(code)
-  );
   const {
     selectedObjectInfo: { id, content },
-  } = useSelector(selectObject);
+  } = useSelector((state: RootState) => state.code);
 
   // schema
   const terraformSchemaMap = getSchemaMap();
