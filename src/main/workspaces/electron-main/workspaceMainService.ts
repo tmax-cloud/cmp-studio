@@ -68,6 +68,12 @@ export class WorkspaceMainService
     return newUid;
   }
 
+  async getFolderUriByWorkspaceId(workspaceId: string) {
+    const folderUri =
+      this.workspaceManagementService.getFolderUriByWorkspaceId(workspaceId);
+    return folderUri;
+  }
+
   private registerListeners() {
     ipcMain.handle(
       'studio:createNewFolderAndWorkspace',
@@ -104,6 +110,15 @@ export class WorkspaceMainService
           status: WorkspaceTypes.WorkspaceStatusType.ERROR,
           data: { message: 'Invalid folder uri.' },
         };
+      }
+    );
+
+    ipcMain.handle(
+      'studio:getFolderUriByWorkspaceId',
+      async (event, arg: any): Promise<any> => {
+        const { workspaceId } = arg;
+        const folderUri = await this.getFolderUriByWorkspaceId(workspaceId);
+        return folderUri;
       }
     );
 

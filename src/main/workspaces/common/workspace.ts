@@ -95,6 +95,7 @@ export interface WorkspaceManagementServiceInterface {
   removeOldWorkspaceMeta(workspaceRealPath: string): void;
   removeGhostWorkspaceMeta(workspaceRealPath: string): void;
   getWorkspaceIdByFolderUri(folderUri: string): string | null;
+  getFolderUriByWorkspaceId(workspaceId: string): string | null;
   checkRealWorkspaceExists(workspaceRealPath: string): boolean;
   getWorkspaceConfig(uid: string): any;
   generateDefaultNewWorkspaceName(): string;
