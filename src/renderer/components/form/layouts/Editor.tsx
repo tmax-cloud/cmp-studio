@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { useSelector, useDispatch } from 'react-redux';
 import { ArrowDropDown } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
@@ -44,17 +43,6 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
     selectedObjectInfo: { id, content, sourceSchema },
   } = useSelector(selectCode);
 
-  const terraformSchemaMap: Map<any, any> = React.useMemo(
-    () => getSchemaMap(),
-    []
-  );
-  const currentSchema = React.useMemo(
-    () => terraformSchemaMap.get(id),
-    [terraformSchemaMap, id]
-  );
-  React.useEffect(() => {
-    dispatch(setSelectedSourceSchema(currentSchema));
-  }, []);
   return (
     <div>
       <Accordion>
@@ -78,10 +66,10 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               onChange={(e) => {
                 setAdditionalSchema(e.target.value);
               }}
-              defaultValue={currentSchema?.properties[0]}
+              defaultValue={sourceSchema?.properties[0]}
             >
-              {currentSchema &&
-                Object.keys(currentSchema?.properties).map((cur) => (
+              {sourceSchema &&
+                Object.keys(sourceSchema?.properties).map((cur) => (
                   <MenuItem key={cur} value={cur}>
                     {cur}
                   </MenuItem>
@@ -118,7 +106,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                 setCustomFieldType(e.target.value);
               }}
             >
-              {currentSchema &&
+              {sourceSchema &&
                 inputTypeList.map((cur) => (
                   <MenuItem key={cur} value={cur}>
                     {cur}
