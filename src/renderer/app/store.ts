@@ -5,16 +5,23 @@ import storage from 'redux-persist/lib/storage';
 import codeReducer from '../features/codeSlice';
 import commonReducer from '../features/commonSlice';
 
-const persistConfig = {
+const rootPersistConfig = {
   key: 'root',
+  blacklist: ['code'],
+  storage,
+};
+
+const codePersistConfig = {
+  key: 'code',
+  blacklist: ['selectedObjectInfo'],
   storage,
 };
 
 const rootReducer: any = combineReducers({
-  code: codeReducer,
+  code: persistReducer(codePersistConfig, codeReducer),
   common: commonReducer,
 });
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
 
 export const store: any = configureStore({
   reducer: persistedReducer, // 리듀서들로 구성된 객체 (내부적으로 combineReducers해줌.)
