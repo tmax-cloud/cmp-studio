@@ -5,7 +5,8 @@ import { makeStyles, createStyles } from '@mui/styles';
 import { setSchemaMap } from '@renderer/utils/storageAPI';
 import { useGraphProps } from '@renderer/hooks/useGraphProps';
 import { fetchGraphData } from '@renderer/features/graphSlice';
-import { useAppDispatch } from '@renderer/app/store';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 // import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
@@ -56,9 +57,9 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
   })
 );
 
-export const TopologyPage: React.FC<TopologyPageProps> = (props) => {
-  const { workspaceUid } = props;
+export const TopologyPage = () => {
   const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
+  const workspaceUid = useAppSelector(selectWorkspaceUid);
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
@@ -89,7 +90,3 @@ export const TopologyPage: React.FC<TopologyPageProps> = (props) => {
     </TopologyLayoutRoot>
   );
 };
-
-interface TopologyPageProps {
-  workspaceUid: string;
-}

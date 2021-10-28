@@ -66,9 +66,9 @@ const WorkspacesListPage: React.FC = (props) => {
         if (status === WorkspaceTypes.WorkspaceStatusType.SUCCESS) {
           const uid = (data as WorkspaceTypes.WorkspaceSuccessUidData)?.uid;
           if (uid) {
+            dispatch(setWorkspaceUid(uid));
             history.push(`/main/${uid}`);
             maximizeWindowSize();
-            dispatch(setWorkspaceUid(uid));
           }
           return response;
         } else if (
