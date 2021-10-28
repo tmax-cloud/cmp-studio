@@ -9,7 +9,7 @@ import commonReducer from '../features/commonSlice';
 
 const rootPersistConfig = {
   key: 'root',
-  blacklist: ['code'],
+  blacklist: ['code', 'graph'],
   storage,
 };
 
@@ -17,7 +17,6 @@ const codePersistConfig = {
   key: 'code',
   blacklist: ['selectedObjectInfo'],
   storage,
-  blacklist: ['graph'],
 };
 
 const rootReducer: any = combineReducers({
