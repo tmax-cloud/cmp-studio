@@ -52,7 +52,6 @@ const setAdditionalSchemaByType = (key: string, type: string) => {
     }
     default:
   }
-  console.log({ properties: { [key]: newSchema } });
   return { properties: { [key]: newSchema } };
 };
 

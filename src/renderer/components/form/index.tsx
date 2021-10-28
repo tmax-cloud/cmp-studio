@@ -21,7 +21,6 @@ const DynamicForm = (props: FormProps<any>) => {
         widgets={{ ...defaultWidgets }}
         schema={schema}
         uiSchema={uiSchema}
-        onSubmit={(data) => console.log('result: ', data)}
       >
         {true}
       </Form>
