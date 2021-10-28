@@ -4,7 +4,8 @@ import { styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import { setSchemaMap } from '@renderer/utils/storageAPI';
 import { useGraphProps } from '@renderer/hooks/useGraphProps';
-import { useGraphData } from '@renderer/hooks/useGraphData';
+import { fetchGraphData } from '@renderer/features/graphSlice';
+import { useAppDispatch } from '@renderer/app/store';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 // import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
@@ -58,13 +59,19 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
 export const TopologyPage: React.FC<TopologyPageProps> = (props) => {
   const { workspaceUid } = props;
   const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
+  const dispatch = useAppDispatch();
+
+  React.useEffect(() => {
+    (async () => {
+      dispatch(fetchGraphData(workspaceUid));
+    })();
+  }, [dispatch, workspaceUid]);
 
   if (!localStorage.getItem('schemaJson')) {
     const schemaJson = parseJson('aws');
     setSchemaMap(JSON.stringify(Array.from(schemaJson.entries())));
   }
   const { graphRef, graphOption, graphHandler } = useGraphProps();
-  const graphData = useGraphData(workspaceUid);
 
   const classes = useStyles({ isSidePanelOpen });
 
@@ -73,11 +80,7 @@ export const TopologyPage: React.FC<TopologyPageProps> = (props) => {
       <TopologySidebar setIsSidePanelOpen={setIsSidePanelOpen} />
       <div className={classes.topologyLayoutWrapper}>
         <TopologyToolbar handlers={graphHandler} />
-        <TopologyGraph
-          graphRef={graphRef}
-          graphOptions={graphOption}
-          graphData={graphData}
-        />
+        <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
       </div>
       <TopologySidePanel
         isSidePanelOpen={isSidePanelOpen}

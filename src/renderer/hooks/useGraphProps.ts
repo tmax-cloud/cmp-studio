@@ -101,7 +101,7 @@ export const useGraphProps = () => {
     cooldownTime: 1000,
     d3AlphaDecay: 0.5,
     enableZoomInteraction: false,
-    autoPauseRedraw: false,
+    //autoPauseRedraw: false,
     onEngineTick: handleEngineTick,
     onEngineStop: handleEngineStop,
     onZoomEnd: handleZoomEnd,

@@ -4,6 +4,7 @@ import { LinkData, ModulePath, NodeData, ROOT } from '@renderer/types/graph';
 import { getRawGraph } from './dot';
 import { getRefinedGraph } from './parse';
 import { traverseGraph } from './traverse';
+import { getTerraformGraphData } from './terraform';
 
 export const getRootNode = (gData: GraphData): NodeData | undefined =>
   gData.nodes.find(
@@ -82,8 +83,11 @@ export const getModulePath = (gData: GraphData): ModulePath[] => {
   return modulePaths;
 };
 
-export const getGraphData = async (src: string): Promise<GraphData> => {
-  const rawGraph = await getRawGraph(src);
+export const getGraphData = async (
+  workspaceUid: string
+): Promise<GraphData> => {
+  const tfGraph = await getTerraformGraphData(workspaceUid);
+  const rawGraph = await getRawGraph(tfGraph);
   const graph = getRefinedGraph(rawGraph);
   console.log('graph data: ', graph);
   //console.log('path: ', getModulePath(graph));
