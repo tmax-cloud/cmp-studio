@@ -63,10 +63,10 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               className={classes.root}
               select
               label="스키마"
+              value={additionalSchema}
               onChange={(e) => {
                 setAdditionalSchema(e.target.value);
               }}
-              defaultValue={sourceSchema?.properties[0]}
             >
               {sourceSchema &&
                 Object.keys(sourceSchema?.properties).map((cur) => (
@@ -102,6 +102,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               className={classes.root}
               select
               label="타입"
+              value={customFieldType}
               onChange={(e) => {
                 setCustomFieldType(e.target.value);
               }}
