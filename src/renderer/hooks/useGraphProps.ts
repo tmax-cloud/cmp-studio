@@ -52,7 +52,7 @@ export const useGraphProps = () => {
     graphRef.current?.zoomToFit(500);
   };
 
-  const handleNodeHover = (
+  /*const handleNodeHover = (
     obj: NodeObject | null,
     previousNode: NodeObject | null
   ) => {
@@ -71,7 +71,7 @@ export const useGraphProps = () => {
     configRef.current.hoverNode = node || null;
     configRef.current.highlightNodes = highlightNodes;
     configRef.current.highlightLinks = highlightLinks;
-  };
+  };*/
 
   const handleEngineTick = () => {
     // charge: Attracts (+) or repels (-) nodes to/from each other
@@ -105,7 +105,7 @@ export const useGraphProps = () => {
     onEngineTick: handleEngineTick,
     onEngineStop: handleEngineStop,
     onZoomEnd: handleZoomEnd,
-    onNodeHover: handleNodeHover,
+    //onNodeHover: handleNodeHover,
   };
 
   const graphHandler = {

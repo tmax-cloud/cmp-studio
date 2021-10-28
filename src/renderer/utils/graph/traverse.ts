@@ -1,15 +1,17 @@
-import { GraphData } from 'react-force-graph-2d';
 import { LinkData, NodeData } from '@renderer/types/graph';
 
-export const nodesById = (gData: GraphData) =>
-  Object.fromEntries(gData.nodes.map((node) => [node.id, node]));
+export const nodesById = (nodes: NodeData[]) =>
+  Object.fromEntries(nodes.map((node) => [node.id, node]));
 
 export const traverseGraph = (
-  gData: GraphData,
-  id: string | number,
+  nodes: NodeData[],
+  id: string | number | undefined,
   worker: (node: NodeData) => void
 ) => {
-  (function traverse(node = nodesById(gData)[id]) {
+  if (!id) {
+    return;
+  }
+  (function traverse(node = nodesById(nodes)[id]) {
     if (!node) {
       return;
     }
@@ -21,7 +23,7 @@ export const traverseGraph = (
           if (target) {
             return typeof target === 'object'
               ? target
-              : nodesById(gData)[target];
+              : nodesById(nodes)[target];
           }
         })
         .forEach(traverse);
