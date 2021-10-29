@@ -9,6 +9,8 @@ export type WorkspaceOpenProjectArgs = {
   folderUri: string;
 };
 
+export type WorkspaceGetFolderUriArgs = { workspaceId: string };
+
 export type WorkspaceGetProjectJsonArgs = {
   folderUri: string;
 };

@@ -115,7 +115,10 @@ export class WorkspaceMainService
 
     ipcMain.handle(
       'studio:getFolderUriByWorkspaceId',
-      async (event, arg: any): Promise<any> => {
+      async (
+        event,
+        arg: WorkspaceTypes.WorkspaceGetFolderUriArgs
+      ): Promise<any> => {
         const { workspaceId } = arg;
         const folderUri = await this.getFolderUriByWorkspaceId(workspaceId);
         return folderUri;
