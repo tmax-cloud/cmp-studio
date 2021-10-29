@@ -103,9 +103,12 @@ export class TerraformMainService {
       const appTfExePath = this.appConfigurationMainService.getItem(
         TERRAFORM_EXE_PATH_KEY
       );
-      const tfInitCmd = spawn(`"${appTfExePath}" -chdir="${folderUri}" init`, {
-        shell: true,
-      });
+      const tfInitCmd = spawn(
+        `"${appTfExePath}" -chdir="${folderUri}" init -no-color`,
+        {
+          shell: true,
+        }
+      );
       // MEMO : 워크스페이스마다 다른 테라폼 exe경로로 커맨드 실행시켜줘야될 경우 아래 주석으로 대체하기
       /*
        const tfInitCmd = spawn(`${tfExePath} -chdir="${folderUri}" init`, {

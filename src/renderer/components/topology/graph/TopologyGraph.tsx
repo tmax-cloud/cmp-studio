@@ -1,16 +1,30 @@
 import * as React from 'react';
+import * as _ from 'lodash';
 import ForceGraph2D, {
   ForceGraphMethods,
   ForceGraphProps,
-  GraphData,
 } from 'react-force-graph-2d';
 import { withResizeDetector } from 'react-resize-detector';
+import { useAppSelector } from '@renderer/app/store';
+import { useGraphData, useGraphInitOutput } from '@renderer/hooks/useGraphData';
+import {
+  selectErrorMsg,
+  selectGraphData,
+} from '@renderer/features/graphSliceInputSelectors';
 import Box from '@mui/material/Box';
 import Error from './Error';
+import { GraphLoadingModal } from '../modal';
 
 const TopologyGraph = (props: TopologyGraphProps) => {
-  const { width, height, graphRef, graphOptions, graphData } = props;
-  const isError = !width || !height || graphData.error;
+  const { width, height, graphRef, graphOptions } = props;
+
+  const originGraphData = useAppSelector(selectGraphData);
+  const graphData = useGraphData(originGraphData);
+
+  const initOutputMsg = useGraphInitOutput();
+  const errorMsg = useAppSelector(selectErrorMsg);
+
+  const isError = errorMsg || _.isEmpty(graphData.nodes);
 
   React.useEffect(() => {
     graphRef.current?.zoomToFit();
@@ -26,13 +40,19 @@ const TopologyGraph = (props: TopologyGraphProps) => {
       }}
     >
       {isError ? (
-        <Error message={graphData.error} />
+        <>
+          <Error message={errorMsg} />
+          <GraphLoadingModal
+            isOpen={!errorMsg || !!initOutputMsg}
+            message={initOutputMsg}
+          />
+        </>
       ) : (
         <ForceGraph2D
           ref={graphRef}
           width={width}
           height={height}
-          graphData={graphData.data as GraphData}
+          graphData={graphData}
           {...graphOptions}
         />
       )}
@@ -48,10 +68,6 @@ export interface GraphSizeProps {
 export interface GraphProps {
   graphRef: React.MutableRefObject<ForceGraphMethods | undefined>;
   graphOptions: ForceGraphProps;
-  graphData: {
-    data: GraphData;
-    error?: string;
-  };
 }
 
 export type TopologyGraphProps = GraphSizeProps & GraphProps;

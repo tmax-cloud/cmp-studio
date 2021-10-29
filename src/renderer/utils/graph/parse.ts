@@ -1,6 +1,10 @@
+import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
 import { LinkData, NodeData, NodeKind, ROOT } from '@renderer/types/graph';
 import { nodesById } from './traverse';
+
+export const getRootNode = (nodes: NodeData[]): NodeData | undefined =>
+  nodes.find((node) => (node as NodeData).simpleName === ROOT) as NodeData;
 
 const parseNodeSimpleName = (str: string, status?: string) =>
   status ? str.replace(`(${status})`, '').trim() : str;
@@ -51,31 +55,56 @@ const parseNodeFullName = (str: string) => {
 };
 
 const setNeighborElements = (gData: GraphData) => {
+  const nodes = gData.nodes as NodeData[];
   gData.links.forEach((link) => {
     const { source, target } = link;
     const sourceNode =
-      source && typeof source !== 'object' && nodesById(gData)[source];
+      source && typeof source !== 'object' && nodesById(nodes)[source];
     const targetNode =
-      target && typeof target !== 'object' && nodesById(gData)[target];
+      target && typeof target !== 'object' && nodesById(nodes)[target];
     if (sourceNode && targetNode) {
       // add neighborNodes
-      !sourceNode.childNodes && (sourceNode.childNodes = new Set<NodeData>());
-      !targetNode.parentNodes && (targetNode.parentNodes = new Set<NodeData>());
-      sourceNode.childNodes.add(targetNode);
-      targetNode.parentNodes.add(sourceNode);
-      // add neighborLinks
-      !sourceNode.childLinks && (sourceNode.childLinks = new Set<LinkData>());
-      !targetNode.parentLinks && (targetNode.parentLinks = new Set<LinkData>());
-      sourceNode.childLinks.add(link);
-      targetNode.parentLinks.add(link);
+      sourceNode.childNodes = _.union(sourceNode.childNodes, [targetNode.id]);
+      targetNode.parentNodes = _.union(targetNode.parentNodes, [sourceNode.id]);
     }
   });
   return gData;
+};
+
+const filterElements = (gData: GraphData) => {
+  const removeNodeList = ['meta.count-boundary (EachMode fixup)'];
+  let newNodes = _.cloneDeep(gData.nodes) as NodeData[];
+  let newLinks = _.cloneDeep(gData.links) as LinkData[];
+  const addLinks: LinkData[] = [];
+  removeNodeList.forEach((fullName) => {
+    const removeNode = gData.nodes.find(
+      (node) => (node as NodeData).fullName === fullName
+    ) as NodeData;
+    if (removeNode) {
+      gData.links.forEach((link) => {
+        // connecting with a new node
+        if (link.source === removeNode.id) {
+          gData.links.forEach((link2) => {
+            if (link2.target === removeNode.id) {
+              addLinks.push({ source: link2.source, target: link.target });
+            }
+          });
+        }
+      });
+      // remove node
+      newNodes = newNodes.filter((node) => node.id !== removeNode.id);
+      newLinks = newLinks.filter(
+        (link) => link.source !== removeNode.id && link.target !== removeNode.id
+      );
+      newLinks = _.union(newLinks, addLinks);
+    }
+  });
+  return { nodes: newNodes, links: newLinks };
 };
 
 export const getRefinedGraph = (gData: GraphData) => {
   const nodes = gData.nodes.map((node) => {
     return { ...node, ...parseNodeFullName((node as NodeData).fullName) };
   });
-  return setNeighborElements({ nodes, links: gData.links });
+  return setNeighborElements(filterElements({ nodes, links: gData.links }));
 };

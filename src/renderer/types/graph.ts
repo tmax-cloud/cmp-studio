@@ -16,10 +16,8 @@ export interface NodeData extends NodeObject {
   type?: NodeKind;
   status?: string;
   modules?: string[];
-  parentNodes?: Set<NodeData>;
-  childNodes?: Set<NodeData>;
-  parentLinks?: Set<LinkData>;
-  childLinks?: Set<LinkData>;
+  parentNodes?: (string | number)[];
+  childNodes?: (string | number)[];
 }
 export interface LinkData extends LinkObject {
   id?: string | number;
