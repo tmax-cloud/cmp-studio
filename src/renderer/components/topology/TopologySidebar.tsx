@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import _ from 'lodash';
 import {
   Box,
@@ -12,6 +13,7 @@ import {
   ClickAwayListener,
   MenuList,
   MenuItem,
+  ThemeProvider,
 } from '@mui/material';
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
@@ -32,6 +34,8 @@ import {
   setInitObjects,
 } from '../../features/codeSlice';
 import { setWorkspaceUid } from '../../features/commonSlice';
+import CreateWorkspaceModal from '../workspace/CreateWorkspaceModal';
+import StudioTheme from '../../theme';
 
 export const SIDEBAR_WIDTH = '300px';
 
@@ -119,6 +123,26 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
     setTabIndex(newValue);
   };
 
+  const openWorkspaceFromTopologySidebar = async (folderUri: string) => {
+    const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
+      folderUri,
+    };
+    openExistFolder(args)
+      .then(async (response: any) => {
+        const uid = response?.data?.uid;
+        if (uid) {
+          const projectJsonRes = await getProjectJson(args);
+          dispatch(setInitObjects(projectJsonRes.data));
+          history.push(`/main/${uid}`);
+          dispatch(setWorkspaceUid(uid));
+        }
+        return response;
+      })
+      .catch((err: any) => {
+        console.log('[Error] Failed to open exist folder : ', err);
+      });
+  };
+
   const clickAwayHandler = () => {
     setPrjContextMenuOpen(false);
   };
@@ -162,24 +186,8 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
       'studio:dirPathToOpen',
       (res: { canceled: boolean; filePaths: string[] }) => {
         const { filePaths, canceled } = res;
-        const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
-          folderUri: filePaths[0],
-        };
         if (!canceled) {
-          openExistFolder(args)
-            .then(async (response: any) => {
-              const uid = response?.data?.uid;
-              if (uid) {
-                const projectJsonRes = await getProjectJson(args);
-                dispatch(setInitObjects(projectJsonRes.data));
-                history.push(`/main/${uid}`);
-                dispatch(setWorkspaceUid(uid));
-              }
-              return response;
-            })
-            .catch((err: any) => {
-              console.log('[Error] Failed to open exist folder : ', err);
-            });
+          openWorkspaceFromTopologySidebar(filePaths[0]);
         }
       }
     );
@@ -262,7 +270,16 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                 <MenuItem
                   className={classes.menuItem}
                   onClick={() => {
-                    console.log(' 메뉴 클릭');
+                    setPrjContextMenuOpen(false);
+                    ReactDOM.render(
+                      <ThemeProvider theme={StudioTheme}>
+                        <CreateWorkspaceModal
+                          history={history}
+                          openWorkspace={openWorkspaceFromTopologySidebar}
+                        />
+                      </ThemeProvider>,
+                      document.getElementById('modal-container')
+                    );
                   }}
                 >
                   <span className={classes.menuItemText}>새 프로젝트 생성</span>
