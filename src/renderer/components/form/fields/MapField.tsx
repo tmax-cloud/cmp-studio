@@ -34,7 +34,7 @@ const MapField = (props: FieldProps) => {
     fontWeight: 'bold',
   };
 
-  const [mapData, setMapData] = React.useState(_.cloneDeep(formData) || []);
+  const [mapData, setMapData] = React.useState(_.cloneDeep(formData) || {});
 
   if (!additional) {
     return <>{children}</>;

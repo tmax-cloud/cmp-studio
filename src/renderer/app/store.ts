@@ -7,18 +7,24 @@ import graphReducer from '@renderer/features/graphSlice';
 import codeReducer from '../features/codeSlice';
 import commonReducer from '../features/commonSlice';
 
-const persistConfig = {
+const rootPersistConfig = {
   key: 'root',
+  blacklist: ['code', 'graph'],
   storage,
-  blacklist: ['graph'],
+};
+
+const codePersistConfig = {
+  key: 'code',
+  blacklist: ['selectedObjectInfo'],
+  storage,
 };
 
 const rootReducer: any = combineReducers({
-  code: codeReducer,
+  code: persistReducer(codePersistConfig, codeReducer),
   common: commonReducer,
   graph: graphReducer,
 });
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
 
 export const store: any = configureStore({
   reducer: persistedReducer, // 리듀서들로 구성된 객체 (내부적으로 combineReducers해줌.)
