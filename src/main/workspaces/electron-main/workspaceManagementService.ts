@@ -154,6 +154,25 @@ export class WorkspaceManagementService
     }
   }
 
+  getFolderUriByWorkspaceId(workspaceId: string): string | null {
+    const workspaceMap = readFileJson(workspaceMapPath);
+    const folderUris: string[] = [];
+    Object.keys(workspaceMap)?.forEach((key) => {
+      if (key === workspaceId) {
+        folderUris.push(workspaceMap[key]);
+      }
+    });
+
+    switch (folderUris.length) {
+      case 1:
+        return folderUris[0];
+      case 0:
+        return null;
+      default:
+        throw new Error('[Error] Duplicate folderUri in workspaceMap');
+    }
+  }
+
   generateDefaultNewWorkspaceName(): string {
     let index = 1;
     let newWorkspaceName = `새프로젝트${index}`;

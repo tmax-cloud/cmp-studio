@@ -4,6 +4,11 @@ export const openExistFolder = (
   args: WorkspaceTypes.WorkspaceOpenProjectArgs
 ) => window.electron.ipcRenderer.invoke('studio:openExistFolder', args);
 
+export const getFolderUriByWorkspaceId = (
+  args: WorkspaceTypes.WorkspaceGetFolderUriArgs
+) =>
+  window.electron.ipcRenderer.invoke('studio:getFolderUriByWorkspaceId', args);
+
 export const getRecentlyOpenedWorkspaces = () =>
   window.electron.ipcRenderer.invoke('studio:getRecentlyOpenedWorkspaces');
 

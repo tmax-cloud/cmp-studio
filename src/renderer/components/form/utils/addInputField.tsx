@@ -1,5 +1,4 @@
 import * as _ from 'lodash-es';
-import { setSelectedSourceSchema } from '@renderer/features/codeSlice';
 
 export const addSchemaBasedField = (
   content: any,
@@ -52,7 +51,6 @@ const setAdditionalSchemaByType = (key: string, type: string) => {
     }
     default:
   }
-  console.log({ properties: { [key]: newSchema } });
   return { properties: { [key]: newSchema } };
 };
 
@@ -60,15 +58,15 @@ export const addCustomField = (content: any, input: any, sourceSchema: any) => {
   const type = Object.keys(content)[0]; // ['provider', 'resource', 'datasource']
   const name = type && Object.keys(content[type])[0];
   const displayName = name && Object.keys(content[type][name])[0];
-  const object = _.assign(
+  const object = _.defaultsDeep(
     {
       [type]: { [name]: { [displayName]: { [input.key]: '' } } },
     },
     content
   );
   const schema = _.defaultsDeep(
-    sourceSchema,
-    setAdditionalSchemaByType(input.key, input.type)
+    setAdditionalSchemaByType(input.key, input.type),
+    sourceSchema
   );
 
   return { object, schema };
