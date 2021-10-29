@@ -5,9 +5,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import { exportProject } from '@renderer/utils/ipc/workspaceIpcUtils';
-import * as WorkspaceTypes from '@main/workspaces/common/workspace';
-import { useSelector } from 'react-redux';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import { useAppSelector } from '@renderer/app/store';
 import {
   FitScreenButton,
   SaveButton,
@@ -23,9 +22,8 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
 
   //const handleModuleListModalOpen = () => setOpenModuleListModal(true);
   const handleModuleListModalClose = () => setOpenModuleListModal(false);
-  let objects: WorkspaceTypes.TerraformFileJsonMeta[] = [];
 
-  objects = useSelector(selectCodeFileObjects);
+  const fileObjects = useAppSelector(selectCodeFileObjects);
   return (
     <Toolbar
       style={{ minHeight: 48, paddingLeft: 12, paddingRight: 12 }}
@@ -51,7 +49,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
           >
             <SaveButton
               onClick={async () => {
-                const result = await exportProject({ objects });
+                const result = await exportProject({ objects: fileObjects });
                 console.log('[INFO] File export result : ', result);
               }}
             />
