@@ -1,9 +1,11 @@
 import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
-import { NodeData } from '@renderer/types/graph';
+import { LinkData, NodeData } from '@renderer/types/graph';
 import { getRawGraph } from './dot';
 import { getRefinedGraph } from './parse';
 import { getTerraformGraphData } from './terraform';
+import { draw2Texts, drawImage, drawRoundRect, getBgColor } from './draw';
+import NoImageIcon from '../../../../assets/images/noImage64.png';
 
 export const getModuleNodeByName = (
   gData: GraphData,
@@ -86,4 +88,72 @@ export const getGraphData = async (
   console.log('graph data: ', graph);
   //console.log('path: ', getModulePath(graph));
   return graph;
+};
+
+export const hasNode = (nodes: NodeData[], node: NodeData) => {
+  return !!_.find(nodes, { id: node.id });
+};
+
+export const hasLink = (links: LinkData[], link: LinkData) => {
+  const source =
+    typeof link === 'object'
+      ? (link.source as NodeData).id
+      : (link as LinkData).source;
+  const target =
+    typeof link === 'object'
+      ? (link.target as NodeData).id
+      : (link as LinkData).target;
+  return !!_.find(links, { source, target });
+};
+
+export const drawNode = (
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  radius: number,
+  node: NodeData,
+  isHover: boolean,
+  isHightlight: boolean
+) => {
+  const lineWidth = isHover ? 4 : 2;
+  const opacity = isHightlight ? 1 : 0.5;
+  const bgColor = getBgColor(opacity, node.type);
+  const strokeColor = isHover ? 'red' : bgColor;
+
+  // outter rect
+  drawRoundRect(
+    context,
+    x,
+    y,
+    w,
+    h,
+    radius,
+    lineWidth,
+    strokeColor,
+    bgColor,
+    opacity
+  );
+
+  const imageSize = 24;
+  drawImage(context, NoImageIcon, x + 1 + imageSize / 2, y + 2, imageSize);
+
+  // inner rect
+  drawRoundRect(
+    context,
+    x + 1,
+    y + 29,
+    w - 2,
+    20,
+    radius,
+    lineWidth,
+    bgColor,
+    'white',
+    opacity
+  );
+
+  const type = node.type || '-';
+  const name = node.simpleName;
+  draw2Texts(context, x, y, w, h, type, name);
 };

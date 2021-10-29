@@ -1,27 +1,43 @@
 import * as React from 'react';
-import { ForceGraphMethods, NodeObject } from 'react-force-graph-2d';
+import * as _ from 'lodash';
+import {
+  ForceGraphMethods,
+  LinkObject,
+  NodeObject,
+} from 'react-force-graph-2d';
 import { forceManyBody, forceCollide, forceLink } from 'd3-force';
 import { NodeData, LinkData } from '@renderer/types/graph';
-import { drawNode } from '@renderer/utils/graph/draw';
+import { drawNode, hasLink, hasNode } from '@renderer/utils/graph';
+import { sethighlightElements } from '@renderer/utils/graph/traverse';
+import { useAppSelector } from '@renderer/app/store';
+import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
 
 const initialConfig: GraphConfig = {
   isMounted: false,
   zoomLevel: 1,
+  nodeVisibility: true,
+  linkVisibility: true,
   hoverNode: null,
-  highlightNodes: new Set<NodeData>(),
-  highlightLinks: new Set<LinkData>(),
+  highlightNodes: [],
+  highlightLinks: [],
 };
 
 const NODE_RADIUS = 25;
 
 export const useGraphProps = () => {
   const graphRef = React.useRef<ForceGraphMethods>();
+  const graphData = useAppSelector(selectGraphData);
   const configRef = React.useRef<GraphConfig>(initialConfig);
 
   const nodeCanvasObject = (obj: NodeObject, ctx: CanvasRenderingContext2D) => {
     const node = obj as NodeData;
     const x = node?.x || 0;
     const y = node?.y || 0;
+
+    const isHightlight = configRef.current.nodeVisibility
+      ? true
+      : hasNode(configRef.current.highlightNodes, node as NodeData);
+
     drawNode(
       ctx,
       x - NODE_RADIUS,
@@ -30,8 +46,23 @@ export const useGraphProps = () => {
       NODE_RADIUS * 2,
       4,
       node,
-      node === configRef.current.hoverNode
+      node === configRef.current.hoverNode,
+      isHightlight
     );
+  };
+
+  const linkVisibility = (link: LinkObject) => {
+    return configRef.current.linkVisibility
+      ? true
+      : hasLink(configRef.current.highlightLinks, link);
+  };
+
+  const linkWidth = (link: LinkObject) => {
+    return hasLink(configRef.current.highlightLinks, link) ? 5 : 1;
+  };
+
+  const linkDirectionalParticleWidth = (link: LinkObject) => {
+    return hasLink(configRef.current.highlightLinks, link) ? 4 : 0;
   };
 
   const handleZoomIn = () => {
@@ -52,26 +83,29 @@ export const useGraphProps = () => {
     graphRef.current?.zoomToFit(500);
   };
 
-  /*const handleNodeHover = (
+  const handleNodeHover = (
     obj: NodeObject | null,
     previousNode: NodeObject | null
   ) => {
-    const highlightNodes = new Set<NodeData>();
-    const highlightLinks = new Set<LinkData>();
     const node = obj as NodeData;
-    if (node) {
-      highlightNodes.add(node);
-      node.childNodes?.forEach((neighborNode: NodeData) =>
-        highlightNodes.add(neighborNode)
+    if (node && node.id) {
+      configRef.current.nodeVisibility = false;
+      configRef.current.linkVisibility = false;
+      const { highlightNodes, highlightLinks } = sethighlightElements(
+        graphData.nodes,
+        node.id
       );
-      node.childLinks?.forEach((neighborLink: LinkData) =>
-        highlightLinks.add(neighborLink)
-      );
+      configRef.current.hoverNode = node || null;
+      configRef.current.highlightNodes = _.uniqWith(highlightNodes, _.isEqual);
+      configRef.current.highlightLinks = _.uniqWith(highlightLinks, _.isEqual);
+    } else {
+      configRef.current.nodeVisibility = true;
+      configRef.current.linkVisibility = true;
+      configRef.current.hoverNode = null;
+      configRef.current.highlightNodes = [];
+      configRef.current.highlightLinks = [];
     }
-    configRef.current.hoverNode = node || null;
-    configRef.current.highlightNodes = highlightNodes;
-    configRef.current.highlightLinks = highlightLinks;
-  };*/
+  };
 
   const handleEngineTick = () => {
     // charge: Attracts (+) or repels (-) nodes to/from each other
@@ -96,16 +130,23 @@ export const useGraphProps = () => {
     nodeLabel: 'simpleName',
     nodeRelSize: NODE_RADIUS,
     nodeCanvasObject,
+    linkVisibility,
+    linkWidth,
+    linkDirectionalParticleWidth,
+    linkDirectionalParticles: 4,
+    linkDirectionalArrowLength: 5,
+    linkDirectionalArrowRelPos: 1,
+    linkCurvature: 0.25,
     dagMode: 'td' as DagMode,
-    dagLevelDistance: NODE_RADIUS * 2 + 10,
+    dagLevelDistance: NODE_RADIUS * 3,
     cooldownTime: 1000,
     d3AlphaDecay: 0.5,
     enableZoomInteraction: false,
-    //autoPauseRedraw: false,
+    autoPauseRedraw: false,
     onEngineTick: handleEngineTick,
     onEngineStop: handleEngineStop,
     onZoomEnd: handleZoomEnd,
-    //onNodeHover: handleNodeHover,
+    onNodeHover: handleNodeHover,
   };
 
   const graphHandler = {
@@ -122,7 +163,9 @@ type DagMode = 'td' | 'bu' | 'lr' | 'rl' | 'radialout' | 'radialin';
 interface GraphConfig {
   isMounted: boolean;
   zoomLevel: number;
+  nodeVisibility: boolean;
+  linkVisibility: boolean;
   hoverNode: NodeData | null;
-  highlightNodes: Set<NodeData>;
-  highlightLinks: Set<LinkData>;
+  highlightNodes: NodeData[];
+  highlightLinks: LinkData[];
 }

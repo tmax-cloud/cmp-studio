@@ -3,30 +3,27 @@ import { LinkData, NodeData } from '@renderer/types/graph';
 export const nodesById = (nodes: NodeData[]) =>
   Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-export const traverseGraph = (
+export const sethighlightElements = (
   nodes: NodeData[],
-  id: string | number | undefined,
-  worker: (node: NodeData) => void
+  id: string | number
 ) => {
-  if (!id) {
-    return;
-  }
-  (function traverse(node = nodesById(nodes)[id]) {
-    if (!node) {
+  const highlightNodes: NodeData[] = [];
+  const highlightLinks: LinkData[] = [];
+  (function traverse(n = nodesById(nodes)[id]) {
+    if (!n) {
       return;
     }
-    worker(node); // do something
-    if (node.childLinks) {
-      [...node.childLinks]
-        .map((link: LinkData) => {
-          const { target } = link;
-          if (target) {
-            return typeof target === 'object'
-              ? target
-              : nodesById(nodes)[target];
-          }
+    highlightNodes.push(n);
+    n.childNodes?.forEach((child: string | number) => {
+      highlightLinks.push({ source: n.id, target: child });
+    });
+    if (n.childNodes) {
+      [...n.childNodes]
+        .map((child: string | number) => {
+          return nodesById(nodes)[child];
         })
         .forEach(traverse);
     }
   })();
+  return { highlightNodes, highlightLinks };
 };

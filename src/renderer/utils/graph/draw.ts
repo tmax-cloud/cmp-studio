@@ -1,7 +1,6 @@
-import { NodeData, NodeKind } from '@renderer/types/graph';
-import NoImageIcon from '../../../../assets/images/noImage64.png';
+import { NodeKind } from '@renderer/types/graph';
 
-const drawRoundRect = (
+export const drawRoundRect = (
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -10,10 +9,12 @@ const drawRoundRect = (
   radius: number,
   lineWidth: number,
   strokeColor: string,
-  fillColor: string
+  fillColor: string,
+  opacity: number
 ) => {
   const r = x + w;
   const b = y + h;
+  ctx.globalAlpha = opacity;
   ctx.beginPath();
   ctx.strokeStyle = strokeColor;
   ctx.lineWidth = lineWidth;
@@ -31,7 +32,7 @@ const drawRoundRect = (
   ctx.fill();
 };
 
-const fitText = (
+export const fitText = (
   ctx: CanvasRenderingContext2D,
   str: string,
   maxWidth: number
@@ -52,7 +53,7 @@ const fitText = (
   }
 };
 
-const draw2Texts = (
+export const draw2Texts = (
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -72,7 +73,7 @@ const draw2Texts = (
   ctx.fillText(fittingNameText, x + w / 2, y + h - 6);
 };
 
-const drawImage = (
+export const drawImage = (
   ctx: CanvasRenderingContext2D,
   image: string,
   x: number,
@@ -84,60 +85,20 @@ const drawImage = (
   ctx.drawImage(img, x, y, size, size);
 };
 
-const getBgColor = (type?: NodeKind) => {
+export const getBgColor = (opacity: number, type?: NodeKind) => {
   if (!type) {
-    return 'gray';
+    return `rgba(128, 128, 128, ${opacity})`;
   }
   switch (type) {
-    case 'meta':
-      return 'yellow';
     case 'module':
-      return 'orange';
+      return `rgba(255, 173, 48, ${opacity})`;
     case 'output':
-      return 'purple';
+      return `rgba(192, 192, 128, ${opacity})`;
     case 'provider':
-      return 'blue';
+      return `rgba(144, 157, 255, ${opacity})`;
     case 'var':
-      return 'pink';
+      return `rgba(255, 87, 134, ${opacity})`;
     default:
-      return 'green';
+      return `rgba(0, 183, 189, ${opacity})`;
   }
-};
-
-export const drawNode = (
-  context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  radius: number,
-  node: NodeData,
-  isHover: boolean
-) => {
-  const lineWidth = isHover ? 4 : 2;
-  const bgColor = getBgColor(node.type);
-  const strokeColor = isHover ? 'red' : bgColor;
-
-  // outter rect
-  drawRoundRect(context, x, y, w, h, radius, lineWidth, strokeColor, bgColor);
-
-  const imageSize = 24;
-  drawImage(context, NoImageIcon, x + 1 + imageSize / 2, y + 2, imageSize);
-
-  // inner rect
-  drawRoundRect(
-    context,
-    x + 1,
-    y + 29,
-    w - 2,
-    20,
-    radius,
-    lineWidth,
-    bgColor,
-    'white'
-  );
-
-  const type = node.type || '-';
-  const name = node.simpleName;
-  draw2Texts(context, x, y, w, h, type, name);
 };
