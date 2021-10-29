@@ -1,15 +1,9 @@
 import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
-import { LinkData, ModulePath, NodeData, ROOT } from '@renderer/types/graph';
+import { NodeData } from '@renderer/types/graph';
 import { getRawGraph } from './dot';
 import { getRefinedGraph } from './parse';
-import { traverseGraph } from './traverse';
 import { getTerraformGraphData } from './terraform';
-
-export const getRootNode = (gData: GraphData): NodeData | undefined =>
-  gData.nodes.find(
-    (node) => (node as NodeData).simpleName === ROOT
-  ) as NodeData;
 
 export const getModuleNodeByName = (
   gData: GraphData,
@@ -21,13 +15,13 @@ export const getModuleNodeByName = (
       (node as NodeData).simpleName === name
   ) as NodeData;
 
-export const getPrunedGraph = (
+/*export const getPrunedGraph = (
   gData: GraphData,
   id: number | string
 ): GraphData => {
   const visibleNodes = new Set<NodeData>();
   const visibleLinks = new Set<LinkData>();
-  traverseGraph(gData, id, (node) => {
+  traverseGraph(gData.nodes, id, (node) => {
     visibleNodes.add(node);
     if (!node.childLinks) {
       return;
@@ -37,9 +31,9 @@ export const getPrunedGraph = (
     });
   });
   return { nodes: [...visibleNodes], links: [...visibleLinks] };
-};
+};*/
 
-export const getModulePath = (gData: GraphData): ModulePath[] => {
+/*export const getModulePath = (gData: GraphData): ModulePath[] => {
   const modulePaths: ModulePath[] = [];
   const paths = new Set<string>();
   const rootId = getRootNode(gData)?.id;
@@ -81,7 +75,7 @@ export const getModulePath = (gData: GraphData): ModulePath[] => {
   });
 
   return modulePaths;
-};
+};*/
 
 export const getGraphData = async (
   workspaceUid: string

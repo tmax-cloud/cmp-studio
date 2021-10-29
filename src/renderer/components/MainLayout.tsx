@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router';
 import { styled } from '@mui/material';
 import { TopologyPage } from './topology/TopologyPage';
 import MainNavbar from './MainNavbar';
@@ -13,16 +12,12 @@ const MainLayoutRoot = styled('div')(({ theme }) => ({
   flexDirection: 'column',
 }));
 
-export const MainLayout: React.FC<RouteComponentProps<{ uid: string }>> = ({
-  match,
-}) => {
-  const { uid } = match.params;
-  console.log('uid? ', uid);
+export const MainLayout = () => {
   // TODO : tf파일들에 대해 parser돌려서 object만들어주는 부분 구현하기.
   return (
     <MainLayoutRoot>
       <MainNavbar />
-      <TopologyPage workspaceUid={uid} />
+      <TopologyPage />
     </MainLayoutRoot>
   );
 };
