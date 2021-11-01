@@ -1,4 +1,8 @@
 import { NodeKind } from '@renderer/types/graph';
+import DefaultIcon from '../../../../assets/images/graph/graph-default-type-icon.png';
+import ModuleIcon from '../../../../assets/images/graph/graph-module-type-icon.png';
+import NoImageIcon from '../../../../assets/images/graph/graph-no-type-icon.png';
+import ResourceIcon from '../../../../assets/images/graph/graph-resource-type-icon.png';
 
 export const drawRoundRect = (
   ctx: CanvasRenderingContext2D,
@@ -87,18 +91,30 @@ export const drawImage = (
 
 export const getBgColor = (opacity: number, type?: NodeKind) => {
   if (!type) {
-    return `rgba(128, 128, 128, ${opacity})`;
+    return `rgba(192, 192, 128, ${opacity})`;
   }
   switch (type) {
     case 'module':
       return `rgba(255, 173, 48, ${opacity})`;
-    case 'output':
-      return `rgba(192, 192, 128, ${opacity})`;
     case 'provider':
-      return `rgba(144, 157, 255, ${opacity})`;
-    case 'var':
       return `rgba(255, 87, 134, ${opacity})`;
+    case 'datasource':
+      return `rgba(144, 157, 255, ${opacity})`;
     default:
-      return `rgba(0, 183, 189, ${opacity})`;
+      return `rgba(0, 183, 189, ${opacity})`; // resource
+  }
+};
+
+export const getIcon = (type?: NodeKind) => {
+  if (!type) {
+    return NoImageIcon;
+  }
+  switch (type) {
+    case 'module':
+      return ModuleIcon;
+    case 'provider':
+      return DefaultIcon;
+    default:
+      return ResourceIcon;
   }
 };

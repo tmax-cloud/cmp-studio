@@ -127,7 +127,6 @@ export const useGraphProps = () => {
   };
 
   const graphOption = {
-    nodeLabel: 'simpleName',
     nodeRelSize: NODE_RADIUS,
     nodeCanvasObject,
     linkVisibility,

@@ -4,8 +4,13 @@ import { LinkData, NodeData } from '@renderer/types/graph';
 import { getRawGraph } from './dot';
 import { getRefinedGraph } from './parse';
 import { getTerraformGraphData } from './terraform';
-import { draw2Texts, drawImage, drawRoundRect, getBgColor } from './draw';
-import NoImageIcon from '../../../../assets/images/noImage64.png';
+import {
+  draw2Texts,
+  drawImage,
+  drawRoundRect,
+  getBgColor,
+  getIcon,
+} from './draw';
 
 export const getModuleNodeByName = (
   gData: GraphData,
@@ -121,6 +126,7 @@ export const drawNode = (
   const opacity = isHightlight ? 1 : 0.5;
   const bgColor = getBgColor(opacity, node.type);
   const strokeColor = isHover ? 'red' : bgColor;
+  const icon = getIcon(node.type);
 
   // outter rect
   drawRoundRect(
@@ -137,7 +143,7 @@ export const drawNode = (
   );
 
   const imageSize = 24;
-  drawImage(context, NoImageIcon, x + 1 + imageSize / 2, y + 2, imageSize);
+  drawImage(context, icon, x + 1 + imageSize / 2, y + 2, imageSize);
 
   // inner rect
   drawRoundRect(
