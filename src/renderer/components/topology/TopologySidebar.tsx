@@ -29,7 +29,7 @@ import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import TopologyLibrary from './TopologyLibrary';
 import {
   setSelectedObjectInfo,
-  setInitObjects,
+  setFileObjects,
 } from '../../features/codeSlice';
 import { setWorkspaceUid } from '../../features/commonSlice';
 
@@ -175,7 +175,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
               const uid = response?.data?.uid;
               if (uid) {
                 const projectJsonRes = await getProjectJson(args);
-                dispatch(setInitObjects(projectJsonRes.data));
+                dispatch(setFileObjects(projectJsonRes.data));
                 history.push(`/main/${uid}`);
                 dispatch(setWorkspaceUid(uid));
               }
