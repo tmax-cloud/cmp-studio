@@ -127,12 +127,16 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
   useSelector(selectCodeFileObjects).forEach(
-    (file: { filePath: string; fileJson: any[] }) => {
-      objResult.push(
-        ..._.entries(file.fileJson).map((object) => ({
-          [object[0]]: object[1],
-        }))
-      );
+    (file: { filePath: string; fileJson: any }) => {
+      // eslint-disable-next-line guard-for-in
+      for (const currKey in file.fileJson) {
+        objResult.push(
+          ..._.entries(file.fileJson[currKey]).map((object) => ({
+            [object[0]]: object[1],
+            type: currKey,
+          }))
+        );
+      }
     }
   );
 
@@ -140,8 +144,8 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
     const itemsList: Item[] = [];
     objResult
       .map((result) => {
-        const type = Object.keys(result)[0];
-        const displayName = Object.keys(result[type])[0];
+        const { type, ...object } = result;
+        const displayName = Object.keys(object)[0];
         const title = type + '-' + displayName;
         return { type, displayName, title };
       })
@@ -219,8 +223,8 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                 startIcon={getIcon(item.type)}
                 onClick={() => {
                   const content = objResult.filter((cur: any) => {
-                    const type = Object.keys(cur)[0];
-                    const name = Object.keys(cur[type])[0];
+                    const { type } = cur;
+                    const name = Object.keys(cur)[0];
                     if (item.title === type + '-' + name) {
                       return cur;
                     }
@@ -340,3 +344,6 @@ type TopologySidebarProps = {
 };
 
 export default TopologySidebar;
+function doSomething(key: any) {
+  throw new Error('Function not implemented.');
+}

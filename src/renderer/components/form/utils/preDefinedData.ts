@@ -4,11 +4,11 @@ import * as _ from 'lodash';
 const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
 
 const createFormData = (object: any) => {
-  const type = Object.keys(object)[0];
-  const name = Object.keys(object[type])[0];
-  const displayName = Object.keys(object[type][name])[0];
+  const { type, ...targetObject } = object;
+  const name = Object.keys(targetObject)[0];
+  const displayName = Object.keys(targetObject[name])[0];
   const formData =
-    (!_.isEmpty(object) && _.cloneDeep(object[type][name][displayName])) || {};
+    (!_.isEmpty(object) && _.cloneDeep(targetObject[name][displayName])) || {};
   return formData;
 };
 
@@ -61,6 +61,10 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
                   },
                 });
               }
+              break;
+            }
+            case 'number': {
+              setSchema({ type: 'string' });
               break;
             }
             default:
