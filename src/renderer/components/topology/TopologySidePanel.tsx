@@ -60,6 +60,7 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
           schema={fixedSchema}
           formData={formData}
           uiSchema={customUISchema}
+          toggleSidePanel={toggleSidePanel}
         />
       </Drawer>
     </>
