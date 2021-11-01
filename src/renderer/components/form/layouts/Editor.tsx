@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import { useSelector, useDispatch } from 'react-redux';
 import { ArrowDropDown } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import {
@@ -10,8 +9,11 @@ import {
   Button,
   TextField,
   MenuItem,
+  Select,
 } from '@mui/material';
 import { selectCode } from '@renderer/features/codeSliceInputSelectors';
+import { useAppSelector, useAppDispatch } from '@renderer/app/store';
+import SaveSection from '@renderer/components/form/layouts/SaveSection';
 import DynamicForm from '../index';
 import { addSchemaBasedField, addCustomField } from '../utils/addInputField';
 import {
@@ -33,7 +35,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   const { formData } = props;
   const classes = useStyles();
   const inputTypeList = ['string', 'object', 'array', 'boolean'];
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [additionalSchema, setAdditionalSchema] = React.useState('');
   const [customFieldType, setCustomFieldType] = React.useState('');
@@ -41,8 +43,11 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 
   const {
     selectedObjectInfo: { id, content, sourceSchema },
-  } = useSelector(selectCode);
-
+  } = useAppSelector(selectCode);
+  React.useLayoutEffect(() => {
+    setAdditionalSchema('');
+    setCustomFieldType('');
+  }, [formData]);
   return (
     <div>
       <Accordion>
@@ -57,11 +62,10 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               padding: '16px 0 0 16px',
             }}
           >
-            <TextField
+            <Select
               id={id}
               sx={{ width: '250px' }}
               className={classes.root}
-              select
               label="스키마"
               value={additionalSchema}
               onChange={(e) => {
@@ -74,7 +78,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                     {cur}
                   </MenuItem>
                 ))}
-            </TextField>
+            </Select>
             <Button
               onClick={() => {
                 const result = addSchemaBasedField(
@@ -96,11 +100,10 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               padding: '16px 0 0 16px',
             }}
           >
-            <TextField
+            <Select
               id={id}
               sx={{ width: '250px' }}
               className={classes.root}
-              select
               label="타입"
               value={customFieldType}
               onChange={(e) => {
@@ -113,7 +116,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                     {cur}
                   </MenuItem>
                 ))}
-            </TextField>
+            </Select>
             <TextField
               id={id}
               sx={{ width: '250px', marginLeft: '16px' }}
@@ -151,23 +154,16 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 type AddFieldSectionProps = {
   formData: any;
 };
-const SaveSection = (props: SaveSectionProps) => {
-  const { saveLabel, cancelLabel } = props;
-  return (
-    <div style={{ textAlign: 'end', padding: '20px 10px' }}>
-      <Button variant="outlined">{cancelLabel || '취소'}</Button>
-      <Button variant="contained">{saveLabel || '저장'}</Button>
-    </div>
-  );
-};
-
-type SaveSectionProps = {
-  saveLabel: string;
-  cancelLabel: string;
-};
 
 const EditorTab = (props: EditorTabProps) => {
-  const { schema, formData, uiSchema } = props;
+  const { schema, formData, uiSchema, toggleSidePanel } = props;
+
+  const [formState, setFormState] = React.useState(formData);
+
+  const onChange = React.useCallback(({ formData }, e) => {
+    console.log('formData: ', formData);
+    setFormState(formData);
+  }, []);
   return (
     <>
       <div
@@ -178,10 +174,20 @@ const EditorTab = (props: EditorTabProps) => {
           overflowX: 'hidden',
         }}
       >
-        <DynamicForm schema={schema} formData={formData} uiSchema={uiSchema} />
+        <DynamicForm
+          schema={schema}
+          formData={formState}
+          uiSchema={uiSchema}
+          onChange={onChange}
+        />
       </div>
       <AddFieldSection formData={formData} />
-      <SaveSection saveLabel="저장" cancelLabel="취소" />
+      <SaveSection
+        saveLabel="저장"
+        cancelLabel="취소"
+        toggleSidePanel={toggleSidePanel}
+        formState={formState}
+      />
     </>
   );
 };
@@ -190,6 +196,7 @@ type EditorTabProps = {
   schema: any;
   formData: any;
   uiSchema: any;
+  toggleSidePanel: any;
 };
 
 export default EditorTab;

@@ -102,7 +102,8 @@ function a11yProps(index: number) {
 interface Item {
   provider?: string;
   title: string;
-  displayName: string;
+  resourceName: string;
+  instanceName: string;
   type: string;
 }
 
@@ -145,15 +146,17 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
     objResult
       .map((result) => {
         const { type, ...object } = result;
-        const displayName = Object.keys(object)[0];
-        const title = type + '-' + displayName;
-        return { type, displayName, title };
+        const resourceName = Object.keys(object)[0];
+        const instanceName = Object.keys(object[resourceName])[0];
+        const title = type + '-' + resourceName;
+        return { type, resourceName, title, instanceName };
       })
       .forEach((i: Item) => {
         itemsList.push({
-          provider: i.displayName.split('_')[0],
+          provider: i.resourceName.split('_')[0],
           title: i.title,
-          displayName: i.displayName,
+          instanceName: i.instanceName,
+          resourceName: i.resourceName,
           type: i.type,
         });
       });
@@ -224,13 +227,18 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                 onClick={() => {
                   const content = objResult.filter((cur: any) => {
                     const { type } = cur;
-                    const name = Object.keys(cur)[0];
-                    if (item.title === type + '-' + name) {
-                      return cur;
+                    const resourceName = Object.keys(cur)[0];
+                    if (item.title === type + '-' + resourceName) {
+                      if (type === 'provider' || type === 'module') {
+                        return cur[resourceName];
+                      } else {
+                        return cur[resourceName][item.instanceName];
+                      }
                     }
                   });
                   const object = {
                     id: item.title,
+                    instanceName: item.instanceName,
                     content: content[0],
                   };
 
@@ -238,7 +246,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                   setIsSidePanelOpen((currState: boolean) => true);
                 }}
               >
-                {item.displayName}
+                {item.resourceName}
               </Button>
             );
           })}
