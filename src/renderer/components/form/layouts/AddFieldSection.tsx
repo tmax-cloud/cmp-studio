@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
 import {
-  makeStyles,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -10,6 +9,7 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import {
   addSelectedField,
   setSelectedSourceSchema,
