@@ -45,6 +45,7 @@ const SaveSection = (props: SaveSectionProps) => {
                 ...cur,
                 fileJson: {
                   [type]: {
+                    ...cur.fileJson[type],
                     [resourceName]: {
                       [selectedObjectInstanceName]: {
                         ...formState,
