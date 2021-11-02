@@ -2,6 +2,20 @@ import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
 import { LinkData, NodeData, NodeKind, ROOT } from '@renderer/types/graph';
 import { nodesById } from './traverse';
+import DefaultIcon from '../../../../assets/images/graph/graph-default-type-icon.png';
+import ModuleIcon from '../../../../assets/images/graph/graph-module-type-icon.png';
+import ResourceIcon from '../../../../assets/images/graph/graph-resource-type-icon.png';
+
+const getIconImage = (type: NodeKind) => {
+  switch (type) {
+    case 'module':
+      return ModuleIcon;
+    case 'provider':
+      return DefaultIcon;
+    default:
+      return ResourceIcon;
+  }
+};
 
 const parseNodeSimpleName = (str: string, status?: string) =>
   status ? str.replace(`(${status})`, '').trim() : str;
@@ -17,13 +31,9 @@ const parseNodeProviderName = (str: string) =>
 
 const parseNodeFullName = (str: string) => {
   let simpleName: string | undefined;
-  let type: string | undefined;
+  let type = '';
   let status: string | undefined;
   const modules: NodeKind[] = [ROOT];
-
-  if (str === ROOT) {
-    return { simpleName: ROOT, modules };
-  }
 
   const isProvider = str.startsWith('provider[');
   if (isProvider) {
@@ -49,7 +59,15 @@ const parseNodeFullName = (str: string) => {
     }
   }
 
-  return { simpleName, type, status, modules };
+  const icon = getIconImage(type);
+
+  return {
+    simpleName,
+    type,
+    status,
+    modules,
+    icon,
+  };
 };
 
 const setNeighborElements = (gData: GraphData) => {

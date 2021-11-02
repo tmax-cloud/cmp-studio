@@ -8,7 +8,8 @@ export type NodeKind = TerraformNodeKind | string;
 export interface NodeData extends NodeObject {
   fullName: string;
   simpleName: string;
-  type?: NodeKind;
+  type: NodeKind;
+  icon: string;
   status?: string;
   modules?: string[];
   parentNodes?: (string | number)[];

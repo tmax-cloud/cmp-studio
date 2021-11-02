@@ -15,9 +15,9 @@ import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
 const initialConfig: GraphConfig = {
   isMounted: false,
   zoomLevel: 1,
+  hoverNode: null,
   nodeVisibility: true,
   linkVisibility: true,
-  hoverNode: null,
   highlightNodes: [],
   highlightLinks: [],
 };
@@ -61,10 +61,6 @@ export const useGraphProps = () => {
     return hasLink(configRef.current.highlightLinks, link) ? 5 : 1;
   };
 
-  const linkDirectionalParticleWidth = (link: LinkObject) => {
-    return hasLink(configRef.current.highlightLinks, link) ? 4 : 0;
-  };
-
   const handleZoomIn = () => {
     graphRef.current?.zoom(configRef.current.zoomLevel + 1, 500);
   };
@@ -87,6 +83,7 @@ export const useGraphProps = () => {
     obj: NodeObject | null,
     previousNode: NodeObject | null
   ) => {
+    graphRef.current?.d3ReheatSimulation(); // redraw
     const node = obj as NodeData;
     if (node && node.id) {
       configRef.current.nodeVisibility = false;
@@ -131,8 +128,6 @@ export const useGraphProps = () => {
     nodeCanvasObject,
     linkVisibility,
     linkWidth,
-    linkDirectionalParticleWidth,
-    linkDirectionalParticles: 4,
     linkDirectionalArrowLength: 5,
     linkDirectionalArrowRelPos: 1,
     linkCurvature: 0.25,
@@ -141,7 +136,6 @@ export const useGraphProps = () => {
     cooldownTime: 1000,
     d3AlphaDecay: 0.5,
     enableZoomInteraction: false,
-    autoPauseRedraw: false,
     onEngineTick: handleEngineTick,
     onEngineStop: handleEngineStop,
     onZoomEnd: handleZoomEnd,
@@ -162,9 +156,9 @@ type DagMode = 'td' | 'bu' | 'lr' | 'rl' | 'radialout' | 'radialin';
 interface GraphConfig {
   isMounted: boolean;
   zoomLevel: number;
+  hoverNode: NodeData | null;
   nodeVisibility: boolean;
   linkVisibility: boolean;
-  hoverNode: NodeData | null;
   highlightNodes: NodeData[];
   highlightLinks: LinkData[];
 }

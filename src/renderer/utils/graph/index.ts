@@ -4,13 +4,7 @@ import { LinkData, NodeData } from '@renderer/types/graph';
 import { getRawGraph } from './dot';
 import { getRefinedGraph } from './parse';
 import { getTerraformGraphData } from './terraform';
-import {
-  draw2Texts,
-  drawImage,
-  drawRoundRect,
-  getBgColor,
-  getIcon,
-} from './draw';
+import { draw2Texts, drawRoundRect, getBgColor } from './draw';
 
 export const getModuleNodeByName = (
   gData: GraphData,
@@ -112,7 +106,7 @@ export const hasLink = (links: LinkData[], link: LinkData) => {
 };
 
 export const drawNode = (
-  context: CanvasRenderingContext2D,
+  ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   w: number,
@@ -124,13 +118,12 @@ export const drawNode = (
 ) => {
   const lineWidth = isHover ? 4 : 2;
   const opacity = isHightlight ? 1 : 0.5;
-  const bgColor = getBgColor(opacity, node.type);
+  const bgColor = getBgColor(node.type, opacity);
   const strokeColor = isHover ? 'red' : bgColor;
-  const icon = getIcon(node.type);
 
   // outter rect
   drawRoundRect(
-    context,
+    ctx,
     x,
     y,
     w,
@@ -143,11 +136,13 @@ export const drawNode = (
   );
 
   const imageSize = 24;
-  drawImage(context, icon, x + 1 + imageSize / 2, y + 2, imageSize);
+  const img = document.createElement('img');
+  img.src = node.icon;
+  ctx.drawImage(img, x + 1 + imageSize / 2, y + 2, imageSize, imageSize);
 
   // inner rect
   drawRoundRect(
-    context,
+    ctx,
     x + 1,
     y + 29,
     w - 2,
@@ -159,7 +154,5 @@ export const drawNode = (
     opacity
   );
 
-  const type = node.type || '-';
-  const name = node.simpleName;
-  draw2Texts(context, x, y, w, h, type, name);
+  draw2Texts(ctx, x, y, w, h, node.type, node.simpleName);
 };
