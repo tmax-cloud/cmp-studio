@@ -1,10 +1,12 @@
 import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
 import { LinkData, NodeData, NodeKind, ROOT } from '@renderer/types/graph';
-import { nodesById } from './traverse';
 import DefaultIcon from '../../../../assets/images/graph/graph-default-type-icon.png';
 import ModuleIcon from '../../../../assets/images/graph/graph-module-type-icon.png';
 import ResourceIcon from '../../../../assets/images/graph/graph-resource-type-icon.png';
+
+export const nodesById = (nodes: NodeData[]) =>
+  Object.fromEntries(nodes.map((node) => [node.id, node]));
 
 const getIconImage = (type: NodeKind) => {
   switch (type) {

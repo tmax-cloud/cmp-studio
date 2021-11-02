@@ -1,10 +1,19 @@
 import * as _ from 'lodash';
-import { GraphData } from 'react-force-graph-2d';
+import { GraphData, LinkObject, NodeObject } from 'react-force-graph-2d';
 import { LinkData, NodeData } from '@renderer/types/graph';
 import { getRawGraph } from './dot';
-import { getRefinedGraph } from './parse';
+import { getRefinedGraph, nodesById } from './parse';
 import { getTerraformGraphData } from './terraform';
-import { draw2Texts, drawRoundRect, getBgColor } from './draw';
+import {
+  drawTexts,
+  drawRoundRect,
+  getIconColor,
+  drawImage,
+  drawCircle,
+  getStrokeColor,
+  DrawingKind,
+  getBgColor,
+} from './draw';
 
 export const getModuleNodeByName = (
   gData: GraphData,
@@ -89,11 +98,11 @@ export const getGraphData = async (
   return graph;
 };
 
-export const hasNode = (nodes: NodeData[], node: NodeData) => {
+export const hasNode = (nodes: NodeObject[], node: NodeObject) => {
   return !!_.find(nodes, { id: node.id });
 };
 
-export const hasLink = (links: LinkData[], link: LinkData) => {
+export const hasLink = (links: LinkObject[], link: LinkObject) => {
   const source =
     typeof link === 'object'
       ? (link.source as NodeData).id
@@ -105,54 +114,66 @@ export const hasLink = (links: LinkData[], link: LinkData) => {
   return !!_.find(links, { source, target });
 };
 
+export const sethighlightElements = (
+  nodes: NodeData[],
+  id: string | number
+) => {
+  const highlightNodes: NodeData[] = [];
+  const highlightLinks: LinkData[] = [];
+  (function traverse(n = nodesById(nodes)[id]) {
+    if (!n) {
+      return;
+    }
+    highlightNodes.push(n);
+    n.childNodes?.forEach((child: string | number) => {
+      highlightLinks.push({ source: n.id, target: child });
+    });
+    if (n.childNodes) {
+      [...n.childNodes]
+        .map((child: string | number) => {
+          return nodesById(nodes)[child];
+        })
+        .forEach(traverse);
+    }
+  })();
+  return { highlightNodes, highlightLinks };
+};
+
 export const drawNode = (
   ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  radius: number,
   node: NodeData,
-  isHover: boolean,
-  isHightlight: boolean
+  kind: DrawingKind,
+  w: number,
+  h: number
 ) => {
-  const lineWidth = isHover ? 4 : 2;
-  const opacity = isHightlight ? 1 : 0.5;
-  const bgColor = getBgColor(node.type, opacity);
-  const strokeColor = isHover ? 'red' : bgColor;
+  const x = node?.x || 0;
+  const y = node?.y || 0;
+  const lineWidth = kind === 'focus' ? 2 : 1;
+  const opacity = kind === 'blur' ? 0.5 : 1;
+  const bgColor = getBgColor(kind);
+  const strokeColor = getStrokeColor(kind);
 
-  // outter rect
   drawRoundRect(
     ctx,
-    x,
-    y,
+    x - w / 2,
+    y - h / 2,
     w,
     h,
-    radius,
     lineWidth,
     strokeColor,
     bgColor,
     opacity
   );
-
-  const imageSize = 24;
-  const img = document.createElement('img');
-  img.src = node.icon;
-  ctx.drawImage(img, x + 1 + imageSize / 2, y + 2, imageSize, imageSize);
-
-  // inner rect
-  drawRoundRect(
+  const cirlceSize = 16;
+  const iconColor = getIconColor(node.type, opacity);
+  const padding = 4;
+  drawCircle(ctx, x, y - padding, cirlceSize, iconColor);
+  drawImage(
     ctx,
-    x + 1,
-    y + 29,
-    w - 2,
-    20,
-    radius,
-    lineWidth,
-    bgColor,
-    'white',
-    opacity
+    node.icon,
+    x - cirlceSize / 2,
+    y - cirlceSize + padding,
+    cirlceSize
   );
-
-  draw2Texts(ctx, x, y, w, h, node.type, node.simpleName);
+  drawTexts(ctx, node.simpleName, x, y + cirlceSize + padding, w - padding * 2);
 };

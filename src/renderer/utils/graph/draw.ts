@@ -6,7 +6,6 @@ export const drawRoundRect = (
   y: number,
   w: number,
   h: number,
-  radius: number,
   lineWidth: number,
   strokeColor: string,
   fillColor: string,
@@ -14,6 +13,7 @@ export const drawRoundRect = (
 ) => {
   const r = x + w;
   const b = y + h;
+  const radius = 4;
   ctx.globalAlpha = opacity;
   ctx.beginPath();
   ctx.strokeStyle = strokeColor;
@@ -30,6 +30,31 @@ export const drawRoundRect = (
   ctx.stroke();
   ctx.fillStyle = fillColor;
   ctx.fill();
+};
+
+export const drawCircle = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  fillColor: string
+) => {
+  ctx.beginPath();
+  ctx.fillStyle = fillColor;
+  ctx.arc(x, y, size, 0, 2 * Math.PI, false);
+  ctx.fill();
+};
+
+export const drawImage = (
+  ctx: CanvasRenderingContext2D,
+  src: string,
+  x: number,
+  y: number,
+  size: number
+) => {
+  const img = document.createElement('img');
+  img.src = src;
+  ctx.drawImage(img, x, y, size, size);
 };
 
 export const fitText = (
@@ -53,27 +78,23 @@ export const fitText = (
   }
 };
 
-export const draw2Texts = (
+export const drawTexts = (
   ctx: CanvasRenderingContext2D,
+  text: string,
   x: number,
   y: number,
-  w: number,
-  h: number,
-  typeStr: string,
-  nameStr: string
+  maxWidth: number
 ) => {
   const fontSize = 8;
   ctx.font = `${fontSize}px Arial`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'black';
-  const fittingTypeText = fitText(ctx, typeStr, w - 2);
-  const fittingNameText = fitText(ctx, nameStr, w - 2);
-  ctx.fillText(fittingTypeText, x + w / 2, y + h - 6 - fontSize);
-  ctx.fillText(fittingNameText, x + w / 2, y + h - 6);
+  const newText = fitText(ctx, text, maxWidth);
+  ctx.fillText(newText, x, y);
 };
 
-export const getBgColor = (type: NodeKind, opacity: number) => {
+export const getIconColor = (type: NodeKind, opacity: number) => {
   switch (type) {
     case 'module':
       return `rgba(255, 173, 48, ${opacity})`;
@@ -85,3 +106,26 @@ export const getBgColor = (type: NodeKind, opacity: number) => {
       return `rgba(0, 183, 189, ${opacity})`; // resource
   }
 };
+
+export const getBgColor = (kind: DrawingKind) => {
+  switch (kind) {
+    case 'focus':
+    case 'highlight':
+      return '#D6E4FC';
+    default:
+      return '#F4F6F8';
+  }
+};
+
+export const getStrokeColor = (kind: DrawingKind) => {
+  switch (kind) {
+    case 'focus':
+      return '#1968EC';
+    case 'highlight':
+      return '#C9CFDB';
+    default:
+      return '#F4F6F8';
+  }
+};
+
+export type DrawingKind = 'normal' | 'focus' | 'highlight' | 'blur';

@@ -7,8 +7,13 @@ import {
 } from 'react-force-graph-2d';
 import { forceManyBody, forceCollide, forceLink } from 'd3-force';
 import { NodeData, LinkData } from '@renderer/types/graph';
-import { drawNode, hasLink, hasNode } from '@renderer/utils/graph';
-import { sethighlightElements } from '@renderer/utils/graph/traverse';
+import {
+  drawNode,
+  hasLink,
+  hasNode,
+  sethighlightElements,
+} from '@renderer/utils/graph';
+import { DrawingKind } from '@renderer/utils/graph/draw';
 import { useAppSelector } from '@renderer/app/store';
 import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
 
@@ -16,13 +21,13 @@ const initialConfig: GraphConfig = {
   isMounted: false,
   zoomLevel: 1,
   hoverNode: null,
-  nodeVisibility: true,
-  linkVisibility: true,
   highlightNodes: [],
   highlightLinks: [],
+  nodeDrawingkind: 'normal',
+  linkDrawingkind: 'normal',
 };
 
-const NODE_RADIUS = 25;
+const NODE_RADIUS = 30;
 
 export const useGraphProps = () => {
   const graphRef = React.useRef<ForceGraphMethods>();
@@ -31,28 +36,22 @@ export const useGraphProps = () => {
 
   const nodeCanvasObject = (obj: NodeObject, ctx: CanvasRenderingContext2D) => {
     const node = obj as NodeData;
-    const x = node?.x || 0;
-    const y = node?.y || 0;
-
-    const isHightlight = configRef.current.nodeVisibility
-      ? true
-      : hasNode(configRef.current.highlightNodes, node as NodeData);
-
-    drawNode(
-      ctx,
-      x - NODE_RADIUS,
-      y - NODE_RADIUS,
-      NODE_RADIUS * 2,
-      NODE_RADIUS * 2,
-      4,
-      node,
-      node === configRef.current.hoverNode,
-      isHightlight
-    );
+    const width = NODE_RADIUS * 2;
+    const height = NODE_RADIUS * 2;
+    let { nodeDrawingkind } = configRef.current;
+    if (nodeDrawingkind !== 'normal') {
+      if (!hasNode(configRef.current.highlightNodes, node)) {
+        nodeDrawingkind = 'blur';
+      }
+      if (node === configRef.current.hoverNode) {
+        nodeDrawingkind = 'focus';
+      }
+    }
+    drawNode(ctx, node, nodeDrawingkind, width, height);
   };
 
   const linkVisibility = (link: LinkObject) => {
-    return configRef.current.linkVisibility
+    return configRef.current.linkDrawingkind === 'normal'
       ? true
       : hasLink(configRef.current.highlightLinks, link);
   };
@@ -86,8 +85,6 @@ export const useGraphProps = () => {
     graphRef.current?.d3ReheatSimulation(); // redraw
     const node = obj as NodeData;
     if (node && node.id) {
-      configRef.current.nodeVisibility = false;
-      configRef.current.linkVisibility = false;
       const { highlightNodes, highlightLinks } = sethighlightElements(
         graphData.nodes,
         node.id
@@ -95,12 +92,14 @@ export const useGraphProps = () => {
       configRef.current.hoverNode = node || null;
       configRef.current.highlightNodes = _.uniqWith(highlightNodes, _.isEqual);
       configRef.current.highlightLinks = _.uniqWith(highlightLinks, _.isEqual);
+      configRef.current.nodeDrawingkind = 'highlight';
+      configRef.current.linkDrawingkind = 'highlight';
     } else {
-      configRef.current.nodeVisibility = true;
-      configRef.current.linkVisibility = true;
       configRef.current.hoverNode = null;
       configRef.current.highlightNodes = [];
       configRef.current.highlightLinks = [];
+      configRef.current.nodeDrawingkind = 'normal';
+      configRef.current.linkDrawingkind = 'normal';
     }
   };
 
@@ -157,8 +156,8 @@ interface GraphConfig {
   isMounted: boolean;
   zoomLevel: number;
   hoverNode: NodeData | null;
-  nodeVisibility: boolean;
-  linkVisibility: boolean;
   highlightNodes: NodeData[];
   highlightLinks: LinkData[];
+  nodeDrawingkind: DrawingKind;
+  linkDrawingkind: DrawingKind;
 }
