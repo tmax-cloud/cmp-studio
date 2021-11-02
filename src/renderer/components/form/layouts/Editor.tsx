@@ -1,5 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
+import { selectCodeSelectedObjectInfoId } from '@renderer/features/codeSliceInputSelectors';
+import { useAppSelector } from '@renderer/app/store';
 import SaveSection from '@renderer/components/form/layouts/SaveSection';
 import DynamicForm from '../index';
 import AddFieldSection from './AddFieldSection';
@@ -8,6 +10,11 @@ const EditorTab = (props: EditorTabProps) => {
   const { schema, formData, uiSchema, toggleSidePanel } = props;
 
   const [formState, setFormState] = React.useState(formData);
+  const resoureId = useAppSelector(selectCodeSelectedObjectInfoId);
+
+  React.useEffect(() => {
+    setFormState(formData);
+  }, [resoureId]);
 
   const onChange = React.useCallback(({ formData }, e) => {
     console.log('formData: ', formData);
