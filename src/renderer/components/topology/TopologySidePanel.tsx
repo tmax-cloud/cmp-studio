@@ -18,7 +18,7 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
   toggleSidePanel,
 }) => {
   const {
-    selectedObjectInfo: { id, content, sourceSchema },
+    selectedObjectInfo: { id, content, sourceSchema, instanceName },
   } = useSelector(selectCode);
 
   const dispatch = useAppDispatch();
@@ -55,7 +55,7 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
         anchor="right"
         variant="persistent"
       >
-        <FormHeader title={id} toggleSidePanel={toggleSidePanel} />
+        <FormHeader title={instanceName} toggleSidePanel={toggleSidePanel} />
         <FormTabs
           schema={fixedSchema}
           formData={formData}

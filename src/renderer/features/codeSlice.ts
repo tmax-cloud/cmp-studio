@@ -4,6 +4,7 @@ import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 
 interface ObjcectInfo {
   id: string;
+  instanceName: string;
   content: any;
   sourceSchema: JSONSchema7;
 }
@@ -16,6 +17,7 @@ const initialState: CodeSlice = {
   fileObjects: [],
   selectedObjectInfo: {
     id: '',
+    instanceName: '',
     content: {},
     sourceSchema: {},
   },
