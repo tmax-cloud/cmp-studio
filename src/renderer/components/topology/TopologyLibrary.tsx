@@ -19,8 +19,10 @@ import {
   Delete,
   Explore,
 } from '@mui/icons-material';
-import terraformSchema from '../form/terraform_schema.json';
+import { useAppSelector } from '@renderer/app/store';
+import { selectCode } from '@renderer/features/codeSliceInputSelectors';
 import parseJson from '../form/utils/json2JsonSchemaParser';
+import { ModuleImportModal } from './modal';
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -47,20 +49,27 @@ function seartchDisplayName(searchText: string, displayName: string) {
   }
 }
 
-const Modal: React.FC<ModalProps> = ({ title, confirmText, cancelText }) => {
-  return (
-    <div>
-      <InputLabel>{title || 'Title'}</InputLabel>
-      <InputLabel>{confirmText || 'Confirm'}</InputLabel>
-      <InputLabel>{cancelText || 'Cancel'}</InputLabel>
-    </div>
-  );
-};
-type ModalProps = {
-  title: string;
-  confirmText: string;
-  cancelText: string;
-};
+function getModuleList(items: Item[]) {
+  //get Module 구현 필요
+  //test Module
+  items.push({
+    provider: 'aws',
+    title: 'module-security-group',
+    displayName: 'security-group',
+    type: 'module',
+    source: 'terraform-aws-modules/security-group/aws',
+    version: '4.4.0',
+  });
+  items.push({
+    provider: 'aws',
+    title: 'module-consul',
+    displayName: 'consul',
+    type: 'module',
+    source: 'hashicorp/consul/aws',
+    version: '0.11.0',
+  });
+}
+
 function openSidePanel(obj: { id: string }) {
   alert('OpenForm ' + obj.id);
 }
@@ -97,10 +106,15 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
     <>
       {items.length > 0 && (
         <>
-          <Button onClick={() => setIsShow(!isShow)} color="inherit" fullWidth>
+          <Button
+            onClick={() => setIsShow(!isShow)}
+            color="inherit"
+            fullWidth
+            style={{ textAlign: 'left', alignContent: 'left' }}
+          >
             {title}
             {'(' + items.length + ')'}
-            <span style={{ marginRight: '10px', float: 'right' }}>
+            <span style={{ marginLeft: '10px', float: 'left' }}>
               {isShow ? <ArrowUpward /> : <ArrowDownward />}
             </span>
           </Button>
@@ -141,10 +155,13 @@ interface Item {
   title: string;
   displayName: string;
   type: string;
+  source?: string;
+  version?: string;
 }
-const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
+//const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
+const TopologyLibrary = () => {
   const [provider, setProvider] = React.useState('aws');
-  const [providerItems, setProviderItems] = React.useState<Item[]>([]);
+  const [defaltItems, setDefaltItems] = React.useState<Item[]>([]);
   const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
   const [datasourceItems, setdatasourceItems] = React.useState<Item[]>([]);
   const providerHandleChange = (event: any) => {
@@ -163,14 +180,30 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
   };
   const [isSearchResultEmpty, setIsSearchResultEmpty] = React.useState(false);
 
+  const [openModuleListModal, setOpenModuleListModal] = React.useState(false);
+  const [importModule, setImportModule] = React.useState('');
+
+  const handleModuleListModalOpen = (event: any) => {
+    setImportModule(event.target?.value || event);
+    setOpenModuleListModal(true);
+  };
+  const handleModuleListModalOpen2 = (obj: { id: string }) => {
+    setImportModule(obj.id);
+    setOpenModuleListModal(true);
+  };
+  const handleModuleListModalClose = () => setOpenModuleListModal(false);
+
+  const originCode = useAppSelector(selectCode);
+
   React.useEffect(() => {
     let schemaMap;
-    if (provider === 'aws') {
-      schemaMap = parseJson('aws');
-    } else {
+
+    try {
+      schemaMap = parseJson(provider);
+    } catch (e) {
+      console.log('Cannot get schema in ' + provider);
       schemaMap = new Map();
     }
-
     const items2: Item[] = [];
     schemaMap.forEach((schema) => {
       const schemaProvider = provider;
@@ -185,21 +218,25 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
       });
     });
 
-    const providerList: Item[] = [];
+    getModuleList(items2);
+
+    const defaultList: Item[] = [];
     const resourceList: Item[] = [];
     const datasourceList: Item[] = [];
     const moduleList: Item[] = [];
     items2.forEach((i: Item) => {
       if (i.provider === provider) {
         if (seartchDisplayName(searchText, i.displayName)) {
+          /*
           if (i.type === 'provider') {
-            providerList.push({
+            defaultList.push({
               provider: i.provider,
               title: i.title,
-              displayName: i.displayName,
+              displayName: 'provider',
               type: i.type,
             });
           }
+          */
           if (i.type === 'resource') {
             resourceList.push({
               provider: i.provider,
@@ -257,7 +294,58 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
         displayName: 'defaultName',
         type: 'localModule',
       },
+      {
+        path: '/Network-config/defaultName/pathTest',
+        title: 'localModule-defaultName',
+        objectCount: 13,
+        displayName: 'defaultName',
+        type: 'localModule',
+      },
+      {
+        path: '/Network-config/defaultName/pathTest2',
+        title: 'localModule-defaultName',
+        objectCount: 13,
+        displayName: 'defaultName',
+        type: 'localModule',
+      },
+      {
+        path: '/Network-config2/defaultName/pathTest2',
+        title: 'localModule-defaultName',
+        objectCount: 13,
+        displayName: 'defaultName',
+        type: 'localModule',
+      },
+      {
+        path: '/Network-config3/defaultName/pathTest2',
+        title: 'localModule-defaultName',
+        objectCount: 13,
+        displayName: 'defaultName',
+        type: 'localModule',
+      },
+      {
+        path: '/Network-config3/defaultName/pathTest2',
+        title: 'localModule-defaultName',
+        objectCount: 13,
+        displayName: 'defaultName',
+        type: 'localModule',
+      },
     ];
+    localItems.sort(function (a, b) {
+      if (a.path < b.path) return -1;
+      if (a.path > b.path) return 1;
+      return 0;
+    });
+    /*
+    localItems.forEach((item) => {
+      let newPath = '';
+      for (let i = 0; i < item.path.split('/').length - 2; i++) {
+        newPath += '~';
+      }
+      newPath += '/';
+      newPath += item.path.split('/')[item.path.split('/').length - 1];
+      item.path = newPath;
+    });
+    */
     localItems.forEach((localItem: Item) => {
       if (seartchDisplayName(searchText, localItem.displayName)) {
         localList.push(localItem);
@@ -265,15 +353,39 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
     });
     setLocalModuleItems(localList);
 
-    //setFilteredItems(filteredList);
-    setProviderItems(providerList);
+    defaultList.push({
+      title: 'defaults-provider',
+      displayName: 'provider',
+      type: 'defaults',
+    });
+    defaultList.push({
+      title: 'defaults-variable',
+      displayName: 'variable',
+      type: 'defaults',
+    });
+    defaultList.push({
+      title: 'defaults-output',
+      displayName: 'output',
+      type: 'defaults',
+    });
+    defaultList.push({
+      title: 'defaults-terraform',
+      displayName: 'terraform',
+      type: 'defaults',
+    });
+    defaultList.push({
+      title: 'defaults-locals',
+      displayName: 'locals',
+      type: 'defaults',
+    });
+    setDefaltItems(defaultList);
     setResourceItems(resourceList);
     setdatasourceItems(datasourceList);
     setTerraformModuleItems(moduleList);
 
     if (
       localList.length ||
-      providerList.length ||
+      defaultList.length ||
       resourceList.length ||
       datasourceList.length ||
       moduleList.length
@@ -316,7 +428,7 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
             style={{
               marginTop: '25px',
               position: 'absolute',
-              right: '25px',
+              right: '30px',
               color: 'gray',
             }}
           />
@@ -335,7 +447,7 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
               afterAction={openSidePanel}
             />
             <ShowItemList
-              items={providerItems}
+              items={defaltItems}
               title="테라폼 디폴트"
               clickAction={clickDefault}
               afterAction={openSidePanel}
@@ -344,7 +456,7 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
               items={terraformModuleItems}
               title="테라폼 모듈"
               clickAction={clickModule}
-              afterAction={openSidePanel}
+              afterAction={handleModuleListModalOpen2}
             />
             <ShowItemList
               items={resourceItems}
@@ -360,12 +472,26 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
             />
           </>
         )}
+        <Button onClick={handleModuleListModalOpen} value="test1">
+          Modal Test
+        </Button>
+        <Button onClick={handleModuleListModalOpen} value="test2">
+          Modal Test2
+        </Button>
+        <ModuleImportModal
+          isOpen={openModuleListModal}
+          onClose={handleModuleListModalClose}
+          moduleName={importModule}
+        />
       </Box>
+      {originCode && console.log(originCode)}
     </>
   );
 };
 
+/*
 type TopologyLibraryProps = {
   items: any;
 };
+*/
 export default TopologyLibrary;
