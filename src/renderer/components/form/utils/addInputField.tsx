@@ -5,12 +5,12 @@ export const addSchemaBasedField = (
   object: any,
   input: string
 ) => {
-  const type = Object.keys(content)[0]; // ['provider', 'resource', 'datasource']
-  const name = type && Object.keys(content[type])[0];
-  const displayName = name && Object.keys(content[type][name])[0];
+  const { type } = content; // ['provider', 'resource', 'datasource']
+  const resourceName = Object.keys(content)[0];
+  const instanceName = type && Object.keys(content[resourceName])[0];
   const result = _.merge(
     {
-      [type]: { [name]: { [displayName]: { [input]: '' } } },
+      [resourceName]: { [instanceName]: { [input]: '' } },
     },
     content
   );
@@ -55,12 +55,12 @@ const setAdditionalSchemaByType = (key: string, type: string) => {
 };
 
 export const addCustomField = (content: any, input: any, sourceSchema: any) => {
-  const type = Object.keys(content)[0]; // ['provider', 'resource', 'datasource']
-  const name = type && Object.keys(content[type])[0];
-  const displayName = name && Object.keys(content[type][name])[0];
+  const { type } = content;
+  const resourceName = Object.keys(content)[0]; // ['provider', 'resource', 'datasource']
+  const instanceName = type && Object.keys(content[resourceName])[0];
   const object = _.defaultsDeep(
     {
-      [type]: { [name]: { [displayName]: { [input.key]: '' } } },
+      [resourceName]: { [instanceName]: { [input.key]: '' } },
     },
     content
   );

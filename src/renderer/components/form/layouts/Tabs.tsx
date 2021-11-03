@@ -32,7 +32,7 @@ function a11yProps(index: number) {
 }
 
 const FormTabs = (props: FormTabsProps) => {
-  const { schema, formData, uiSchema } = props;
+  const { schema, formData, uiSchema, toggleSidePanel } = props;
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: any, newValue: number) => {
@@ -52,7 +52,12 @@ const FormTabs = (props: FormTabsProps) => {
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        <EditorTab schema={schema} formData={formData} uiSchema={uiSchema} />
+        <EditorTab
+          schema={schema}
+          formData={formData}
+          uiSchema={uiSchema}
+          toggleSidePanel={toggleSidePanel}
+        />
       </TabPanel>
       <TabPanel value={value} index={1}>
         상태 (구현 예정...)
@@ -68,6 +73,7 @@ type FormTabsProps = {
   schema: any;
   formData: any;
   uiSchema: any;
+  toggleSidePanel: any;
 };
 
 export default FormTabs;
