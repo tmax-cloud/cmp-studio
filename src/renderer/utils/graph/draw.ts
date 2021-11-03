@@ -85,8 +85,7 @@ export const drawTexts = (
   y: number,
   maxWidth: number
 ) => {
-  const fontSize = 8;
-  ctx.font = `${fontSize}px Arial`;
+  ctx.font = `0.5rem NotoSansKR`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'black';

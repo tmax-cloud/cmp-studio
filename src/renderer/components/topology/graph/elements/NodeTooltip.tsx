@@ -5,8 +5,8 @@ const NodeTooltip = (props: NodeTooltipProps) => {
   const { name, type } = props;
   return (
     <Box
-      p={1}
-      pt={0}
+      px={1}
+      py={0.5}
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -15,13 +15,25 @@ const NodeTooltip = (props: NodeTooltipProps) => {
     >
       {type ? (
         <Typography
-          variant="overline"
-          sx={{ fontSize: '0.625rem', color: '#ab8037' }}
+          sx={{
+            color: '#fff',
+            fontSize: '0.6875rem',
+            fontFamily: 'Noto Sans KR',
+            fontWeight: 'lighter',
+            opacity: 0.8,
+          }}
         >
           {type}
         </Typography>
       ) : null}
-      <Typography sx={{ fontSize: '0.875rem', lineHeight: 1 }}>
+      <Typography
+        sx={{
+          color: '#fff',
+          fontSize: '0.8125rem',
+          fontFamily: 'Noto Sans KR',
+          fontWeight: 'lighter',
+        }}
+      >
         {name}
       </Typography>
     </Box>
