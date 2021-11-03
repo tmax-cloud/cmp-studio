@@ -29,7 +29,7 @@ import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import TopologyLibrary from './TopologyLibrary';
 import {
   setSelectedObjectInfo,
-  setInitObjects,
+  setFileObjects,
 } from '../../features/codeSlice';
 import { setWorkspaceUid } from '../../features/commonSlice';
 
@@ -102,7 +102,8 @@ function a11yProps(index: number) {
 interface Item {
   provider?: string;
   title: string;
-  displayName: string;
+  resourceName: string;
+  instanceName: string;
   type: string;
 }
 
@@ -127,12 +128,16 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
   useSelector(selectCodeFileObjects).forEach(
-    (file: { filePath: string; fileJson: any[] }) => {
-      objResult.push(
-        ..._.entries(file.fileJson).map((object) => ({
-          [object[0]]: object[1],
-        }))
-      );
+    (file: { filePath: string; fileJson: any }) => {
+      // eslint-disable-next-line guard-for-in
+      for (const currKey in file.fileJson) {
+        objResult.push(
+          ..._.entries(file.fileJson[currKey]).map((object) => ({
+            [object[0]]: object[1],
+            type: currKey,
+          }))
+        );
+      }
     }
   );
 
@@ -140,16 +145,18 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
     const itemsList: Item[] = [];
     objResult
       .map((result) => {
-        const type = Object.keys(result)[0];
-        const displayName = Object.keys(result[type])[0];
-        const title = type + '-' + displayName;
-        return { type, displayName, title };
+        const { type, ...object } = result;
+        const resourceName = Object.keys(object)[0];
+        const instanceName = Object.keys(object[resourceName])[0];
+        const title = type + '-' + resourceName;
+        return { type, resourceName, title, instanceName };
       })
       .forEach((i: Item) => {
         itemsList.push({
-          provider: i.displayName.split('_')[0],
+          provider: i.resourceName.split('_')[0],
           title: i.title,
-          displayName: i.displayName,
+          instanceName: i.instanceName,
+          resourceName: i.resourceName,
           type: i.type,
         });
       });
@@ -171,7 +178,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
               const uid = response?.data?.uid;
               if (uid) {
                 const projectJsonRes = await getProjectJson(args);
-                dispatch(setInitObjects(projectJsonRes.data));
+                dispatch(setFileObjects(projectJsonRes.data));
                 history.push(`/main/${uid}`);
                 dispatch(setWorkspaceUid(uid));
               }
@@ -219,14 +226,19 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                 startIcon={getIcon(item.type)}
                 onClick={() => {
                   const content = objResult.filter((cur: any) => {
-                    const type = Object.keys(cur)[0];
-                    const name = Object.keys(cur[type])[0];
-                    if (item.title === type + '-' + name) {
-                      return cur;
+                    const { type } = cur;
+                    const resourceName = Object.keys(cur)[0];
+                    if (item.title === type + '-' + resourceName) {
+                      if (type === 'provider' || type === 'module') {
+                        return cur[resourceName];
+                      } else {
+                        return cur[resourceName][item.instanceName];
+                      }
                     }
                   });
                   const object = {
                     id: item.title,
+                    instanceName: item.instanceName,
                     content: content[0],
                   };
 
@@ -234,7 +246,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                   setIsSidePanelOpen((currState: boolean) => true);
                 }}
               >
-                {item.displayName}
+                {item.resourceName}
               </Button>
             );
           })}
@@ -340,3 +352,6 @@ type TopologySidebarProps = {
 };
 
 export default TopologySidebar;
+function doSomething(key: any) {
+  throw new Error('Function not implemented.');
+}
