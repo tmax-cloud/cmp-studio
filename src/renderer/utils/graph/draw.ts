@@ -1,5 +1,18 @@
 import { NodeKind } from '@renderer/types/graph';
 
+export const drawShadow = (ctx: CanvasRenderingContext2D) => {
+  ctx.shadowColor = '#C9CFDB';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetX = 5;
+  ctx.shadowOffsetY = 5;
+};
+
+export const removeShadow = (ctx: CanvasRenderingContext2D) => {
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+};
+
 export const drawRoundRect = (
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -9,11 +22,13 @@ export const drawRoundRect = (
   lineWidth: number,
   strokeColor: string,
   fillColor: string,
-  opacity: number
+  opacity: number,
+  shadow: boolean
 ) => {
   const r = x + w;
   const b = y + h;
   const radius = 4;
+
   ctx.globalAlpha = opacity;
   ctx.beginPath();
   ctx.strokeStyle = strokeColor;
@@ -27,9 +42,16 @@ export const drawRoundRect = (
   ctx.quadraticCurveTo(x, b, x, b - radius);
   ctx.lineTo(x, y + radius);
   ctx.quadraticCurveTo(x, y, x + radius, y);
+
+  shadow && drawShadow(ctx); // draw shadow
+
   ctx.stroke();
   ctx.fillStyle = fillColor;
   ctx.fill();
+
+  shadow && removeShadow(ctx); // clear shadow
+
+  shadow && ctx.stroke(); // restroke
 };
 
 export const drawCircle = (
@@ -109,10 +131,9 @@ export const getIconColor = (type: NodeKind, opacity: number) => {
 export const getBgColor = (kind: DrawingKind) => {
   switch (kind) {
     case 'focus':
-    case 'highlight':
-      return '#D6E4FC';
+      return '#F6F7F9';
     default:
-      return '#F4F6F8';
+      return '#FFF';
   }
 };
 
@@ -120,10 +141,8 @@ export const getStrokeColor = (kind: DrawingKind) => {
   switch (kind) {
     case 'focus':
       return '#1968EC';
-    case 'highlight':
-      return '#C9CFDB';
     default:
-      return '#F4F6F8';
+      return 'rgba(201, 207, 219, 0.5)';
   }
 };
 

@@ -152,6 +152,7 @@ export const drawNode = (
   const opacity = kind === 'blur' ? 0.5 : 1;
   const bgColor = getBgColor(kind);
   const strokeColor = getStrokeColor(kind);
+  const shadow = kind === 'focus' || kind === 'highlight';
 
   drawRoundRect(
     ctx,
@@ -162,8 +163,10 @@ export const drawNode = (
     lineWidth,
     strokeColor,
     bgColor,
-    opacity
+    opacity,
+    shadow
   );
+
   const cirlceSize = 16;
   const iconColor = getIconColor(node.type, opacity);
   const padding = 4;
