@@ -15,7 +15,7 @@ import {
   getRecentlyOpenedWorkspaces,
   getProjectJson,
 } from '../../utils/ipc/workspaceIpcUtils';
-import { setInitObjects } from '../../features/codeSlice';
+import { setFileObjects } from '../../features/codeSlice';
 import { setWorkspaceUid } from '../../features/commonSlice';
 import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
 import { getAppConfigItem } from '../../utils/ipc/configIpcUtils';
@@ -59,7 +59,7 @@ const WorkspacesListPage: React.FC = (props) => {
       folderUri,
     };
     const projectJsonRes = await getProjectJson(args);
-    dispatch(setInitObjects(projectJsonRes.data));
+    dispatch(setFileObjects(projectJsonRes.data));
     openExistFolder(args)
       .then((response: WorkspaceTypes.WorkspaceResponse) => {
         const { status, data } = response;
