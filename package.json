@@ -82,8 +82,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "tmax-cloud",
+      "repo": "cmp-studio"
     }
   },
   "repository": {
