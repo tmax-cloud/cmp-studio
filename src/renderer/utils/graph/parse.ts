@@ -1,10 +1,23 @@
 import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
 import { LinkData, NodeData, NodeKind, ROOT } from '@renderer/types/graph';
-import { nodesById } from './traverse';
+import DefaultIcon from '../../../../assets/images/graph/graph-default-type-icon.png';
+import ModuleIcon from '../../../../assets/images/graph/graph-module-type-icon.png';
+import ResourceIcon from '../../../../assets/images/graph/graph-resource-type-icon.png';
 
-export const getRootNode = (nodes: NodeData[]): NodeData | undefined =>
-  nodes.find((node) => (node as NodeData).simpleName === ROOT) as NodeData;
+export const nodesById = (nodes: NodeData[]) =>
+  Object.fromEntries(nodes.map((node) => [node.id, node]));
+
+const getIconImage = (type: NodeKind) => {
+  switch (type) {
+    case 'module':
+      return ModuleIcon;
+    case 'provider':
+      return DefaultIcon;
+    default:
+      return ResourceIcon;
+  }
+};
 
 const parseNodeSimpleName = (str: string, status?: string) =>
   status ? str.replace(`(${status})`, '').trim() : str;
@@ -15,17 +28,14 @@ const parseNodeProviderName = (str: string) =>
   str
     .match(/\[(.*)\]/)
     ?.pop()
-    ?.replace(/"/g, '');
+    ?.replace(/"/g, '')
+    .replace('registry.terraform.io/hashicorp/', '');
 
 const parseNodeFullName = (str: string) => {
   let simpleName: string | undefined;
-  let type: string | undefined;
+  let type = '';
   let status: string | undefined;
   const modules: NodeKind[] = [ROOT];
-
-  if (str === ROOT) {
-    return { simpleName: ROOT, modules };
-  }
 
   const isProvider = str.startsWith('provider[');
   if (isProvider) {
@@ -51,7 +61,15 @@ const parseNodeFullName = (str: string) => {
     }
   }
 
-  return { simpleName, type, status, modules };
+  const icon = getIconImage(type);
+
+  return {
+    simpleName,
+    type,
+    status,
+    modules,
+    icon,
+  };
 };
 
 const setNeighborElements = (gData: GraphData) => {
@@ -71,20 +89,20 @@ const setNeighborElements = (gData: GraphData) => {
   return gData;
 };
 
-const filterElements = (gData: GraphData) => {
-  const removeNodeList = ['meta.count-boundary (EachMode fixup)'];
+const removeUtilElements = (gData: GraphData) => {
+  const utilNodeList = ['root', 'meta.count-boundary (EachMode fixup)'];
   let newNodes = _.cloneDeep(gData.nodes) as NodeData[];
   let newLinks = _.cloneDeep(gData.links) as LinkData[];
   const addLinks: LinkData[] = [];
-  removeNodeList.forEach((fullName) => {
-    const removeNode = gData.nodes.find(
+  utilNodeList.forEach((fullName) => {
+    const removeNode = newNodes.find(
       (node) => (node as NodeData).fullName === fullName
     ) as NodeData;
     if (removeNode) {
-      gData.links.forEach((link) => {
+      newLinks.forEach((link) => {
         // connecting with a new node
         if (link.source === removeNode.id) {
-          gData.links.forEach((link2) => {
+          newLinks.forEach((link2) => {
             if (link2.target === removeNode.id) {
               addLinks.push({ source: link2.source, target: link.target });
             }
@@ -102,9 +120,40 @@ const filterElements = (gData: GraphData) => {
   return { nodes: newNodes, links: newLinks };
 };
 
+const removeVarElements = (gData: GraphData) => {
+  let newNodes = _.cloneDeep(gData.nodes) as NodeData[];
+  const newLinks: LinkData[] = [];
+
+  gData.links.forEach((link) => {
+    const { source, target } = link;
+    const sourceNode =
+      source && typeof source !== 'object' && nodesById(newNodes)[source];
+    const targetNode =
+      target && typeof target !== 'object' && nodesById(newNodes)[target];
+    if (
+      sourceNode.type !== 'output' &&
+      sourceNode.type !== 'var' &&
+      targetNode.type !== 'output' &&
+      targetNode.type !== 'var'
+    ) {
+      newLinks.push(link);
+    }
+  });
+
+  newNodes = newNodes.filter(
+    (node) => node.type !== 'output' && node.type !== 'var'
+  );
+
+  return { nodes: newNodes, links: newLinks };
+};
+
+const removeElements = (gData: GraphData) => {
+  return removeVarElements(removeUtilElements(gData));
+};
+
 export const getRefinedGraph = (gData: GraphData) => {
   const nodes = gData.nodes.map((node) => {
     return { ...node, ...parseNodeFullName((node as NodeData).fullName) };
   });
-  return setNeighborElements(filterElements({ nodes, links: gData.links }));
+  return setNeighborElements(removeElements({ nodes, links: gData.links }));
 };
