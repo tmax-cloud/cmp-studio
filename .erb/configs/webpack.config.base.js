@@ -6,6 +6,7 @@ import path from 'path';
 import webpack from 'webpack';
 import webpackPaths from './webpack.paths.js';
 import { dependencies as externals } from '../../build/app/package.json';
+import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
 
 export default {
   externals: [...Object.keys(externals || {})],
@@ -52,6 +53,16 @@ export default {
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
+    }),
+    new CspHtmlWebpackPlugin({
+      'base-uri': "'self'",
+      'object-src': "'none'",
+      'script-src': "'self'",
+      'style-src': [
+        "'unsafe-inline'",
+        "'self'",
+        'https://fonts.googleapis.com/earlyaccess/notosanskr.css',
+      ],
     }),
   ],
 };
