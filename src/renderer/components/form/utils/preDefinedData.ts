@@ -1,27 +1,35 @@
 import { JSONSchema7 } from 'json-schema';
 import * as _ from 'lodash';
 
+const supportedSchemaList = ['resource', 'provider'];
+
 const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
+
+const isResourceType = (type: string) => type === 'resource';
 
 const createFormData = (object: any) => {
   const { type, ...targetObject } = object;
   const name = Object.keys(targetObject)[0];
   const displayName = Object.keys(targetObject[name])[0];
-  const formData =
-    (!_.isEmpty(object) && _.cloneDeep(targetObject[name][displayName])) || {};
-  return formData;
+
+  if (_.isEmpty(object)) {
+    return { type, formData: {} };
+  }
+  const formData = isResourceType(type)
+    ? _.cloneDeep(targetObject[name][displayName])
+    : _.cloneDeep(targetObject[name]);
+  return { type, formData };
 };
 
 const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
-  if (!jsonSchema) {
+  const { type, formData } = createFormData(object);
+  if (!jsonSchema && _.findIndex(supportedSchemaList, type) >= 0) {
     return { customUISchema: {}, formData: {}, fixedSchema: {} };
   }
-  const formData = createFormData(object);
 
   const fixedSchema = {};
   const customUISchema = {};
 
-  // formData로 정의된 부분에 대해서만 schema 필터링 (일단 aws_acm_certificate_validation 리소스에 대해서만 해놓음. 다른 스키마들은 밑에 로직 안타서 전체스키마 나오도록 해둠.)
   const makeFixedSchema = (obj: any, prevPath: string) => {
     Object.keys(obj).forEach((currKey) => {
       const makePath = prevPath
@@ -32,7 +40,7 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
         _.set(fixedSchema, makePath, fixedValue);
       };
 
-      const addAdditionalSchema = (obj: any) => {
+      const fillSchemaByFormData = (obj: any) => {
         const currentKey = makePath.split('properties.');
         const currentValue = obj[currentKey[1]];
         if (currentKey.length > 1) {
@@ -71,9 +79,11 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
           }
         }
       };
-
-      if (!_.get(jsonSchema, makePath)) {
-        addAdditionalSchema(obj);
+      if (
+        !_.get(jsonSchema, makePath) ||
+        _.findIndex(supportedSchemaList, (cur) => cur === type) < 0
+      ) {
+        fillSchemaByFormData(obj);
         return;
       }
       if (
