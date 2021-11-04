@@ -14,13 +14,9 @@ const SaveSection = (props: SaveSectionProps) => {
   const { saveLabel, cancelLabel, toggleSidePanel, formState } = props;
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const objectId = useAppSelector(selectCodeSelectedObjectInfoId);
-  const selectedObjectContent = useAppSelector(
-    selectCodeSelectedObjectInfoContent
-  );
   const selectedObjectInstanceName = useAppSelector(
     selectCodeSelectedObjectInfoInstanceName
   );
-  const { type } = selectedObjectContent;
 
   const dispatch = useAppDispatch();
   return (
