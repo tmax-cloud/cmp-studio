@@ -16,6 +16,8 @@ import {
 import ViewBreadcrumbs from './breadcrumb/ViewBreadcrumb';
 import { ModuleListModal } from '../modal';
 
+export const TOPOLOGY_TOOLBAR_HEIGHT = 50;
+
 const TopologyToolbar = (props: TopologyToolbarProps) => {
   const { handlers } = props;
   const [openModuleListModal, setOpenModuleListModal] = React.useState(false);
