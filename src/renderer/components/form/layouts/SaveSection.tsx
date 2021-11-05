@@ -1,4 +1,4 @@
-import * as React from 'React';
+import * as React from 'react';
 import * as _ from 'lodash-es';
 import { Button } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
