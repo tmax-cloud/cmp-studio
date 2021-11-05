@@ -4,6 +4,7 @@ import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 
 interface ObjcectInfo {
   id: string;
+  instanceName: string;
   content: any;
   sourceSchema: JSONSchema7;
 }
@@ -16,6 +17,7 @@ const initialState: CodeSlice = {
   fileObjects: [],
   selectedObjectInfo: {
     id: '',
+    instanceName: '',
     content: {},
     sourceSchema: {},
   },
@@ -25,7 +27,7 @@ const codeSlice = createSlice({
   name: 'code',
   initialState,
   reducers: {
-    setInitObjects: (state, action: PayloadAction<any>) => {
+    setFileObjects: (state, action: PayloadAction<any>) => {
       state.fileObjects = action.payload; //_.defaultsDeep(action.payload); <- 자동으로 내부적으로 immer로 불변성 유지해준다고 함.
     },
     setSelectedObjectInfo: (state, action: PayloadAction<any>) => {
@@ -41,7 +43,7 @@ const codeSlice = createSlice({
 });
 
 export const {
-  setInitObjects,
+  setFileObjects,
   setSelectedObjectInfo,
   addSelectedField,
   setSelectedSourceSchema,

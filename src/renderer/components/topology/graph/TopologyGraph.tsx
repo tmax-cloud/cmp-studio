@@ -1,11 +1,14 @@
 import * as React from 'react';
+import ReactDOMServer from 'react-dom/server';
 import * as _ from 'lodash';
 import ForceGraph2D, {
   ForceGraphMethods,
   ForceGraphProps,
+  NodeObject,
 } from 'react-force-graph-2d';
 import { withResizeDetector } from 'react-resize-detector';
 import { useAppSelector } from '@renderer/app/store';
+import { NodeData } from '@renderer/types/graph';
 import { useGraphData, useGraphInitOutput } from '@renderer/hooks/useGraphData';
 import {
   selectErrorMsg,
@@ -14,6 +17,7 @@ import {
 import Box from '@mui/material/Box';
 import Error from './Error';
 import { GraphLoadingModal } from '../modal';
+import NodeTooltip from './elements/NodeTooltip';
 
 const TopologyGraph = (props: TopologyGraphProps) => {
   const { width, height, graphRef, graphOptions } = props;
@@ -29,6 +33,13 @@ const TopologyGraph = (props: TopologyGraphProps) => {
   React.useEffect(() => {
     graphRef.current?.zoomToFit();
   }, [graphRef, width, height]);
+
+  const NodeLabel = (node: NodeObject) => {
+    const { simpleName, type } = node as NodeData;
+    return ReactDOMServer.renderToString(
+      <NodeTooltip name={simpleName} type={type} />
+    );
+  };
 
   return (
     <Box
@@ -53,6 +64,7 @@ const TopologyGraph = (props: TopologyGraphProps) => {
           width={width}
           height={height}
           graphData={graphData}
+          nodeLabel={NodeLabel}
           {...graphOptions}
         />
       )}

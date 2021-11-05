@@ -7,7 +7,13 @@ import ArrayFieldTemplate from './template/ArrayFieldTemplate';
 import { FieldTemplate } from './template/FieldTemplate';
 
 const DynamicForm = (props: FormProps<any>) => {
-  const { fields = {}, schema = {}, formData = {}, uiSchema = {} } = props;
+  const {
+    fields = {},
+    schema = {},
+    formData = {},
+    uiSchema = {},
+    onChange,
+  } = props;
   return (
     <>
       <Form
@@ -19,6 +25,7 @@ const DynamicForm = (props: FormProps<any>) => {
         ArrayFieldTemplate={ArrayFieldTemplate}
         fields={{ ...defaultFields, ...fields }}
         widgets={{ ...defaultWidgets }}
+        onChange={onChange}
         schema={schema}
         uiSchema={uiSchema}
         onSubmit={(data) => console.log('result: ', data)}
