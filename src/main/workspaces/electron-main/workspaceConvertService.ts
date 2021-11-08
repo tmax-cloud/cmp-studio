@@ -53,7 +53,7 @@ export class WorkspaceConvertService
       // 임시저장 path or 전체 저장 path
       let targetPath = filePath;
       if (!isAllSave) {
-        targetPath = temporaryDataFolderUri + filePath.split(folderUri);
+        targetPath = temporaryDataFolderUri + filePath.split(folderUri)[1];
         console.log('targetPath (temporary Data): ', targetPath);
       }
 
