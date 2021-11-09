@@ -34,6 +34,14 @@ export const useGraphProps = () => {
   const graphData = useAppSelector(selectGraphData);
   const configRef = React.useRef<GraphConfig>(initialConfig);
 
+  const nodeLabel = (obj: NodeObject) => {
+    const node = obj as NodeData;
+    return `<div>
+      <div class='node-type'>${node.type}</div>
+      <div class='node-name'>${node.simpleName}</div>
+    </div>`;
+  };
+
   const nodeCanvasObject = (obj: NodeObject, ctx: CanvasRenderingContext2D) => {
     const node = obj as NodeData;
     const width = NODE_RADIUS * 2;
@@ -123,6 +131,7 @@ export const useGraphProps = () => {
   };
 
   const graphOption = {
+    nodeLabel,
     nodeRelSize: NODE_RADIUS,
     nodeCanvasObject,
     linkVisibility,
