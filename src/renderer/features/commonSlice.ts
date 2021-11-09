@@ -3,10 +3,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface CommonSlice {
   workspaceUid: string;
+  terraformState: any;
 }
 
 const initialState: CommonSlice = {
   workspaceUid: '',
+  terraformState: '',
 };
 
 const commonSlice = createSlice({
@@ -16,9 +18,12 @@ const commonSlice = createSlice({
     setWorkspaceUid: (state, action: PayloadAction<string>) => {
       state.workspaceUid = action.payload;
     },
+    setTerraformState: (state, action: PayloadAction<string>) => {
+      state.terraformState = action.payload;
+    },
   },
 });
 
-export const { setWorkspaceUid } = commonSlice.actions;
+export const { setWorkspaceUid, setTerraformState } = commonSlice.actions;
 
 export default commonSlice.reducer;

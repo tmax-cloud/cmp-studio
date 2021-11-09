@@ -1,15 +1,24 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
 import { Tabs, Tab, Box } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import EditorTab from './Editor';
+import StateTab from './State';
+const useStyles = makeStyles({
+  root: {
+    overflow: 'auto',
+  },
+});
 
 const TabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props;
+  const classes = useStyles();
 
   return (
     <div
       role="tabpanel"
       hidden={value !== index}
+      className={classes.root}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       {...other}
@@ -60,7 +69,7 @@ const FormTabs = (props: FormTabsProps) => {
         />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        상태 (구현 예정...)
+        <StateTab />
       </TabPanel>
       <TabPanel value={value} index={2}>
         Diff (구현 예정...)
