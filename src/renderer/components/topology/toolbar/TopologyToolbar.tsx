@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import { exportProject } from '@renderer/utils/ipc/workspaceIpcUtils';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import { useAppSelector } from '@renderer/app/store';
 import {
   FitScreenButton,
@@ -26,6 +27,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
   const handleModuleListModalClose = () => setOpenModuleListModal(false);
 
   const fileObjects = useAppSelector(selectCodeFileObjects);
+  const workspaceUid = useAppSelector(selectWorkspaceUid);
   return (
     <Toolbar
       style={{ minHeight: 48, paddingLeft: 12, paddingRight: 12 }}
@@ -51,7 +53,11 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
           >
             <SaveButton
               onClick={async () => {
-                const result = await exportProject({ objects: fileObjects });
+                const result = await exportProject({
+                  objects: fileObjects,
+                  workspaceUid,
+                  isAllSave: true,
+                });
                 console.log('[INFO] File export result : ', result);
               }}
             />

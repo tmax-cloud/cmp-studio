@@ -17,12 +17,21 @@ import {
 
 const WORKSPACE_MAP_PATH = 'workspaceMap.json';
 const WORKSPACE_CONFIG_PATH = 'workspace.json';
+const TEMPORARYDATA_FOLDER_PATH = 'Temporary';
 export const workspaceMapPath = path.join(
   getWorkspaceMetaFolderPath(),
   WORKSPACE_MAP_PATH
 );
 export const getWorkspaceConfigPath = (uid: string) => {
   return path.join(getWorkspaceMetaFolderPath(), uid, WORKSPACE_CONFIG_PATH);
+};
+
+export const getWorkspaceTemporaryFolderPath = (uid: string) => {
+  return path.join(
+    getWorkspaceMetaFolderPath(),
+    uid,
+    TEMPORARYDATA_FOLDER_PATH
+  );
 };
 
 export class WorkspaceManagementService

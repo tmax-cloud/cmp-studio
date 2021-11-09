@@ -2,6 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import * as FileUtils from '../../base/common/fileUtils';
 import * as WorkspaceTypes from '../common/workspace';
+import {
+  WorkspaceManagementService,
+  getWorkspaceTemporaryFolderPath,
+} from './workspaceManagementService';
 const Converter = require('../../utils/hcljsonconverter');
 
 export class WorkspaceConvertService
@@ -32,25 +36,43 @@ export class WorkspaceConvertService
     return resultArray;
   }
 
-  convertAllJsonToHcl(objList: WorkspaceTypes.TerraformFileJsonMeta[]) {
+  convertAllJsonToHcl(
+    objList: WorkspaceTypes.TerraformFileJsonMeta[],
+    workspaceUid: string,
+    isAllSave: boolean
+  ) {
+    const workspaceManagementService = new WorkspaceManagementService();
+    const folderUri = workspaceManagementService.getFolderUriByWorkspaceId(
+      workspaceUid
+    ) as string;
+    const temporaryDataFolderUri =
+      getWorkspaceTemporaryFolderPath(workspaceUid);
     objList.forEach((obj) => {
-      const { filePath, fileJson } = obj;
+      const { fileJson, filePath } = obj;
+
+      // 임시저장 path or 전체 저장 path
+      let targetPath = filePath;
+      if (!isAllSave) {
+        targetPath = temporaryDataFolderUri + filePath.split(folderUri)[1];
+        console.log('targetPath (temporary Data): ', targetPath);
+      }
+
       const buf = Buffer.from(JSON.stringify(fileJson));
       const result = Converter.JsonToHcl(buf);
       const resultStr = Buffer.from(result).toString();
-      if (!fs.existsSync(FileUtils.getDirName(filePath))) {
-        fs.mkdirSync(FileUtils.getDirName(filePath), { recursive: true });
+      if (!fs.existsSync(FileUtils.getDirName(targetPath))) {
+        fs.mkdirSync(FileUtils.getDirName(targetPath), { recursive: true });
       }
 
-      if (fs.existsSync(filePath)) {
+      if (fs.existsSync(targetPath)) {
         // MEMO : 원본파일이 있는 경우 원본과 저장할 파일 내용 비교 후 합침
-        const originalTf = FileUtils.readFileString(filePath);
+        const originalTf = FileUtils.readFileString(targetPath);
         const prettyNewTf = this.getPrettyString(resultStr);
         const finalTf = Converter.HclToHcl(originalTf, prettyNewTf);
-        fs.writeFileSync(filePath, finalTf);
+        fs.writeFileSync(targetPath, finalTf);
       } else {
         // MEMO : 원본파일이 없는 경우 그냥 새 파일 생성
-        fs.writeFileSync(filePath, this.getPrettyString(resultStr));
+        fs.writeFileSync(targetPath, this.getPrettyString(resultStr));
       }
     });
     console.log('[INFO] File Export Finished.');
