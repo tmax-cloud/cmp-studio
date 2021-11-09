@@ -1,23 +1,27 @@
 import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
 import { LinkData, NodeData, NodeKind, ROOT } from '@renderer/types/graph';
-/*import DefaultIcon from '../../../../assets/images/graph/graph-default-type-icon.png';
-import ModuleIcon from '../../../../assets/images/graph/graph-module-type-icon.png';
-import ResourceIcon from '../../../../assets/images/graph/graph-resource-type-icon.png';*/
+import AWsIcon from '../../../../assets/images/graph-provider-aws-icon.svg';
+import DefaultTypeIcon from '../../../../assets/images/graph-default-type-icon.svg';
+import ModuleTypeIcon from '../../../../assets/images/graph-module-type-icon.svg';
+import ResourceTypeIcon from '../../../../assets/images/graph-resource-type-icon.svg';
 
 export const nodesById = (nodes: NodeData[]) =>
   Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-/*const getIconImage = (type: NodeKind) => {
+const getIconImage = (type: NodeKind, name: string) => {
   switch (type) {
     case 'module':
-      return ModuleIcon;
+      return ModuleTypeIcon;
     case 'provider':
-      return DefaultIcon;
+      if (name === 'aws') {
+        return AWsIcon;
+      }
+      return DefaultTypeIcon;
     default:
-      return ResourceIcon;
+      return ResourceTypeIcon;
   }
-};*/
+};
 
 const parseNodeSimpleName = (str: string, status?: string) =>
   status ? str.replace(`(${status})`, '').trim() : str;
@@ -32,7 +36,7 @@ const parseNodeProviderName = (str: string) =>
     .replace('registry.terraform.io/hashicorp/', '');
 
 const parseNodeFullName = (str: string) => {
-  let simpleName: string | undefined;
+  let simpleName = '';
   let type = '';
   let status: string | undefined;
   const modules: NodeKind[] = [ROOT];
@@ -61,13 +65,14 @@ const parseNodeFullName = (str: string) => {
     }
   }
 
-  //const icon = getIconImage(type);
+  const icon = getIconImage(type, simpleName);
 
   return {
     simpleName,
     type,
     status,
     modules,
+    icon,
   };
 };
 
