@@ -49,23 +49,22 @@ body,
 }
 
 .force-graph-container .graph-tooltip {
-  background: #31475e;
+  background: #31475e !important;
 }
 
-.force-graph-container .graph-tooltip {
-  background: #31475e;
+.force-graph-container .tooltip-container {
   padding: 8px;
   min-width: 120px;
 }
 
-.force-graph-container .graph-tooltip .node-type {
+.force-graph-container .tooltip-container .node-type {
   font-family: 'cursive';
   font-size: 10px;
   opacity: 0.8;
 }
 
-.force-graph-container .graph-tooltip .node-name {
+.force-graph-container .tooltip-container .node-name {
   font-family: 'cursive';
   font-size: 12px;
-  margin-top: 2px;
+  margin-top: 4px;
 }

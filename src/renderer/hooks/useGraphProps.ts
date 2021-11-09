@@ -36,7 +36,7 @@ export const useGraphProps = () => {
 
   const nodeLabel = (obj: NodeObject) => {
     const node = obj as NodeData;
-    return `<div>
+    return `<div class='tooltip-container'>
       <div class='node-type'>${node.type}</div>
       <div class='node-name'>${node.simpleName}</div>
     </div>`;
