@@ -2,18 +2,14 @@ import { NodeObject, LinkObject } from 'react-force-graph-2d';
 
 export const ROOT = 'root';
 
-export type TerraformNodeKind =
-  | 'meta'
-  | 'module'
-  | 'output'
-  | 'provider'
-  | 'var';
+export type TerraformNodeKind = 'module' | 'output' | 'provider' | 'var';
 export type NodeKind = TerraformNodeKind | string;
 
 export interface NodeData extends NodeObject {
   fullName: string;
   simpleName: string;
-  type?: NodeKind;
+  type: NodeKind;
+  icon: string;
   status?: string;
   modules?: string[];
   parentNodes?: (string | number)[];

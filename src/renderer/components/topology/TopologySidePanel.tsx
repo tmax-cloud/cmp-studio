@@ -10,6 +10,7 @@ import FormHeader from '../form/layouts/Header';
 import FormTabs from '../form/layouts/Tabs';
 import preDefinedData from '../form/utils/preDefinedData';
 import { setSelectedSourceSchema } from '../../features/codeSlice';
+import { TOPOLOGY_TOOLBAR_HEIGHT } from './toolbar/TopologyToolbar';
 
 export const SIDEPANEL_WIDTH = 500;
 // 저장 버튼 누르면 redux objects에 content 덮어씌우기나이ㅓㄻ
@@ -47,8 +48,9 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
           sx: {
             width: SIDEPANEL_WIDTH,
             backgroundColor: '#eff2fd',
-            top: TOP_NAVBAR_HEIGHT,
-            height: `calc(100% - ${TOP_NAVBAR_HEIGHT}px)`,
+            top: TOP_NAVBAR_HEIGHT + TOPOLOGY_TOOLBAR_HEIGHT,
+            height: `calc(100% - ${TOP_NAVBAR_HEIGHT}px - ${TOPOLOGY_TOOLBAR_HEIGHT}px)`,
+            overflow: 'hidden',
           },
         }}
         open={isSidePanelOpen}

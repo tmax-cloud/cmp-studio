@@ -121,6 +121,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               sx={{ width: '250px', marginLeft: '16px' }}
               className={classes.root}
               label="키"
+              value={customFieldKey}
               onChange={(e) => {
                 setCustomFieldKey(e.target.value);
               }}
@@ -138,7 +139,8 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                 );
                 dispatch(addSelectedField(object));
                 dispatch(setSelectedSourceSchema(schema));
-                setAdditionalSchema('');
+                setCustomFieldType('');
+                setCustomFieldKey('');
               }}
             >
               추가

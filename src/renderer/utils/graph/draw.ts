@@ -1,19 +1,35 @@
-import { NodeData, NodeKind } from '@renderer/types/graph';
-import NoImageIcon from '../../../../assets/images/noImage64.png';
+import { NodeKind } from '@renderer/types/graph';
 
-const drawRoundRect = (
+export const drawShadow = (ctx: CanvasRenderingContext2D) => {
+  ctx.shadowColor = '#C9CFDB';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetX = 5;
+  ctx.shadowOffsetY = 5;
+};
+
+export const removeShadow = (ctx: CanvasRenderingContext2D) => {
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+};
+
+export const drawRoundRect = (
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   w: number,
   h: number,
-  radius: number,
   lineWidth: number,
   strokeColor: string,
-  fillColor: string
+  fillColor: string,
+  opacity: number,
+  shadow: boolean
 ) => {
   const r = x + w;
   const b = y + h;
+  const radius = 4;
+
+  ctx.globalAlpha = opacity;
   ctx.beginPath();
   ctx.strokeStyle = strokeColor;
   ctx.lineWidth = lineWidth;
@@ -26,12 +42,44 @@ const drawRoundRect = (
   ctx.quadraticCurveTo(x, b, x, b - radius);
   ctx.lineTo(x, y + radius);
   ctx.quadraticCurveTo(x, y, x + radius, y);
+
+  shadow && drawShadow(ctx); // draw shadow
+
   ctx.stroke();
   ctx.fillStyle = fillColor;
   ctx.fill();
+
+  shadow && removeShadow(ctx); // clear shadow
+
+  shadow && ctx.stroke(); // restroke
 };
 
-const fitText = (
+export const drawCircle = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  fillColor: string
+) => {
+  ctx.beginPath();
+  ctx.fillStyle = fillColor;
+  ctx.arc(x, y, size, 0, 2 * Math.PI, false);
+  ctx.fill();
+};
+
+export const drawImage = (
+  ctx: CanvasRenderingContext2D,
+  src: string,
+  x: number,
+  y: number,
+  size: number
+) => {
+  const img = document.createElement('img');
+  img.src = src;
+  ctx.drawImage(img, x, y, size, size);
+};
+
+export const fitText = (
   ctx: CanvasRenderingContext2D,
   str: string,
   maxWidth: number
@@ -52,92 +100,50 @@ const fitText = (
   }
 };
 
-const draw2Texts = (
+export const drawTexts = (
   ctx: CanvasRenderingContext2D,
+  text: string,
   x: number,
   y: number,
-  w: number,
-  h: number,
-  typeStr: string,
-  nameStr: string
+  maxWidth: number
 ) => {
-  const fontSize = 8;
-  ctx.font = `${fontSize}px Arial`;
+  ctx.font = `0.5rem NotoSansKR`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'black';
-  const fittingTypeText = fitText(ctx, typeStr, w - 2);
-  const fittingNameText = fitText(ctx, nameStr, w - 2);
-  ctx.fillText(fittingTypeText, x + w / 2, y + h - 6 - fontSize);
-  ctx.fillText(fittingNameText, x + w / 2, y + h - 6);
+  const newText = fitText(ctx, text, maxWidth);
+  ctx.fillText(newText, x, y);
 };
 
-const drawImage = (
-  ctx: CanvasRenderingContext2D,
-  image: string,
-  x: number,
-  y: number,
-  size: number
-) => {
-  const img = new Image();
-  img.src = image;
-  ctx.drawImage(img, x, y, size, size);
-};
-
-const getBgColor = (type?: NodeKind) => {
-  if (!type) {
-    return 'gray';
-  }
+export const getIconColor = (type: NodeKind, opacity: number) => {
   switch (type) {
-    case 'meta':
-      return 'yellow';
     case 'module':
-      return 'orange';
-    case 'output':
-      return 'purple';
+      return `rgba(255, 173, 48, ${opacity})`;
     case 'provider':
-      return 'blue';
-    case 'var':
-      return 'pink';
+      return `rgba(255, 87, 134, ${opacity})`;
+    case 'datasource':
+      return `rgba(144, 157, 255, ${opacity})`;
     default:
-      return 'green';
+      return `rgba(0, 183, 189, ${opacity})`; // resource
   }
 };
 
-export const drawNode = (
-  context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  radius: number,
-  node: NodeData,
-  isHover: boolean
-) => {
-  const lineWidth = isHover ? 4 : 2;
-  const bgColor = getBgColor(node.type);
-  const strokeColor = isHover ? 'red' : bgColor;
-
-  // outter rect
-  drawRoundRect(context, x, y, w, h, radius, lineWidth, strokeColor, bgColor);
-
-  const imageSize = 24;
-  drawImage(context, NoImageIcon, x + 1 + imageSize / 2, y + 2, imageSize);
-
-  // inner rect
-  drawRoundRect(
-    context,
-    x + 1,
-    y + 29,
-    w - 2,
-    20,
-    radius,
-    lineWidth,
-    bgColor,
-    'white'
-  );
-
-  const type = node.type || '-';
-  const name = node.simpleName;
-  draw2Texts(context, x, y, w, h, type, name);
+export const getBgColor = (kind: DrawingKind) => {
+  switch (kind) {
+    case 'focus':
+      return '#F6F7F9';
+    default:
+      return '#FFF';
+  }
 };
+
+export const getStrokeColor = (kind: DrawingKind) => {
+  switch (kind) {
+    case 'focus':
+      return '#1968EC';
+    default:
+      return 'rgba(201, 207, 219, 0.5)';
+  }
+};
+
+export type DrawingKind = 'normal' | 'focus' | 'highlight' | 'blur';
