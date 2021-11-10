@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
 import chalk from 'chalk';
 import { merge } from 'webpack-merge';
 import { spawn, execSync } from 'child_process';
@@ -263,6 +264,16 @@ export default merge(baseConfig, {
       env: process.env.NODE_ENV,
       isDevelopment: process.env.NODE_ENV !== 'production',
       nodeModules: webpackPaths.appNodeModulesPath,
+    }),
+    new CspHtmlWebpackPlugin({
+      'base-uri': "'self'",
+      'object-src': "'none'",
+      'script-src': "'self'",
+      'style-src': [
+        "'unsafe-inline'",
+        "'self'",
+        'https://fonts.googleapis.com/earlyaccess/notosanskr.css',
+      ],
     }),
   ],
 

@@ -10,6 +10,7 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import { merge } from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
+import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths.js';
 import checkNodeEnv from '../scripts/check-node-env';
@@ -178,5 +179,23 @@ export default merge(baseConfig, {
       isBrowser: false,
       isDevelopment: process.env.NODE_ENV !== 'production',
     }),
+
+    new CspHtmlWebpackPlugin(
+      {
+        'base-uri': "'self'",
+        'object-src': "'none'",
+        'script-src': "'self'",
+        'style-src': [
+          "'unsafe-inline'",
+          "'self'",
+          'https://fonts.googleapis.com/earlyaccess/notosanskr.css',
+        ],
+      },
+      {
+        nonceEnabled: {
+          'style-src': false,
+        },
+      }
+    ),
   ],
 });

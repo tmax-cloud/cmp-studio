@@ -262,16 +262,19 @@ export class WorkspaceMainService
         }
       }
     );
-
     ipcMain.handle(
       'studio:exportProject',
       (
         event,
         arg: WorkspaceTypes.WorkspaceExportProjectArgs
       ): WorkspaceTypes.WorkspaceResponse => {
-        const { objects } = arg;
+        const { objects, workspaceUid, isAllSave } = arg;
         try {
-          this.workspaceConvertService.convertAllJsonToHcl(objects);
+          this.workspaceConvertService.convertAllJsonToHcl(
+            objects,
+            workspaceUid,
+            isAllSave
+          );
           return {
             status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
             data: 'Project saved successfully.',
