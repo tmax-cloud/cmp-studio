@@ -9,6 +9,11 @@ export const getFolderUriByWorkspaceId = (
 ) =>
   window.electron.ipcRenderer.invoke('studio:getFolderUriByWorkspaceId', args);
 
+export const getFolderNameByWorkspaceId = (
+  args: WorkspaceTypes.WorkspaceGetFolderUriArgs
+) =>
+  window.electron.ipcRenderer.invoke('studio:getFolderNameByWorkspaceId', args);
+
 export const getRecentlyOpenedWorkspaces = () =>
   window.electron.ipcRenderer.invoke('studio:getRecentlyOpenedWorkspaces');
 
