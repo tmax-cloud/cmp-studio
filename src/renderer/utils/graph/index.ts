@@ -93,7 +93,7 @@ export const getGraphData = async (
   const tfGraph = await getTerraformGraphData(workspaceUid);
   const rawGraph = await getRawGraph(tfGraph);
   const graph = getRefinedGraph(rawGraph);
-  console.log('graph data: ', graph);
+  //console.log('graph data: ', graph);
   //console.log('path: ', getModulePath(graph));
   return graph;
 };
