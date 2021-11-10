@@ -1,14 +1,10 @@
 /* eslint-disable  @typescript-eslint/ban-types */
 import * as React from 'react';
 import { Box, Modal, Typography } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { INIT_FINISHED } from '@renderer/utils/graph/terraform';
 import LoadingIcon from '../../../../../assets/images/loading64x64.gif';
 
 const GraphLoadingModal = (props: GraphLoadingModalProps) => {
-  const { isOpen, message } = props;
-
-  const isFinished = message === INIT_FINISHED;
+  const { isOpen, initMsg, loadingMsg } = props;
 
   return (
     <Modal
@@ -31,37 +27,24 @@ const GraphLoadingModal = (props: GraphLoadingModalProps) => {
         }}
       >
         <Box mb={5} sx={{ display: 'flex', justifyContent: 'center' }}>
-          {isFinished ? (
-            <CheckCircleIcon color="primary" sx={{ fontSize: 100 }} />
-          ) : (
-            <img
-              alt="loading"
-              src={LoadingIcon}
-              style={{ width: 96, height: 96 }}
-            />
-          )}
+          <img
+            alt="loading"
+            src={LoadingIcon}
+            style={{ width: 96, height: 96 }}
+          />
         </Box>
         <Typography
           align="center"
           variant="h4"
-          my={4}
+          mt={4}
+          mb={2}
           sx={{ fontWeight: 'bold' }}
         >
-          {isFinished ? '' : '시각화 중...'}
+          시각화 중...
         </Typography>
-        <Typography
-          align="center"
-          variant="subtitle2"
-          mt={2}
-          sx={{ color: 'gray' }}
-        >
-          {message}
+        <Typography align="center" variant="subtitle2" sx={{ color: 'gray' }}>
+          {initMsg || loadingMsg}
         </Typography>
-        {isFinished ? (
-          <Typography align="center" variant="subtitle2" sx={{ color: 'gray' }}>
-            테라폼 그래프를 불러오는 중입니다.
-          </Typography>
-        ) : null}
       </Box>
     </Modal>
   );
@@ -69,11 +52,8 @@ const GraphLoadingModal = (props: GraphLoadingModalProps) => {
 
 export interface GraphLoadingModalProps {
   isOpen: boolean;
-  message?: string;
+  initMsg?: string;
+  loadingMsg?: string;
 }
-
-GraphLoadingModal.defaultProps = {
-  message: '테라폼 그래프를 불러오는 중입니다.',
-};
 
 export default GraphLoadingModal;
