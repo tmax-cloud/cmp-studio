@@ -4,6 +4,7 @@ import { Tabs, Tab, Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import EditorTab from './Editor';
 import StateTab from './State';
+import DiffTab from './Diff';
 const useStyles = makeStyles({
   root: {
     overflow: 'auto',
@@ -72,7 +73,7 @@ const FormTabs = (props: FormTabsProps) => {
         <StateTab />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Diff (구현 예정...)
+        <DiffTab />
       </TabPanel>
     </>
   );
