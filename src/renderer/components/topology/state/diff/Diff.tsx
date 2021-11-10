@@ -4,7 +4,7 @@ import { List, ListItem, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useAppSelector } from '@renderer/app/store';
 import { selectTerraformState } from '@renderer/features/commonSliceInputSelectors';
-import parse from '../utils/terraformPlanParser';
+import parse from './utils/terraformPlanParser';
 import * as TerraformPlanType from '../common/terraformPlan';
 
 const useStyles: any = makeStyles({

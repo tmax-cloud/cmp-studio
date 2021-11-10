@@ -19,8 +19,8 @@ import {
   Delete,
   Explore,
 } from '@mui/icons-material';
-import terraformSchema from '../form/terraform_schema.json';
-import parseJson from '../form/utils/json2JsonSchemaParser';
+import terraformSchema from './state/form/terraform_schema.json';
+import parseJson from './state/form/utils/json2JsonSchemaParser';
 
 const getIcon = (type: string) => {
   switch (type) {

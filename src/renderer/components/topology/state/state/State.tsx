@@ -3,7 +3,7 @@ import * as _ from 'lodash-es';
 import { Typography } from '@mui/material';
 import { useAppSelector } from '@renderer/app/store';
 import { selectTerraformState } from '@renderer/features/commonSliceInputSelectors';
-import parse from '../utils/terraformPlanParser';
+import parse from '../diff/utils/terraformPlanParser';
 import * as TerraformPlanType from '../common/terraformPlan';
 
 const StateTab = () => {

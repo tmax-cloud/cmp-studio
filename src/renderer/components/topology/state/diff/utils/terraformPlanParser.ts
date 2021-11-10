@@ -1,5 +1,5 @@
 import * as _ from 'lodash-es';
-import * as TerraformPlanType from '../common/terraformPlan';
+import * as TerraformPlanType from '../../common/terraformPlan';
 
 const parseId = (resourceId: string): TerraformPlanType.ResourceId => {
   const idSegments = resourceId.split('.');

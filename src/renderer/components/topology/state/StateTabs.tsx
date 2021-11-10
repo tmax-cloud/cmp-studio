@@ -2,9 +2,9 @@ import * as React from 'react';
 import * as _ from 'lodash-es';
 import { Tabs, Tab, Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import EditorTab from './Editor';
-import StateTab from './State';
-import DiffTab from './Diff';
+import EditorTab from './form/Editor';
+import StateTab from './state/State';
+import DiffTab from './diff/Diff';
 const useStyles = makeStyles({
   root: {
     overflow: 'auto',

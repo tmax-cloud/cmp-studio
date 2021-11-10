@@ -6,9 +6,9 @@ import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { selectCode } from '@renderer/features/codeSliceInputSelectors';
 import { useAppDispatch } from '@renderer/app/store';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
-import FormHeader from '../form/layouts/Header';
-import FormTabs from '../form/layouts/Tabs';
-import preDefinedData from '../form/utils/preDefinedData';
+import FormHeader from './state/form/Header';
+import FormTabs from './state/StateTabs';
+import preDefinedData from './state/form/utils/preDefinedData';
 import { setSelectedSourceSchema } from '../../features/codeSlice';
 import { TOPOLOGY_TOOLBAR_HEIGHT } from './toolbar/TopologyToolbar';
 
