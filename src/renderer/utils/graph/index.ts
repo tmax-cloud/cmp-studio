@@ -15,6 +15,8 @@ import {
   getBgColor,
 } from './draw';
 
+export const QUICK_START = 'CMP Studio 시작하기';
+
 export const getModuleNodeByName = (
   gData: GraphData,
   name: string
@@ -93,7 +95,7 @@ export const getGraphData = async (
   const tfGraph = await getTerraformGraphData(workspaceUid);
   const rawGraph = await getRawGraph(tfGraph);
   const graph = getRefinedGraph(rawGraph);
-  console.log('graph data: ', graph);
+  //console.log('graph data: ', graph);
   //console.log('path: ', getModulePath(graph));
   return graph;
 };
