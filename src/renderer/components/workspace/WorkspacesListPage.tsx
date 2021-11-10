@@ -89,7 +89,6 @@ const WorkspacesListPage: React.FC = (props) => {
       window.electron.ipcRenderer.on(
         'studio:dirPathToOpen',
         (res: Electron.OpenDialogReturnValue) => {
-          console.log('dirPathToOpen res?', res);
           const { filePaths, canceled } = res;
           if (!canceled) {
             openWorkspace(filePaths[0]);

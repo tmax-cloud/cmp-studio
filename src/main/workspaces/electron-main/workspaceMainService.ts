@@ -138,7 +138,6 @@ export class WorkspaceMainService
           ) {
             const uid = await this.getWorkspaceMetaOfExistFolder(folderUri);
             this.workspacesHistoryService.addWorkspaceToStorage(folderUri);
-            // TODO : 지금은 uid만 반환해주는데 열리는 부분은 어떻게 처리하지? win size도 바꿔줘야 함
             return {
               status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
               data: { uid },
