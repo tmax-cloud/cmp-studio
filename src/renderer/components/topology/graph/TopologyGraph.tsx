@@ -10,7 +10,9 @@ import { useGraphData, useGraphInitOutput } from '@renderer/hooks/useGraphData';
 import {
   selectErrorMsg,
   selectGraphData,
+  selectLoadingMsg,
 } from '@renderer/features/graphSliceInputSelectors';
+import { INIT_FINISHED } from '@renderer/utils/graph/terraform';
 import Box from '@mui/material/Box';
 import Error from './Error';
 import { GraphLoadingModal } from '../modal';
@@ -22,9 +24,10 @@ const TopologyGraph = (props: TopologyGraphProps) => {
   const graphData = useGraphData(originGraphData);
 
   const initOutputMsg = useGraphInitOutput();
+  const loadingMsg = useAppSelector(selectLoadingMsg);
   const errorMsg = useAppSelector(selectErrorMsg);
-
-  const isError = errorMsg || _.isEmpty(graphData.nodes);
+  const isInitFinished = !initOutputMsg || initOutputMsg === INIT_FINISHED;
+  const isLoadFinished = isInitFinished && !loadingMsg;
 
   React.useEffect(() => {
     graphRef.current?.zoomToFit();
@@ -39,12 +42,13 @@ const TopologyGraph = (props: TopologyGraphProps) => {
         overflow: 'hidden',
       }}
     >
-      {isError ? (
+      {!isLoadFinished || errorMsg ? (
         <>
-          <Error message={errorMsg} />
+          <Error isLoading={!isLoadFinished} message={errorMsg} />
           <GraphLoadingModal
-            isOpen={!errorMsg || !!initOutputMsg}
-            message={initOutputMsg}
+            isOpen={!isLoadFinished}
+            initMsg={initOutputMsg}
+            loadingMsg={loadingMsg}
           />
         </>
       ) : (
