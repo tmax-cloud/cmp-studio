@@ -57,8 +57,8 @@ const FormTabs = (props: FormTabsProps) => {
           aria-label="basic tabs example"
         >
           <Tab label="에디터" {...a11yProps(0)} />
-          <Tab label="상태" {...a11yProps(1)} />
-          <Tab label="Diff" {...a11yProps(2)} />
+          <Tab label="Diff (가공 전)" {...a11yProps(1)} />
+          <Tab label="Diff (가공 후 - 진행중)" {...a11yProps(2)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>

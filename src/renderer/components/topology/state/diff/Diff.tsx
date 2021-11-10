@@ -1,24 +1,15 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import { List, ListItem, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { List } from '@mui/material';
+
 import { useAppSelector } from '@renderer/app/store';
 import { selectTerraformState } from '@renderer/features/commonSliceInputSelectors';
+import DiffItem from './DiffItem';
 import parse from './utils/terraformPlanParser';
 import * as TerraformPlanType from '../common/terraformPlan';
 
-const useStyles: any = makeStyles({
-  planItem: {
-    borderLeft: '3px solid #519bf0',
-    backgroundColor: 'white',
-    listStyle: 'none',
-    margin: '4px',
-  },
-});
-
 const DiffTab = () => {
   const terraFormState = useAppSelector(selectTerraformState);
-  const classes = useStyles();
 
   const plan: TerraformPlanType.Plan = React.useMemo(() => {
     return parse(terraFormState);
@@ -32,9 +23,7 @@ const DiffTab = () => {
   return (
     <List>
       {plan.actions.map((action, idx) => (
-        <ListItem key={action.type + idx} className={classes.planItem}>
-          <ListItemText>{action.type}</ListItemText>
-        </ListItem>
+        <DiffItem key={action.type + idx} action={action} />
       ))}
     </List>
   );
