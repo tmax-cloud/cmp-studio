@@ -14,8 +14,9 @@ import {
   sethighlightElements,
 } from '@renderer/utils/graph';
 import { DrawingKind } from '@renderer/utils/graph/draw';
-import { useAppSelector } from '@renderer/app/store';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
+import { setSelectedNode } from '@renderer/features/graphSlice';
 
 const initialConfig: GraphConfig = {
   isMounted: false,
@@ -31,8 +32,9 @@ const NODE_RADIUS = 30;
 
 export const useGraphProps = () => {
   const graphRef = React.useRef<ForceGraphMethods>();
-  const graphData = useAppSelector(selectGraphData);
   const configRef = React.useRef<GraphConfig>(initialConfig);
+  const graphData = useAppSelector(selectGraphData);
+  const dispatch = useAppDispatch();
 
   const nodeLabel = (obj: NodeObject) => {
     const node = obj as NodeData;
@@ -93,6 +95,7 @@ export const useGraphProps = () => {
   const handleNodeClick = (obj: NodeObject, event: MouseEvent) => {
     const node = obj as NodeData;
     configRef.current.selectedNode = node;
+    dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
   };
 
   const handleNodeHover = (
