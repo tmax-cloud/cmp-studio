@@ -169,16 +169,11 @@ export const drawNode = (
     shadow
   );
 
-  const cirlceSize = 16;
+  const cirlceSize = 12;
   const iconColor = getIconColor(node.type, opacity);
+  drawCircle(ctx, x, y - cirlceSize / 2, cirlceSize, iconColor);
+  drawImage(ctx, node.icon, x - cirlceSize / 2, y - cirlceSize, cirlceSize);
+
   const padding = 4;
-  drawCircle(ctx, x, y - padding, cirlceSize, iconColor);
-  drawImage(
-    ctx,
-    node.icon,
-    x - cirlceSize / 2,
-    y - cirlceSize + padding,
-    cirlceSize
-  );
   drawTexts(ctx, node.simpleName, x, y + cirlceSize + padding, w - padding * 2);
 };
