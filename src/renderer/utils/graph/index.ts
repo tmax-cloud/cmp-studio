@@ -150,11 +150,11 @@ export const drawNode = (
 ) => {
   const x = node?.x || 0;
   const y = node?.y || 0;
-  const lineWidth = kind === 'focus' ? 2 : 1;
+  const lineWidth = kind === 'selected' ? 2 : 1;
   const opacity = kind === 'blur' ? 0.5 : 1;
   const bgColor = getBgColor(kind);
   const strokeColor = getStrokeColor(kind);
-  const shadow = kind === 'focus' || kind === 'highlight';
+  const shadow = kind === 'hover';
 
   drawRoundRect(
     ctx,
