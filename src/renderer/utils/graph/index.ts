@@ -150,11 +150,11 @@ export const drawNode = (
 ) => {
   const x = node?.x || 0;
   const y = node?.y || 0;
-  const lineWidth = kind === 'focus' ? 2 : 1;
+  const lineWidth = kind === 'selected' ? 2 : 1;
   const opacity = kind === 'blur' ? 0.5 : 1;
   const bgColor = getBgColor(kind);
   const strokeColor = getStrokeColor(kind);
-  const shadow = kind === 'focus' || kind === 'highlight';
+  const shadow = kind === 'hover';
 
   drawRoundRect(
     ctx,
@@ -169,16 +169,11 @@ export const drawNode = (
     shadow
   );
 
-  const cirlceSize = 16;
+  const cirlceSize = 12;
   const iconColor = getIconColor(node.type, opacity);
+  drawCircle(ctx, x, y - cirlceSize / 2, cirlceSize, iconColor);
+  drawImage(ctx, node.icon, x - cirlceSize / 2, y - cirlceSize, cirlceSize);
+
   const padding = 4;
-  drawCircle(ctx, x, y - padding, cirlceSize, iconColor);
-  drawImage(
-    ctx,
-    node.icon,
-    x - cirlceSize / 2,
-    y - cirlceSize + padding,
-    cirlceSize
-  );
   drawTexts(ctx, node.simpleName, x, y + cirlceSize + padding, w - padding * 2);
 };

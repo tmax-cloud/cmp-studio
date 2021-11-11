@@ -130,8 +130,12 @@ export const getIconColor = (type: NodeKind, opacity: number) => {
 
 export const getBgColor = (kind: DrawingKind) => {
   switch (kind) {
-    case 'focus':
+    case 'selected':
+      return '#D6E4FC';
+    case 'hover':
       return '#F6F7F9';
+    case 'drag':
+      return '#B4CDF8';
     default:
       return '#FFF';
   }
@@ -139,11 +143,13 @@ export const getBgColor = (kind: DrawingKind) => {
 
 export const getStrokeColor = (kind: DrawingKind) => {
   switch (kind) {
-    case 'focus':
+    case 'selected':
       return '#1968EC';
+    case 'drag':
+      return 'rgba(25, 104, 236, 0.20)';
     default:
       return 'rgba(201, 207, 219, 0.5)';
   }
 };
 
-export type DrawingKind = 'normal' | 'focus' | 'highlight' | 'blur';
+export type DrawingKind = 'normal' | 'selected' | 'hover' | 'blur' | 'drag';
