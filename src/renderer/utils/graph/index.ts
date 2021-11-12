@@ -27,24 +27,6 @@ export const getModuleNodeByName = (
       (node as NodeData).simpleName === name
   ) as NodeData;
 
-/*export const getPrunedGraph = (
-  gData: GraphData,
-  id: number | string
-): GraphData => {
-  const visibleNodes = new Set<NodeData>();
-  const visibleLinks = new Set<LinkData>();
-  traverseGraph(gData.nodes, id, (node) => {
-    visibleNodes.add(node);
-    if (!node.childLinks) {
-      return;
-    }
-    node.childLinks.forEach((childLink: LinkData) => {
-      visibleLinks.add(childLink);
-    });
-  });
-  return { nodes: [...visibleNodes], links: [...visibleLinks] };
-};*/
-
 /*export const getModulePath = (gData: GraphData): ModulePath[] => {
   const modulePaths: ModulePath[] = [];
   const paths = new Set<string>();
@@ -116,19 +98,16 @@ export const hasLink = (links: LinkObject[], link: LinkObject) => {
   return !!_.find(links, { source, target });
 };
 
-export const sethighlightElements = (
-  nodes: NodeData[],
-  id: string | number
-) => {
-  const highlightNodes: NodeData[] = [];
-  const highlightLinks: LinkData[] = [];
+export const getPrunedGraph = (nodes: NodeData[], id: string | number) => {
+  const newNodes = new Set<NodeData>();
+  const newLinks = new Set<LinkData>();
   (function traverse(n = nodesById(nodes)[id]) {
     if (!n) {
       return;
     }
-    highlightNodes.push(n);
+    newNodes.add(n);
     n.childNodes?.forEach((child: string | number) => {
-      highlightLinks.push({ source: n.id, target: child });
+      newLinks.add({ source: n.id, target: child });
     });
     if (n.childNodes) {
       [...n.childNodes]
@@ -138,7 +117,10 @@ export const sethighlightElements = (
         .forEach(traverse);
     }
   })();
-  return { highlightNodes, highlightLinks };
+  return {
+    nodes: [...newNodes],
+    links: [...newLinks],
+  };
 };
 
 export const drawNode = (

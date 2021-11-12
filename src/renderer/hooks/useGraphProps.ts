@@ -11,12 +11,19 @@ import {
   drawNode,
   hasLink,
   hasNode,
-  sethighlightElements,
+  getPrunedGraph,
 } from '@renderer/utils/graph';
 import { DrawingKind } from '@renderer/utils/graph/draw';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
-import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
-import { setSelectedNode } from '@renderer/features/graphSlice';
+import {
+  selectSelectedData,
+  selectSelectedModulePath,
+} from '@renderer/features/graphSliceInputSelectors';
+import {
+  setSelectedData,
+  setSelectedModulePath,
+  setSelectedNode,
+} from '@renderer/features/graphSlice';
 
 const initialConfig: GraphConfig = {
   isMounted: false,
@@ -26,6 +33,7 @@ const initialConfig: GraphConfig = {
   hoverNode: null,
   highlightNodes: [],
   highlightLinks: [],
+  clickCount: 0,
 };
 
 const NODE_RADIUS = 30;
@@ -33,7 +41,8 @@ const NODE_RADIUS = 30;
 export const useGraphProps = () => {
   const graphRef = React.useRef<ForceGraphMethods>();
   const configRef = React.useRef<GraphConfig>(initialConfig);
-  const graphData = useAppSelector(selectGraphData);
+  const graphData = useAppSelector(selectSelectedData);
+  const selectedModulePath = useAppSelector(selectSelectedModulePath);
   const dispatch = useAppDispatch();
 
   const nodeLabel = (obj: NodeObject) => {
@@ -74,6 +83,14 @@ export const useGraphProps = () => {
     return hasLink(configRef.current.highlightLinks, link) ? 5 : 1;
   };
 
+  const linkColor = (link: LinkObject) => {
+    return '#d3d3d3';
+  };
+
+  const linkDirectionalArrowColor = (link: LinkObject) => {
+    return '#bababa';
+  };
+
   const handleZoomIn = () => {
     graphRef.current?.zoom(configRef.current.zoomLevel + 1, 500);
   };
@@ -92,10 +109,35 @@ export const useGraphProps = () => {
     graphRef.current?.zoomToFit(500);
   };
 
+  const handleNodeDoubleClick = (node: NodeData) => {
+    if (node && node.id && node.type === 'module') {
+      const newData = getPrunedGraph(graphData.nodes, node.id);
+      if (newData.nodes.length < 2) {
+        return;
+      }
+      const newPath = node.modules?.join('/');
+      if (selectedModulePath !== newPath) {
+        dispatch(setSelectedData(newData));
+        dispatch(setSelectedModulePath(newPath));
+      }
+    }
+  };
+
   const handleNodeClick = (obj: NodeObject, event: MouseEvent) => {
     const node = obj as NodeData;
-    configRef.current.selectedNode = node;
-    dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
+
+    configRef.current.clickCount += 1;
+    setTimeout(() => {
+      if (configRef.current.clickCount === 2) {
+        handleNodeDoubleClick(node);
+      }
+      configRef.current.clickCount = 0;
+    }, 300);
+
+    if (configRef.current.selectedNode !== node) {
+      configRef.current.selectedNode = node;
+      dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
+    }
   };
 
   const handleNodeHover = (
@@ -105,13 +147,10 @@ export const useGraphProps = () => {
     graphRef.current?.d3ReheatSimulation(); // redraw
     const node = obj as NodeData;
     if (node && node.id) {
-      const { highlightNodes, highlightLinks } = sethighlightElements(
-        graphData.nodes,
-        node.id
-      );
+      const { nodes, links } = getPrunedGraph(graphData.nodes, node.id);
       configRef.current.hoverNode = node || null;
-      configRef.current.highlightNodes = _.uniqWith(highlightNodes, _.isEqual);
-      configRef.current.highlightLinks = _.uniqWith(highlightLinks, _.isEqual);
+      configRef.current.highlightNodes = nodes;
+      configRef.current.highlightLinks = links;
     } else {
       configRef.current.hoverNode = null;
       configRef.current.highlightNodes = [];
@@ -162,6 +201,8 @@ export const useGraphProps = () => {
     nodeCanvasObject,
     linkVisibility,
     linkWidth,
+    linkColor,
+    linkDirectionalArrowColor,
     linkDirectionalArrowLength: 5,
     linkDirectionalArrowRelPos: 1,
     linkCurvature: 0.25,
@@ -198,4 +239,5 @@ interface GraphConfig {
   hoverNode: NodeData | null;
   highlightNodes: NodeData[];
   highlightLinks: LinkData[];
+  clickCount: number;
 }

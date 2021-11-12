@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { GraphData } from 'react-force-graph-2d';
-import { LinkData, NodeData, NodeKind, ROOT } from '@renderer/types/graph';
+import { LinkData, NodeData, NodeKind } from '@renderer/types/graph';
 import DefaultTypeIcon from '../../../../assets/images/graph-default-type-icon.svg';
 import ModuleTypeIcon from '../../../../assets/images/graph-module-type-icon.svg';
 import ResourceTypeIcon from '../../../../assets/images/graph-resource-type-icon.svg';
@@ -35,7 +35,7 @@ const parseNodeFullName = (str: string) => {
   let simpleName = '';
   let type = '';
   let status: string | undefined;
-  const modules: NodeKind[] = [ROOT];
+  const modules: NodeKind[] = [];
 
   const isProvider = str.startsWith('provider[');
   if (isProvider) {
