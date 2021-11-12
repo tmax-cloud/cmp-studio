@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
-import { GraphData } from 'react-force-graph-2d';
+import { GraphData, NodeObject } from 'react-force-graph-2d';
 import { LinkData, NodeData, NodeKind } from '@renderer/types/graph';
 import DefaultTypeIcon from '../../../../assets/images/graph-default-type-icon.svg';
 import ModuleTypeIcon from '../../../../assets/images/graph-module-type-icon.svg';
 import ResourceTypeIcon from '../../../../assets/images/graph-resource-type-icon.svg';
 
-export const nodesById = (nodes: NodeData[]) =>
+export const nodesById = (nodes: NodeObject[]) =>
   Object.fromEntries(nodes.map((node) => [node.id, node]));
 
 const getIconImage = (type: NodeKind, name: string) => {
@@ -29,7 +29,8 @@ const parseNodeProviderName = (str: string) =>
     .match(/\[(.*)\]/)
     ?.pop()
     ?.replace(/"/g, '')
-    .replace('registry.terraform.io/hashicorp/', '');
+    .replace('registry.terraform.io/hashicorp/', '')
+    .replace('registry.terraform.io/', '');
 
 const parseNodeFullName = (str: string) => {
   let simpleName = '';
@@ -73,13 +74,12 @@ const parseNodeFullName = (str: string) => {
 };
 
 const setNeighborElements = (gData: GraphData) => {
-  const nodes = gData.nodes as NodeData[];
   gData.links.forEach((link) => {
     const { source, target } = link;
     const sourceNode =
-      source && typeof source !== 'object' && nodesById(nodes)[source];
+      source && typeof source !== 'object' && nodesById(gData.nodes)[source];
     const targetNode =
-      target && typeof target !== 'object' && nodesById(nodes)[target];
+      target && typeof target !== 'object' && nodesById(gData.nodes)[target];
     if (sourceNode && targetNode) {
       // add neighborNodes
       sourceNode.childNodes = _.union(sourceNode.childNodes, [targetNode.id]);

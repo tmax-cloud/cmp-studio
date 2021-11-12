@@ -17,18 +17,18 @@ import { DrawingKind } from '@renderer/utils/graph/draw';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import {
   selectSelectedData,
-  selectSelectedModulePath,
+  selectSelectedModule,
+  selectSelectedNode,
 } from '@renderer/features/graphSliceInputSelectors';
 import {
   setSelectedData,
-  setSelectedModulePath,
+  setSelectedModule,
   setSelectedNode,
 } from '@renderer/features/graphSlice';
 
 const initialConfig: GraphConfig = {
   isMounted: false,
   zoomLevel: 1,
-  selectedNode: null,
   dragNode: null,
   hoverNode: null,
   highlightNodes: [],
@@ -41,8 +41,11 @@ const NODE_RADIUS = 30;
 export const useGraphProps = () => {
   const graphRef = React.useRef<ForceGraphMethods>();
   const configRef = React.useRef<GraphConfig>(initialConfig);
+
   const graphData = useAppSelector(selectSelectedData);
-  const selectedModulePath = useAppSelector(selectSelectedModulePath);
+  const selectedNode = useAppSelector(selectSelectedNode);
+  const selectedModule = useAppSelector(selectSelectedModule);
+
   const dispatch = useAppDispatch();
 
   const nodeLabel = (obj: NodeObject) => {
@@ -57,13 +60,12 @@ export const useGraphProps = () => {
     const node = obj as NodeData;
     const width = NODE_RADIUS * 2;
     const height = NODE_RADIUS * 2;
-    const { selectedNode, dragNode, hoverNode, highlightNodes } =
-      configRef.current;
+    const { dragNode, hoverNode, highlightNodes } = configRef.current;
     let drawingKind: DrawingKind = 'normal';
     if (hoverNode) {
       drawingKind = hasNode(highlightNodes, node) ? 'hover' : 'blur';
     }
-    if (node === selectedNode) {
+    if (node.id === selectedNode?.id) {
       drawingKind = 'selected';
     }
     if (node === dragNode) {
@@ -115,10 +117,12 @@ export const useGraphProps = () => {
       if (newData.nodes.length < 2) {
         return;
       }
+      const selectedPath = selectedModule?.modules.join('/');
       const newPath = node.modules?.join('/');
-      if (selectedModulePath !== newPath) {
+      if (selectedPath !== newPath) {
         dispatch(setSelectedData(newData));
-        dispatch(setSelectedModulePath(newPath));
+        dispatch(setSelectedModule(node));
+        dispatch(setSelectedNode(null));
       }
     }
   };
@@ -134,8 +138,7 @@ export const useGraphProps = () => {
       configRef.current.clickCount = 0;
     }, 300);
 
-    if (configRef.current.selectedNode !== node) {
-      configRef.current.selectedNode = node;
+    if (selectedNode?.id !== node.id) {
       dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
     }
   };
@@ -164,7 +167,7 @@ export const useGraphProps = () => {
   ) => {
     const node = obj as NodeData;
     configRef.current.dragNode = node;
-    configRef.current.selectedNode = null;
+    dispatch(setSelectedNode(null));
   };
 
   const handleNodeDragEnd = (
@@ -173,7 +176,7 @@ export const useGraphProps = () => {
   ) => {
     const node = obj as NodeData;
     configRef.current.dragNode = null;
-    configRef.current.selectedNode = node;
+    dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
   };
 
   const handleEngineTick = () => {
@@ -234,7 +237,6 @@ type DagMode = 'td' | 'bu' | 'lr' | 'rl' | 'radialout' | 'radialin';
 interface GraphConfig {
   isMounted: boolean;
   zoomLevel: number;
-  selectedNode: NodeData | null;
   dragNode: NodeData | null;
   hoverNode: NodeData | null;
   highlightNodes: NodeData[];

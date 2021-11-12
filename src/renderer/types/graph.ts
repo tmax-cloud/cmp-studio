@@ -11,7 +11,7 @@ export interface NodeData extends NodeObject {
   type: NodeKind;
   icon: string;
   status?: string;
-  modules?: string[];
+  modules: string[];
   parentNodes?: (string | number)[];
   childNodes?: (string | number)[];
 }

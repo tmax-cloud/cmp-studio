@@ -17,16 +17,6 @@ import {
 
 export const QUICK_START = 'CMP Studio 시작하기';
 
-export const getModuleNodeByName = (
-  gData: GraphData,
-  name: string
-): NodeData | undefined =>
-  gData.nodes.find(
-    (node) =>
-      (node as NodeData).type === 'module' &&
-      (node as NodeData).simpleName === name
-  ) as NodeData;
-
 /*export const getModulePath = (gData: GraphData): ModulePath[] => {
   const modulePaths: ModulePath[] = [];
   const paths = new Set<string>();
@@ -98,7 +88,7 @@ export const hasLink = (links: LinkObject[], link: LinkObject) => {
   return !!_.find(links, { source, target });
 };
 
-export const getPrunedGraph = (nodes: NodeData[], id: string | number) => {
+export const getPrunedGraph = (nodes: NodeObject[], id: string | number) => {
   const newNodes = new Set<NodeData>();
   const newLinks = new Set<LinkData>();
   (function traverse(n = nodesById(nodes)[id]) {
@@ -122,6 +112,14 @@ export const getPrunedGraph = (nodes: NodeData[], id: string | number) => {
     links: [...newLinks],
   };
 };
+
+export const getModuleNodeByName = (
+  nodes: NodeObject[],
+  name: string
+): NodeData | undefined =>
+  (nodes as NodeData[]).find(
+    (node) => node.type === 'module' && node.simpleName === name
+  ) as NodeData;
 
 export const drawNode = (
   ctx: CanvasRenderingContext2D,

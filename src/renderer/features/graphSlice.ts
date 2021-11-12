@@ -8,7 +8,7 @@ interface GraphState {
   graphData: GraphData;
   selectedData: GraphData;
   selectedNode: NodeData | null;
-  selectedModulePath: string;
+  selectedModule: NodeData | null;
   errorMsg: string | null;
   loadingMsg: string | null;
 }
@@ -17,7 +17,7 @@ const initialState: GraphState = {
   graphData: { nodes: [], links: [] },
   selectedData: { nodes: [], links: [] },
   selectedNode: null,
-  selectedModulePath: '',
+  selectedModule: null,
   errorMsg: null,
   loadingMsg: null,
 };
@@ -45,8 +45,8 @@ const graphSlice = createSlice({
     setSelectedNode: (state, { payload }) => {
       state.selectedNode = payload;
     },
-    setSelectedModulePath: (state, { payload }) => {
-      state.selectedModulePath = payload;
+    setSelectedModule: (state, { payload }) => {
+      state.selectedModule = payload;
     },
   },
   extraReducers: (builder) => {
@@ -68,7 +68,7 @@ const graphSlice = createSlice({
   },
 });
 
-export const { setSelectedData, setSelectedNode, setSelectedModulePath } =
+export const { setSelectedData, setSelectedNode, setSelectedModule } =
   graphSlice.actions;
 
 export default graphSlice.reducer;
