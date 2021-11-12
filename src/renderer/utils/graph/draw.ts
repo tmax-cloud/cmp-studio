@@ -115,15 +115,20 @@ export const drawTexts = (
   ctx.fillText(newText, x, y);
 };
 
-export const getIconColor = (type: NodeKind, opacity: number) => {
+export const getIconColor = (
+  opacity: number,
+  type: NodeKind,
+  isDataSource?: boolean
+) => {
   switch (type) {
     case 'module':
       return `rgba(255, 173, 48, ${opacity})`;
     case 'provider':
       return `rgba(255, 87, 134, ${opacity})`;
-    case 'datasource':
-      return `rgba(144, 157, 255, ${opacity})`;
     default:
+      if (isDataSource) {
+        return `rgba(144, 157, 255, ${opacity})`; // datasource
+      }
       return `rgba(0, 183, 189, ${opacity})`; // resource
   }
 };

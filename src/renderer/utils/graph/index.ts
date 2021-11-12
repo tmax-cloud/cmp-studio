@@ -66,6 +66,7 @@ export const getGraphData = async (
 ): Promise<GraphData> => {
   const tfGraph = await getTerraformGraphData(workspaceUid);
   const rawGraph = await getRawGraph(tfGraph);
+  //console.log('## raw data: ', rawGraph);
   const graph = getRefinedGraph(rawGraph);
   //console.log('graph data: ', graph);
   //console.log('path: ', getModulePath(graph));
@@ -150,7 +151,7 @@ export const drawNode = (
   );
 
   const cirlceSize = 12;
-  const iconColor = getIconColor(node.type, opacity);
+  const iconColor = getIconColor(opacity, node.type, node.isDataSource);
   drawCircle(ctx, x, y - cirlceSize / 2, cirlceSize, iconColor);
   drawImage(ctx, node.icon, x - cirlceSize / 2, y - cirlceSize, cirlceSize);
 

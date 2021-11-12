@@ -1,3 +1,4 @@
+/* eslint-disable no-continue */
 import * as _ from 'lodash';
 import { GraphData, NodeObject } from 'react-force-graph-2d';
 import { LinkData, NodeData, NodeKind } from '@renderer/types/graph';
@@ -8,13 +9,16 @@ import ResourceTypeIcon from '../../../../assets/images/graph-resource-type-icon
 export const nodesById = (nodes: NodeObject[]) =>
   Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-const getIconImage = (type: NodeKind, name: string) => {
+const getIconImage = (type: NodeKind, isDataSource?: boolean) => {
   switch (type) {
     case 'module':
       return ModuleTypeIcon;
     case 'provider':
       return DefaultTypeIcon;
     default:
+      if (isDataSource) {
+        return ResourceTypeIcon;
+      }
       return ResourceTypeIcon;
   }
 };
@@ -24,45 +28,49 @@ const parseNodeSimpleName = (str: string, status?: string) =>
 
 const parseNodeStatus = (str: string) => str.match(/\((.*)\)/)?.pop();
 
-const parseNodeProviderName = (str: string) =>
-  str
-    .match(/\[(.*)\]/)
-    ?.pop()
-    ?.replace(/"/g, '')
-    .replace('registry.terraform.io/hashicorp/', '')
-    .replace('registry.terraform.io/', '');
-
 const parseNodeFullName = (str: string) => {
   let simpleName = '';
   let type = '';
-  let status: string | undefined;
-  const modules: NodeKind[] = [];
+  let status;
+  let isDataSource;
+  const modules = [];
 
-  const isProvider = str.startsWith('provider[');
-  if (isProvider) {
-    type = 'provider';
-    status = parseNodeStatus(str);
-    simpleName = parseNodeSimpleName(str, status);
-    const providerName = parseNodeProviderName(simpleName);
-    simpleName = providerName || simpleName;
-  } else {
-    const parts = str.split('.');
-    while (parts.length > 0) {
-      const part = parts.shift();
-      if (part) {
-        const isModule = part === 'module';
-        type = isModule ? 'module' : part;
-        const part2 = parts.shift();
-        if (part2) {
-          status = parseNodeStatus(part2);
-          simpleName = parseNodeSimpleName(part2, status);
-          isModule && simpleName && modules.push(simpleName);
-        }
+  let newStr = str;
+  if (str.includes('provider[')) {
+    newStr = str
+      .replace('["', '.')
+      .replace('"]', '')
+      .replace('registry.terraform.io/hashicorp/', '')
+      .replace('registry.terraform.io/', '');
+  }
+
+  const parts = newStr.split('.');
+  while (parts.length > 0) {
+    const part = parts.shift();
+    if (!part) {
+      continue;
+    }
+
+    // 데이터소스 일 경우
+    if (part === 'data') {
+      if (parts.length === 2) {
+        isDataSource = true;
       }
+      continue;
+    }
+
+    const isModule = part === 'module';
+    type = isModule ? 'module' : part;
+
+    const part2 = parts.shift();
+    if (part2) {
+      status = parseNodeStatus(part2);
+      simpleName = parseNodeSimpleName(part2, status);
+      isModule && simpleName && modules.push(simpleName);
     }
   }
 
-  const icon = getIconImage(type, simpleName);
+  const icon = getIconImage(type, isDataSource);
 
   return {
     simpleName,
@@ -70,6 +78,7 @@ const parseNodeFullName = (str: string) => {
     status,
     modules,
     icon,
+    isDataSource,
   };
 };
 

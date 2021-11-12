@@ -10,8 +10,9 @@ export interface NodeData extends NodeObject {
   simpleName: string;
   type: NodeKind;
   icon: string;
-  status?: string;
   modules: string[];
+  status?: string;
+  isDataSource?: boolean;
   parentNodes?: (string | number)[];
   childNodes?: (string | number)[];
 }
