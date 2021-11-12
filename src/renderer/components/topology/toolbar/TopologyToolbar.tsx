@@ -1,6 +1,5 @@
 import * as React from 'react';
 import _ from 'lodash';
-import Grid from '@mui/material/Grid';
 import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -8,6 +7,7 @@ import { exportProject } from '@renderer/utils/ipc/workspaceIpcUtils';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import { useAppSelector } from '@renderer/app/store';
+import { useWorkspaceName } from '@renderer/hooks/useWorkspaceName';
 import {
   FitScreenButton,
   SaveButton,
@@ -28,9 +28,11 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
 
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
+  const workspaceName = useWorkspaceName(workspaceUid);
+
   return (
     <Toolbar
-      style={{ minHeight: 48, paddingLeft: 12, paddingRight: 12 }}
+      style={{ minHeight: 48, paddingLeft: 20, paddingRight: 20 }}
       sx={{
         display: 'flex',
         flexShrink: 0,
@@ -38,46 +40,42 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
         borderRight: '1px solid',
         borderColor: 'rgba(0, 0, 0, 0.12)',
         backgroundColor: 'white',
+        justifyContent: 'space-between',
       }}
     >
-      <Grid container justifyContent="space-between">
-        <Grid item justifyContent="center">
-          <ViewBreadcrumbs />
-        </Grid>
-        <Grid item sx={{ display: 'flex' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <SaveButton
-              onClick={async () => {
-                const result = await exportProject({
-                  objects: fileObjects,
-                  workspaceUid,
-                  isAllSave: true,
-                });
-                console.log('[INFO] File export result : ', result);
-              }}
-            />
-            {/* <SelectModuleButton onClick={handleModuleListModalOpen} /> */}
-            <ModuleListModal
-              isOpen={openModuleListModal}
-              onClose={handleModuleListModalClose}
-            />
-            <Divider
-              orientation="vertical"
-              variant="middle"
-              flexItem
-              sx={{ mx: 1 }}
-            />
-            <ZoomInButton onClick={handlers.handleZoomIn} />
-            <ZoomOutButton onClick={handlers.handleZoomOut} />
-            <FitScreenButton onClick={handlers.handleZoomToFit} />
-          </Box>
-        </Grid>
-      </Grid>
+      <ViewBreadcrumbs workspaceName={workspaceName} />
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          ml: 5,
+        }}
+      >
+        <SaveButton
+          onClick={async () => {
+            const result = await exportProject({
+              objects: fileObjects,
+              workspaceUid,
+              isAllSave: true,
+            });
+            console.log('[INFO] File export result : ', result);
+          }}
+        />
+        {/* <SelectModuleButton onClick={handleModuleListModalOpen} /> */}
+        <ModuleListModal
+          isOpen={openModuleListModal}
+          onClose={handleModuleListModalClose}
+        />
+        <Divider
+          orientation="vertical"
+          variant="middle"
+          flexItem
+          sx={{ mx: 1 }}
+        />
+        <ZoomInButton onClick={handlers.handleZoomIn} />
+        <ZoomOutButton onClick={handlers.handleZoomOut} />
+        <FitScreenButton onClick={handlers.handleZoomToFit} />
+      </Box>
     </Toolbar>
   );
 };

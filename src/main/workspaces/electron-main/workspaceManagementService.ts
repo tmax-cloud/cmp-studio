@@ -182,6 +182,17 @@ export class WorkspaceManagementService
     }
   }
 
+  getFolderNameByWorkspaceId(workspaceId: string): string | null {
+    const workspaceMap = readFileJson(workspaceMapPath);
+    let folderName = null;
+    Object.keys(workspaceMap)?.forEach((key) => {
+      if (key === workspaceId) {
+        folderName = workspaceMap[key].split(path.sep).pop();
+      }
+    });
+    return folderName;
+  }
+
   generateDefaultNewWorkspaceName(): string {
     let index = 1;
     let newWorkspaceName = `새프로젝트${index}`;
