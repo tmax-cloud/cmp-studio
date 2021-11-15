@@ -118,7 +118,7 @@ export const drawTexts = (
 export const getIconColor = (
   opacity: number,
   type: NodeKind,
-  isDataSource?: boolean
+  dataSource?: boolean
 ) => {
   switch (type) {
     case 'module':
@@ -126,7 +126,7 @@ export const getIconColor = (
     case 'provider':
       return `rgba(255, 87, 134, ${opacity})`;
     default:
-      if (isDataSource) {
+      if (dataSource) {
         return `rgba(144, 157, 255, ${opacity})`; // datasource
       }
       return `rgba(0, 183, 189, ${opacity})`; // resource

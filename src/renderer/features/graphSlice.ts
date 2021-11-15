@@ -5,12 +5,12 @@ import { GraphData } from 'react-force-graph-2d';
 import { NodeData } from '@renderer/types/graph';
 
 interface GraphState {
-  graphData: GraphData;
-  selectedData: GraphData;
-  selectedNode: NodeData | null;
-  selectedModule: NodeData | null;
-  errorMsg: string | null;
-  loadingMsg: string | null;
+  graphData: GraphData; // 전체 그래프 데이터
+  selectedData: GraphData; // 선택한 모듈 하위 그래프 데이터
+  selectedNode: NodeData | null; // 선택한 노드
+  selectedModule: NodeData | null; // 선택한 모듈 모드
+  errorMsg: string | null; // 에러 메시지
+  loadingMsg: string | null; // 로딩 메시지
 }
 
 const initialState: GraphState = {

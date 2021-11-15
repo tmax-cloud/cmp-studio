@@ -11,7 +11,7 @@ import ResourceTypeIcon from '../../../../assets/images/graph-resource-type-icon
 export const nodesById = (nodes: NodeObject[]) =>
   Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-const getIconImage = (type: NodeKind, name: string, isDataSource?: boolean) => {
+const getIconImage = (type: NodeKind, name: string, dataSource?: boolean) => {
   switch (type) {
     case 'module':
       return ModuleTypeIcon;
@@ -21,7 +21,7 @@ const getIconImage = (type: NodeKind, name: string, isDataSource?: boolean) => {
       }
       return DefaultTypeIcon;
     default:
-      return isDataSource ? DatasourceTypeIcon : ResourceTypeIcon;
+      return dataSource ? DatasourceTypeIcon : ResourceTypeIcon;
   }
 };
 
@@ -34,7 +34,7 @@ const parseNodeFullName = (str: string) => {
   let simpleName = '';
   let type = '';
   let status;
-  let isDataSource;
+  let dataSource;
   const modules = [];
 
   let newStr = str;
@@ -56,7 +56,7 @@ const parseNodeFullName = (str: string) => {
     // 데이터소스 일 경우
     if (part === 'data') {
       if (parts.length === 2) {
-        isDataSource = true;
+        dataSource = true;
       }
       continue;
     }
@@ -72,7 +72,7 @@ const parseNodeFullName = (str: string) => {
     }
   }
 
-  const icon = getIconImage(type, simpleName, isDataSource);
+  const icon = getIconImage(type, simpleName, dataSource);
 
   return {
     simpleName,
@@ -80,7 +80,7 @@ const parseNodeFullName = (str: string) => {
     status,
     modules,
     icon,
-    isDataSource,
+    dataSource,
   };
 };
 

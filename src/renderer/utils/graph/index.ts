@@ -151,7 +151,7 @@ export const drawNode = (
   );
 
   const cirlceSize = 12;
-  const iconColor = getIconColor(opacity, node.type, node.isDataSource);
+  const iconColor = getIconColor(opacity, node.type, node.dataSource);
   drawCircle(ctx, x, y - cirlceSize / 2, cirlceSize, iconColor);
   drawImage(ctx, node.icon, x - cirlceSize / 2, y - cirlceSize, cirlceSize);
 
