@@ -64,6 +64,9 @@
     "win": {
       "target": [
         "nsis"
+      ],
+      "files": [
+        "!assets/**"
       ]
     },
     "linux": {
