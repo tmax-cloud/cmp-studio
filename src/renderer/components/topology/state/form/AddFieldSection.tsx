@@ -17,7 +17,7 @@ import {
 import { ArrowDropDown } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectCode } from '@renderer/features/codeSliceInputSelectors';
-import { addSchemaBasedField, addCustomField } from '../utils/addInputField';
+import { addSchemaBasedField, addCustomField } from './utils/addInputField';
 
 const useStyles: any = makeStyles({
   root: {

@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { JSONSchema7 } from 'json-schema';
-import DynamicForm from '@renderer/components/form';
+import DynamicForm from '@renderer/components/topology/state/form';
 
 describe('MapField component test', () => {
   const fakeSchema = {

@@ -10,7 +10,7 @@ import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 import TopologyToolbar from './toolbar/TopologyToolbar';
 import TopologyGraph from './graph/TopologyGraph';
-import parseJson from '../form/utils/json2JsonSchemaParser';
+import parseJson from './state/form/utils/json2JsonSchemaParser';
 
 type StyleProps = {
   isSidePanelOpen?: boolean;

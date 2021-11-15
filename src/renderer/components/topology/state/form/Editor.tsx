@@ -2,8 +2,8 @@ import * as React from 'react';
 import * as _ from 'lodash-es';
 import { selectCodeSelectedObjectInfoId } from '@renderer/features/codeSliceInputSelectors';
 import { useAppSelector } from '@renderer/app/store';
-import SaveSection from '@renderer/components/form/layouts/SaveSection';
-import DynamicForm from '../index';
+import SaveSection from '@renderer/components/topology/state/form/SaveSection';
+import DynamicForm from './index';
 import AddFieldSection from './AddFieldSection';
 
 const EditorTab = (props: EditorTabProps) => {

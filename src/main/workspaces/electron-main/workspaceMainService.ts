@@ -74,6 +74,12 @@ export class WorkspaceMainService
     return folderUri;
   }
 
+  async getFolderNameByWorkspaceId(workspaceId: string) {
+    const folderName =
+      this.workspaceManagementService.getFolderNameByWorkspaceId(workspaceId);
+    return folderName;
+  }
+
   private registerListeners() {
     ipcMain.handle(
       'studio:createNewFolderAndWorkspace',
@@ -121,6 +127,18 @@ export class WorkspaceMainService
       ): Promise<any> => {
         const { workspaceId } = arg;
         const folderUri = await this.getFolderUriByWorkspaceId(workspaceId);
+        return folderUri;
+      }
+    );
+
+    ipcMain.handle(
+      'studio:getFolderNameByWorkspaceId',
+      async (
+        event,
+        arg: WorkspaceTypes.WorkspaceGetFolderUriArgs
+      ): Promise<any> => {
+        const { workspaceId } = arg;
+        const folderUri = await this.getFolderNameByWorkspaceId(workspaceId);
         return folderUri;
       }
     );

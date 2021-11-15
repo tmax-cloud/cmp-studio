@@ -1,15 +1,25 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
 import { Tabs, Tab, Box } from '@mui/material';
-import EditorTab from './Editor';
+import { makeStyles } from '@mui/styles';
+import EditorTab from './form/Editor';
+import StateTab from './state/State';
+import DiffTab from './diff/Diff';
+const useStyles = makeStyles({
+  root: {
+    overflow: 'auto',
+  },
+});
 
 const TabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props;
+  const classes = useStyles();
 
   return (
     <div
       role="tabpanel"
       hidden={value !== index}
+      className={classes.root}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       {...other}
@@ -47,8 +57,8 @@ const FormTabs = (props: FormTabsProps) => {
           aria-label="basic tabs example"
         >
           <Tab label="에디터" {...a11yProps(0)} />
-          <Tab label="상태" {...a11yProps(1)} />
-          <Tab label="Diff" {...a11yProps(2)} />
+          <Tab label="Diff (가공 전)" {...a11yProps(1)} />
+          <Tab label="Diff (가공 후 - 진행중)" {...a11yProps(2)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -60,10 +70,10 @@ const FormTabs = (props: FormTabsProps) => {
         />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        상태 (구현 예정...)
+        <StateTab />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Diff (구현 예정...)
+        <DiffTab />
       </TabPanel>
     </>
   );
