@@ -2,6 +2,8 @@
 import * as _ from 'lodash';
 import { GraphData, NodeObject } from 'react-force-graph-2d';
 import { LinkData, NodeData, NodeKind } from '@renderer/types/graph';
+import AWSProviderIcon from '../../../../assets/images/graph-provider-aws-icon.svg';
+import DatasourceTypeIcon from '../../../../assets/images/graph-datasource-type-icon.svg';
 import DefaultTypeIcon from '../../../../assets/images/graph-default-type-icon.svg';
 import ModuleTypeIcon from '../../../../assets/images/graph-module-type-icon.svg';
 import ResourceTypeIcon from '../../../../assets/images/graph-resource-type-icon.svg';
@@ -9,17 +11,17 @@ import ResourceTypeIcon from '../../../../assets/images/graph-resource-type-icon
 export const nodesById = (nodes: NodeObject[]) =>
   Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-const getIconImage = (type: NodeKind, isDataSource?: boolean) => {
+const getIconImage = (type: NodeKind, name: string, isDataSource?: boolean) => {
   switch (type) {
     case 'module':
       return ModuleTypeIcon;
     case 'provider':
+      if (name === 'aws') {
+        return AWSProviderIcon;
+      }
       return DefaultTypeIcon;
     default:
-      if (isDataSource) {
-        return ResourceTypeIcon;
-      }
-      return ResourceTypeIcon;
+      return isDataSource ? DatasourceTypeIcon : ResourceTypeIcon;
   }
 };
 
@@ -70,7 +72,7 @@ const parseNodeFullName = (str: string) => {
     }
   }
 
-  const icon = getIconImage(type, isDataSource);
+  const icon = getIconImage(type, simpleName, isDataSource);
 
   return {
     simpleName,
