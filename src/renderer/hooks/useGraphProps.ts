@@ -114,9 +114,6 @@ export const useGraphProps = () => {
   const handleNodeDoubleClick = (node: NodeData) => {
     if (node && node.id && node.type === 'module') {
       const newData = getPrunedGraph(graphData.nodes, node.id);
-      if (newData.nodes.length < 2) {
-        return;
-      }
       const selectedPath = selectedModule?.modules.join('/');
       const newPath = node.modules?.join('/');
       if (selectedPath !== newPath) {
