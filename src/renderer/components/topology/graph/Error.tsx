@@ -89,8 +89,7 @@ interface ErrorDetailProps {
 }
 interface ErrorProps {
   isLoading: boolean;
-  // eslint-disable-next-line react/require-default-props
-  message?: string;
+  message: string | null;
 }
 
 export default Error;
