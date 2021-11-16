@@ -94,11 +94,11 @@ export const useGraphProps = () => {
   };
 
   const handleZoomIn = () => {
-    graphRef.current?.zoom(configRef.current.zoomLevel + 1, 500);
+    graphRef.current?.zoom(configRef.current.zoomLevel + 0.1, 500);
   };
 
   const handleZoomOut = () => {
-    graphRef.current?.zoom(configRef.current.zoomLevel - 1, 500);
+    graphRef.current?.zoom(configRef.current.zoomLevel - 0.1, 500);
   };
 
   const handleZoomEnd = (transform: { k: number; x: number; y: number }) => {
