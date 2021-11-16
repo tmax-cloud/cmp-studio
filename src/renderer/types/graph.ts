@@ -20,9 +20,10 @@ export interface LinkData extends LinkObject {
   id?: string | number;
 }
 
-export interface ModulePath {
-  id?: string | number;
+export interface ModuleData {
+  root: boolean; // 프로젝트 루트 경로인지 여부. true면 루트
+  id: string | number;
   name: string;
   path: string;
-  size?: number;
+  size: number;
 }
