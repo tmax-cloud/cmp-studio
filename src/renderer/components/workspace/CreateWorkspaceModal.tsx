@@ -27,7 +27,6 @@ import {
 } from '@main/workspaces/common/workspace';
 import * as TerraformTypes from '@main/terraform-command/common/terraform';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
-import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
 import * as WorkspaceIpcUtils from '../../utils/ipc/workspaceIpcUtils';
 import { getTerraformVersion } from '../../utils/ipc/terraformIpcUtils';
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
@@ -225,7 +224,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
         if (status === WorkspaceStatusType.SUCCESS) {
           const uid = (data as WorkspaceSuccessUidData)?.uid;
           if (uid) {
-            setOpen(false);
+            closeModal();
             openWorkspace(newProjectPath);
           }
         } else if (status === WorkspaceStatusType.ERROR_FILE_EXISTS) {

@@ -51,7 +51,6 @@ export class WorkspacesHistoryService {
   }
 
   serializeEntries(entries: RecentWorkspace[]): RecentWorkspace[] {
-    // TODO : isPinned여부 체크해서 순서 정리해주는 로직 구현하기
     return entries;
   }
 
