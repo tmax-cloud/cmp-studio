@@ -100,16 +100,21 @@ const setNeighborElements = (gData: GraphData) => {
   return gData;
 };
 
-const removeUtilElements = (gData: GraphData) => {
+const removeElements = (gData: GraphData) => {
+  // 그래프 유틸성 노드 및 output & variable 노드 제거
   const utilNodeList = ['root', 'meta.count-boundary (EachMode fixup)'];
+
   let newNodes = _.cloneDeep(gData.nodes) as NodeData[];
   let newLinks = _.cloneDeep(gData.links) as LinkData[];
-  const addLinks: LinkData[] = [];
-  utilNodeList.forEach((fullName) => {
-    const removeNode = newNodes.find(
-      (node) => (node as NodeData).fullName === fullName
-    ) as NodeData;
-    if (removeNode) {
+
+  gData.nodes.forEach((n) => {
+    const removeNode = n as NodeData;
+    if (
+      utilNodeList.includes(removeNode.fullName) ||
+      removeNode.type === 'output' ||
+      removeNode.type === 'var'
+    ) {
+      const addLinks: LinkData[] = [];
       newLinks.forEach((link) => {
         // connecting with a new node
         if (link.source === removeNode.id) {
@@ -129,37 +134,6 @@ const removeUtilElements = (gData: GraphData) => {
     }
   });
   return { nodes: newNodes, links: newLinks };
-};
-
-const removeVarElements = (gData: GraphData) => {
-  let newNodes = _.cloneDeep(gData.nodes) as NodeData[];
-  const newLinks: LinkData[] = [];
-
-  gData.links.forEach((link) => {
-    const { source, target } = link;
-    const sourceNode =
-      source && typeof source !== 'object' && nodesById(newNodes)[source];
-    const targetNode =
-      target && typeof target !== 'object' && nodesById(newNodes)[target];
-    if (
-      sourceNode.type !== 'output' &&
-      sourceNode.type !== 'var' &&
-      targetNode.type !== 'output' &&
-      targetNode.type !== 'var'
-    ) {
-      newLinks.push(link);
-    }
-  });
-
-  newNodes = newNodes.filter(
-    (node) => node.type !== 'output' && node.type !== 'var'
-  );
-
-  return { nodes: newNodes, links: newLinks };
-};
-
-const removeElements = (gData: GraphData) => {
-  return removeVarElements(removeUtilElements(gData));
 };
 
 export const getRefinedGraph = (gData: GraphData) => {
