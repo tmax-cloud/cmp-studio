@@ -1,4 +1,5 @@
 import * as React from 'react';
+import _ from 'lodash';
 import {
   Box,
   Button,
@@ -18,9 +19,15 @@ import {
   ArrowUpward,
   Delete,
   Explore,
+  Devices,
 } from '@mui/icons-material';
-import { useAppSelector } from '@renderer/app/store';
-import { selectCode } from '@renderer/features/codeSliceInputSelectors';
+import { useSelector, useDispatch } from 'react-redux';
+//import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import {
+  setFileObjects,
+  setSelectedObjectInfo,
+} from '@renderer/features/codeSlice';
+import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
 import parseJson from '../form/utils/json2JsonSchemaParser';
 import { ModuleImportModal } from './modal';
 
@@ -36,19 +43,56 @@ const getIcon = (type: string) => {
       return <Mode />;
     case 'localModule':
       return <Explore />;
+    case 'default':
+      return <Devices />;
     default:
       return <Circle />;
   }
 };
+const defaultList = [
+  {
+    title: 'defaults-provider',
+    instanceName: 'provider',
+    resourceName: 'provider',
+    type: 'default',
+  },
+  {
+    title: 'defaults-variable',
+    instanceName: 'variable',
+    resourceName: 'variable',
+    type: 'default',
+  },
+  {
+    title: 'defaults-output',
+    instanceName: 'output',
+    resourceName: 'output',
+    type: 'default',
+  },
+  {
+    title: 'defaults-terraform',
+    instanceName: 'terraform',
+    resourceName: 'terraform',
+    type: 'default',
+  },
+  {
+    title: 'defaults-locals',
+    instanceName: 'locals',
+    resourceName: 'locals',
+    type: 'default',
+  },
+];
 
-function seartchDisplayName(searchText: string, displayName: string) {
-  if (displayName.toUpperCase().indexOf(searchText.toUpperCase()) !== -1) {
+function seartchByName(searchText: string, name: string) {
+  if (name.toUpperCase().indexOf(searchText.toUpperCase()) !== -1) {
     return true;
   } else {
     return false;
   }
 }
-
+function isLocalModule(item: Item) {
+  return true;
+}
+/*
 function getModuleList(items: Item[]) {
   //get Module 구현 필요
   //test Module
@@ -60,47 +104,38 @@ function getModuleList(items: Item[]) {
     source: 'terraform-aws-modules/security-group/aws',
     version: '4.4.0',
   });
-  items.push({
-    provider: 'aws',
-    title: 'module-consul',
-    displayName: 'consul',
-    type: 'module',
-    source: 'hashicorp/consul/aws',
-    version: '0.11.0',
+}
+*/
+function getLocalModuleList(items: Item[]) {
+  //Module 중 Local Module 구분하는 isLocalModule 구현 필요
+  const localItems: Item[] = [];
+  items.forEach((item) => {
+    if (item?.type === 'module' && isLocalModule(item)) {
+      localItems.push(item);
+    }
   });
-}
-
-function openSidePanel(obj: { id: string }) {
-  alert('OpenForm ' + obj.id);
-}
-function clickLocalModule(afterAction: any, obj: { id: string }) {
-  alert('Local Module ' + obj.id);
-  afterAction(obj);
-}
-function clickDefault(afterAction: any, obj: { id: string }) {
-  alert('Default ' + obj.id);
-  afterAction(obj);
-}
-function clickModule(afterAction: any, obj: { id: string }) {
-  alert('Module ' + obj.id);
-  afterAction(obj);
-}
-function clickResource(afterAction: any, obj: { id: string }) {
-  alert('Resource ' + obj.id);
-  afterAction(obj);
-}
-function clickDatasource(afterAction: any, obj: { id: string }) {
-  alert('Data Source ' + obj.id);
-  afterAction(obj);
+  return localItems;
 }
 
 const ShowItemList: React.FC<ShowItemListProps> = ({
   items,
   title,
-  clickAction,
-  afterAction,
+  setIsSidePanelOpen,
+  provider,
 }) => {
   const [isShow, setIsShow] = React.useState(false);
+  const fileObjects = useSelector(selectCodeFileObjects);
+  const originPath = '.';
+  const addedObjectJSON = {}; //temp
+  const dispatch = useDispatch();
+  let schemaMap;
+
+  try {
+    schemaMap = parseJson(provider);
+  } catch (e) {
+    console.log('Cannot get schema in ' + provider);
+    schemaMap = new Map();
+  }
 
   return (
     <>
@@ -126,12 +161,42 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
                     key={`button-${index}`}
                     startIcon={getIcon(item.type)}
                     onClick={() => {
-                      clickAction(afterAction, { id: item.title });
+                      const newInstanceName =
+                        'new-' +
+                        item.type +
+                        '-' +
+                        item.resourceName +
+                        '-' +
+                        fileObjects.length;
+                      const newFileObjects = [
+                        {
+                          filePath: `${originPath}/${item.type}/${newInstanceName}.tf`,
+                          fileJson: {
+                            [item.type]: {
+                              [item.resourceName]: {
+                                [newInstanceName]: addedObjectJSON,
+                              },
+                            },
+                          },
+                        },
+                      ];
+                      dispatch(
+                        setFileObjects(fileObjects.concat(newFileObjects))
+                      );
+                      const object = {
+                        id: item.title,
+                        instanceName: newInstanceName,
+                        content: newFileObjects[0].fileJson,
+                      };
+                      dispatch(setSelectedObjectInfo(object));
+                      setIsSidePanelOpen((currState: boolean) => true);
                     }}
                     fullWidth
                     style={{ textAlign: 'left' }}
                   >
-                    {item.type === 'localModule' ? item.path : item.displayName}
+                    {item.type === 'localModule'
+                      ? item.path
+                      : item.resourceName}
                   </Button>
                 );
               })}
@@ -144,8 +209,8 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
 type ShowItemListProps = {
   items: Item[];
   title: string;
-  clickAction: any;
-  afterAction: any;
+  setIsSidePanelOpen: any;
+  provider: string;
 };
 
 interface Item {
@@ -153,14 +218,16 @@ interface Item {
   objectCount?: number;
   provider?: string;
   title: string;
-  displayName: string;
+  instanceName: string;
+  resourceName: string;
   type: string;
   source?: string;
   version?: string;
 }
-//const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
-const TopologyLibrary = () => {
-  const [provider, setProvider] = React.useState('aws');
+let selectedProvider = '';
+const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
+  const { setIsSidePanelOpen } = props;
+  const [provider, setProvider] = React.useState(selectedProvider || 'aws');
   const [defaltItems, setDefaltItems] = React.useState<Item[]>([]);
   const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
   const [datasourceItems, setdatasourceItems] = React.useState<Item[]>([]);
@@ -168,9 +235,7 @@ const TopologyLibrary = () => {
     setProvider(event.target.value);
   };
   const [localModuleItems, setLocalModuleItems] = React.useState<Item[]>([]);
-  const [terraformModuleItems, setTerraformModuleItems] = React.useState<
-    Item[]
-  >([]);
+  //const [terraformModuleItems, setTerraformModuleItems] = React.useState<Item[]>([]);
   const [searchText, setSearchText] = React.useState('');
   const searchTextChange = (event: any) => {
     setSearchText(event.target.value);
@@ -187,13 +252,44 @@ const TopologyLibrary = () => {
     setImportModule(event.target?.value || event);
     setOpenModuleListModal(true);
   };
-  const handleModuleListModalOpen2 = (obj: { id: string }) => {
-    setImportModule(obj.id);
-    setOpenModuleListModal(true);
-  };
   const handleModuleListModalClose = () => setOpenModuleListModal(false);
+  const dispatch = useDispatch();
 
-  const originCode = useAppSelector(selectCode);
+  const objResult: any[] = [];
+
+  // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
+  useSelector(selectCodeFileObjects).forEach(
+    (file: { filePath: string; fileJson: any }) => {
+      // eslint-disable-next-line guard-for-in
+      for (const currKey in file.fileJson) {
+        objResult.push(
+          ..._.entries(file.fileJson[currKey]).map((object) => ({
+            [object[0]]: object[1],
+            type: currKey,
+          }))
+        );
+      }
+    }
+  );
+
+  const itemsList: Item[] = [];
+  objResult
+    .map((result) => {
+      const { type, ...object } = result;
+      const resourceName = Object.keys(object)[0];
+      const instanceName = Object.keys(object[resourceName])[0];
+      const title = type + '-' + resourceName;
+      return { type, resourceName, title, instanceName };
+    })
+    .forEach((i: Item) => {
+      itemsList.push({
+        provider: i.resourceName.split('_')[0],
+        title: i.title,
+        instanceName: i.instanceName,
+        resourceName: i.resourceName,
+        type: i.type,
+      });
+    });
 
   React.useEffect(() => {
     let schemaMap;
@@ -204,184 +300,58 @@ const TopologyLibrary = () => {
       console.log('Cannot get schema in ' + provider);
       schemaMap = new Map();
     }
-    const items2: Item[] = [];
+    const items: Item[] = [];
     schemaMap.forEach((schema) => {
       const schemaProvider = provider;
       const schemaTitle = schema.title;
-      const schemaDisplayName = schema.title.split('-')[1];
+      const schemaResourceName = schema.title.split('-')[1];
       const schemaType = schema.title.split('-')[0];
-      items2.push({
+      items.push({
         provider: schemaProvider,
         title: schemaTitle,
-        displayName: schemaDisplayName,
+        instanceName: schemaResourceName,
+        resourceName: schemaResourceName,
         type: schemaType,
       });
     });
-
-    getModuleList(items2);
-
-    const defaultList: Item[] = [];
     const resourceList: Item[] = [];
     const datasourceList: Item[] = [];
     const moduleList: Item[] = [];
-    items2.forEach((i: Item) => {
-      if (i.provider === provider) {
-        if (seartchDisplayName(searchText, i.displayName)) {
-          /*
-          if (i.type === 'provider') {
-            defaultList.push({
-              provider: i.provider,
-              title: i.title,
-              displayName: 'provider',
-              type: i.type,
-            });
-          }
-          */
-          if (i.type === 'resource') {
-            resourceList.push({
-              provider: i.provider,
-              title: i.title,
-              displayName: i.displayName,
-              type: i.type,
-            });
-          }
-          if (i.type === 'datasource') {
-            datasourceList.push({
-              provider: i.provider,
-              title: i.title,
-              displayName: i.displayName,
-              type: i.type,
-            });
-          }
-          if (i.type === 'module') {
-            moduleList.push({
-              provider: i.provider,
-              title: i.title,
-              displayName: i.displayName,
-              type: i.type,
-            });
-          }
+    items.forEach((i: Item) => {
+      if (seartchByName(searchText, i.resourceName)) {
+        if (i.type === 'resource') {
+          resourceList.push({
+            provider: i.provider,
+            title: i.title,
+            instanceName: i.instanceName,
+            resourceName: i.resourceName,
+            type: i.type,
+          });
+        }
+        if (i.type === 'datasource') {
+          datasourceList.push({
+            provider: i.provider,
+            title: i.title,
+            instanceName: i.instanceName,
+            resourceName: i.resourceName,
+            type: i.type,
+          });
         }
       }
     });
     const localList: Item[] = [];
-    const localItems = [
-      {
-        path: '/',
-        title: 'localModule-Project_Root',
-        objectCount: 20,
-        displayName: 'Project_root',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config',
-        title: 'localModule-Network-config',
-        objectCount: 12,
-        displayName: 'Network-config',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config2',
-        title: 'localModule-Network-config-2',
-        objectCount: 3,
-        displayName: 'Network-config 2',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config/defaultName',
-        title: 'localModule-defaultName',
-        objectCount: 13,
-        displayName: 'defaultName',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config/defaultName/pathTest',
-        title: 'localModule-defaultName',
-        objectCount: 13,
-        displayName: 'defaultName',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config/defaultName/pathTest2',
-        title: 'localModule-defaultName',
-        objectCount: 13,
-        displayName: 'defaultName',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config2/defaultName/pathTest2',
-        title: 'localModule-defaultName',
-        objectCount: 13,
-        displayName: 'defaultName',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config3/defaultName/pathTest2',
-        title: 'localModule-defaultName',
-        objectCount: 13,
-        displayName: 'defaultName',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config3/defaultName/pathTest2',
-        title: 'localModule-defaultName',
-        objectCount: 13,
-        displayName: 'defaultName',
-        type: 'localModule',
-      },
-    ];
-    localItems.sort(function (a, b) {
-      if (a.path < b.path) return -1;
-      if (a.path > b.path) return 1;
-      return 0;
-    });
-    /*
-    localItems.forEach((item) => {
-      let newPath = '';
-      for (let i = 0; i < item.path.split('/').length - 2; i++) {
-        newPath += '~';
-      }
-      newPath += '/';
-      newPath += item.path.split('/')[item.path.split('/').length - 1];
-      item.path = newPath;
-    });
-    */
+    const localItems = getLocalModuleList(itemsList);
+
     localItems.forEach((localItem: Item) => {
-      if (seartchDisplayName(searchText, localItem.displayName)) {
+      if (seartchByName(searchText, localItem.resourceName)) {
         localList.push(localItem);
       }
     });
     setLocalModuleItems(localList);
-
-    defaultList.push({
-      title: 'defaults-provider',
-      displayName: 'provider',
-      type: 'defaults',
-    });
-    defaultList.push({
-      title: 'defaults-variable',
-      displayName: 'variable',
-      type: 'defaults',
-    });
-    defaultList.push({
-      title: 'defaults-output',
-      displayName: 'output',
-      type: 'defaults',
-    });
-    defaultList.push({
-      title: 'defaults-terraform',
-      displayName: 'terraform',
-      type: 'defaults',
-    });
-    defaultList.push({
-      title: 'defaults-locals',
-      displayName: 'locals',
-      type: 'defaults',
-    });
     setDefaltItems(defaultList);
     setResourceItems(resourceList);
     setdatasourceItems(datasourceList);
-    setTerraformModuleItems(moduleList);
+    //setTerraformModuleItems(moduleList);
 
     if (
       localList.length ||
@@ -394,6 +364,7 @@ const TopologyLibrary = () => {
     } else {
       setIsSearchResultEmpty(true);
     }
+    selectedProvider = provider;
   }, [provider, searchText]);
 
   return (
@@ -413,7 +384,6 @@ const TopologyLibrary = () => {
           <MenuItem value="gcp">Google Cloud Platform</MenuItem>
           <MenuItem value="openstack">OpenStack</MenuItem>
           <MenuItem value="vmware">Vmware vSphere</MenuItem>
-          <MenuItem value="test">TEST</MenuItem>
         </Select>
         <div>
           <TextField
@@ -443,40 +413,130 @@ const TopologyLibrary = () => {
             <ShowItemList
               items={localModuleItems}
               title="로컬 모듈"
-              clickAction={clickLocalModule}
-              afterAction={openSidePanel}
+              setIsSidePanelOpen={setIsSidePanelOpen}
+              provider={provider}
             />
             <ShowItemList
               items={defaltItems}
               title="테라폼 디폴트"
-              clickAction={clickDefault}
-              afterAction={openSidePanel}
+              setIsSidePanelOpen={setIsSidePanelOpen}
+              provider={provider}
             />
+            {/* 모듈 추후 추가 */}
+            {/*
             <ShowItemList
               items={terraformModuleItems}
               title="테라폼 모듈"
-              clickAction={clickModule}
-              afterAction={handleModuleListModalOpen2}
+              setIsSidePanelOpen={setIsSidePanelOpen}
+              provider={provider}
             />
+            */}
             <ShowItemList
               items={resourceItems}
               title="테라폼 리소스"
-              clickAction={clickResource}
-              afterAction={openSidePanel}
+              setIsSidePanelOpen={setIsSidePanelOpen}
+              provider={provider}
             />
             <ShowItemList
               items={datasourceItems}
               title="테라폼 데이터소스"
-              clickAction={clickDatasource}
-              afterAction={openSidePanel}
+              setIsSidePanelOpen={setIsSidePanelOpen}
+              provider={provider}
+            />
+            {/* 테스트용 Object 표시 */}
+            <InputLabel>Object 표시 - 임시</InputLabel>
+            <ShowItemList
+              items={itemsList}
+              title="Object"
+              setIsSidePanelOpen={setIsSidePanelOpen}
+              provider={provider}
             />
           </>
         )}
         <Button onClick={handleModuleListModalOpen} value="test1">
           Modal Test
         </Button>
-        <Button onClick={handleModuleListModalOpen} value="test2">
-          Modal Test2
+        <Button onClick={() => dispatch(setFileObjects([]))} value="test2">
+          Delete Object for Test
+        </Button>
+        <Button
+          onClick={() =>
+            dispatch(
+              setFileObjects([
+                {
+                  filePath: './test.tf',
+                  fileJson: {
+                    module: {
+                      'test-network-configs': {
+                        source: './network-configs',
+                      },
+                    },
+                    provider: {
+                      aws: {
+                        region: 'test-region',
+                      },
+                    },
+                  },
+                },
+                {
+                  filePath: './a.tf',
+                  fileJson: {
+                    resource: {
+                      aws_instance: {
+                        'ubuntu-ssh-server': {
+                          ami: 'ami-0b9064170e32bde34',
+                          associate_public_ip_address: true,
+                          count: 1,
+                          instance_type: 't2.micro',
+                          key_name: '{var.key_pair}',
+                          subnet_id:
+                            '{module.aws-network-configs.test-subnet-a-id}',
+                          tags: { Naem: 'test-instance' },
+                          vpc_security_group_ids: [
+                            '{module.aws-network-configs.test-sg-id}',
+                          ],
+                        },
+                      },
+                    },
+                    variable: {
+                      key_pair: {
+                        default: 'aws-key',
+                      },
+                    },
+                  },
+                },
+                {
+                  filePath: './b.tf',
+                  fileJson: {
+                    resource: {
+                      aws_key_pair: {
+                        'terraform-key': {
+                          key_name: 'aws-key',
+                          public_key:
+                            '{tls_private_key.example.public_key_openssh}',
+                        },
+                      },
+                      tls_private_key: {
+                        example: {
+                          algorithm: 'RSA',
+                          provisioner: {
+                            'local-exec': {
+                              command:
+                                "echo '@@@{self.private_key_pem}@@@' > ./aws-key.pem",
+                            },
+                            rsa_bits: 4096,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              ])
+            )
+          }
+          value="test3"
+        >
+          Set Object for Test
         </Button>
         <ModuleImportModal
           isOpen={openModuleListModal}
@@ -484,14 +544,11 @@ const TopologyLibrary = () => {
           moduleName={importModule}
         />
       </Box>
-      {originCode && console.log(originCode)}
     </>
   );
 };
 
-/*
 type TopologyLibraryProps = {
-  items: any;
+  setIsSidePanelOpen: any;
 };
-*/
 export default TopologyLibrary;
