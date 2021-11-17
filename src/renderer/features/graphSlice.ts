@@ -52,6 +52,8 @@ const graphSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchGraphData.pending, (state, { payload }) => {
       state.loadingMsg = '테라폼 그래프를 불러오는 중입니다.';
+      state.selectedNode = null;
+      state.selectedModule = null;
     });
     builder.addCase(fetchGraphData.fulfilled, (state, { payload }) => {
       state.graphData = payload as GraphData;
