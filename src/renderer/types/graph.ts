@@ -11,7 +11,7 @@ export interface NodeData extends NodeObject {
   type: NodeKind;
   icon: string;
   modules: string[];
-  status?: string;
+  state?: string;
   dataSource?: boolean; // 데이터소스 여부. true면 데이터소스
   parentNodes?: (string | number)[];
   childNodes?: (string | number)[];
