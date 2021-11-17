@@ -151,19 +151,18 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
   const objResult: any[] = [];
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
-  useSelector(selectCodeFileObjects).forEach(
-    (file: { filePath: string; fileJson: any }) => {
-      // eslint-disable-next-line guard-for-in
-      for (const currKey in file.fileJson) {
-        objResult.push(
-          ..._.entries(file.fileJson[currKey]).map((object) => ({
-            [object[0]]: object[1],
-            type: currKey,
-          }))
-        );
-      }
+  const fileObjects = useSelector(selectCodeFileObjects);
+  fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
+    // eslint-disable-next-line guard-for-in
+    for (const currKey in file.fileJson) {
+      objResult.push(
+        ..._.entries(file.fileJson[currKey]).map((object) => ({
+          [object[0]]: object[1],
+          type: currKey,
+        }))
+      );
     }
-  );
+  });
 
   React.useEffect(() => {
     const itemsList: Item[] = [];
@@ -171,7 +170,13 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
       .map((result) => {
         const { type, ...object } = result;
         const resourceName = Object.keys(object)[0];
-        const instanceName = Object.keys(object[resourceName])[0];
+        const instanceName =
+          type === 'module' ||
+          type === 'provider' ||
+          type === 'variable' ||
+          type === 'output'
+            ? Object.keys(object)[0]
+            : Object.keys(object[resourceName])[0];
         const title = type + '-' + resourceName;
         return { type, resourceName, title, instanceName };
       })
@@ -186,7 +191,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
       });
     setItems(itemsList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history.location.pathname]);
+  }, [history.location.pathname, fileObjects]);
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on(
@@ -237,7 +242,12 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                     const { type } = cur;
                     const resourceName = Object.keys(cur)[0];
                     if (item.title === type + '-' + resourceName) {
-                      if (type === 'provider' || type === 'module') {
+                      if (
+                        type === 'provider' ||
+                        type === 'module' ||
+                        type === 'variable' ||
+                        type === 'output'
+                      ) {
                         return cur[resourceName];
                       } else {
                         return cur[resourceName][item.instanceName];
