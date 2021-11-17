@@ -2,9 +2,9 @@ import * as React from 'react';
 import Form, { FormProps } from '@rjsf/core';
 import defaultFields from './fields';
 import defaultWidgets from './widgets';
-import { ObjectFieldTemplate } from './template/ObjectFieldTemplate';
-import ArrayFieldTemplate from './template/ArrayFieldTemplate';
-import { FieldTemplate } from './template/FieldTemplate';
+import { ObjectFieldTemplate } from './templates/ObjectFieldTemplate';
+import ArrayFieldTemplate from './templates/ArrayFieldTemplate';
+import { FieldTemplate } from './templates/FieldTemplate';
 
 const DynamicForm = (props: FormProps<any>) => {
   const {

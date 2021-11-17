@@ -62,12 +62,9 @@ const DefaultArrayItem = (props: any) => {
     key,
     children,
     hasToolbar,
-    hasMoveUp,
-    hasMoveDown,
     disabled,
     readonly,
     index,
-    onReorderClick,
     onDropIndexClick,
     hasRemove,
   } = props;

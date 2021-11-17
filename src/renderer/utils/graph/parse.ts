@@ -1,25 +1,27 @@
+/* eslint-disable no-continue */
 import * as _ from 'lodash';
-import { GraphData } from 'react-force-graph-2d';
-import { LinkData, NodeData, NodeKind, ROOT } from '@renderer/types/graph';
-import AWsIcon from '../../../../assets/images/graph-provider-aws-icon.svg';
+import { GraphData, NodeObject } from 'react-force-graph-2d';
+import { LinkData, NodeData, NodeKind } from '@renderer/types/graph';
+import AWSProviderIcon from '../../../../assets/images/graph-provider-aws-icon.svg';
+import DatasourceTypeIcon from '../../../../assets/images/graph-datasource-type-icon.svg';
 import DefaultTypeIcon from '../../../../assets/images/graph-default-type-icon.svg';
 import ModuleTypeIcon from '../../../../assets/images/graph-module-type-icon.svg';
 import ResourceTypeIcon from '../../../../assets/images/graph-resource-type-icon.svg';
 
-export const nodesById = (nodes: NodeData[]) =>
+export const nodesById = (nodes: NodeObject[]) =>
   Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-const getIconImage = (type: NodeKind, name: string) => {
+const getIconImage = (type: NodeKind, name: string, dataSource?: boolean) => {
   switch (type) {
     case 'module':
       return ModuleTypeIcon;
     case 'provider':
       if (name === 'aws') {
-        return AWsIcon;
+        return AWSProviderIcon;
       }
       return DefaultTypeIcon;
     default:
-      return ResourceTypeIcon;
+      return dataSource ? DatasourceTypeIcon : ResourceTypeIcon;
   }
 };
 
@@ -28,44 +30,49 @@ const parseNodeSimpleName = (str: string, status?: string) =>
 
 const parseNodeStatus = (str: string) => str.match(/\((.*)\)/)?.pop();
 
-const parseNodeProviderName = (str: string) =>
-  str
-    .match(/\[(.*)\]/)
-    ?.pop()
-    ?.replace(/"/g, '')
-    .replace('registry.terraform.io/hashicorp/', '');
-
 const parseNodeFullName = (str: string) => {
   let simpleName = '';
   let type = '';
-  let status: string | undefined;
-  const modules: NodeKind[] = [ROOT];
+  let status;
+  let dataSource;
+  const modules = [];
 
-  const isProvider = str.startsWith('provider[');
-  if (isProvider) {
-    type = 'provider';
-    status = parseNodeStatus(str);
-    simpleName = parseNodeSimpleName(str, status);
-    const providerName = parseNodeProviderName(simpleName);
-    simpleName = providerName || simpleName;
-  } else {
-    const parts = str.split('.');
-    while (parts.length > 0) {
-      const part = parts.shift();
-      if (part) {
-        const isModule = part === 'module';
-        type = isModule ? 'module' : part;
-        const part2 = parts.shift();
-        if (part2) {
-          status = parseNodeStatus(part2);
-          simpleName = parseNodeSimpleName(part2, status);
-          isModule && simpleName && modules.push(simpleName);
-        }
+  let newStr = str;
+  if (str.includes('provider[')) {
+    newStr = str
+      .replace('["', '.')
+      .replace('"]', '')
+      .replace('registry.terraform.io/hashicorp/', '')
+      .replace('registry.terraform.io/', '');
+  }
+
+  const parts = newStr.split('.');
+  while (parts.length > 0) {
+    const part = parts.shift();
+    if (!part) {
+      continue;
+    }
+
+    // 데이터소스 일 경우
+    if (part === 'data') {
+      if (parts.length === 2) {
+        dataSource = true;
       }
+      continue;
+    }
+
+    const isModule = part === 'module';
+    type = isModule ? 'module' : part;
+
+    const part2 = parts.shift();
+    if (part2) {
+      status = parseNodeStatus(part2);
+      simpleName = parseNodeSimpleName(part2, status);
+      isModule && simpleName && modules.push(simpleName);
     }
   }
 
-  const icon = getIconImage(type, simpleName);
+  const icon = getIconImage(type, simpleName, dataSource);
 
   return {
     simpleName,
@@ -73,17 +80,17 @@ const parseNodeFullName = (str: string) => {
     status,
     modules,
     icon,
+    dataSource,
   };
 };
 
 const setNeighborElements = (gData: GraphData) => {
-  const nodes = gData.nodes as NodeData[];
   gData.links.forEach((link) => {
     const { source, target } = link;
     const sourceNode =
-      source && typeof source !== 'object' && nodesById(nodes)[source];
+      source && typeof source !== 'object' && nodesById(gData.nodes)[source];
     const targetNode =
-      target && typeof target !== 'object' && nodesById(nodes)[target];
+      target && typeof target !== 'object' && nodesById(gData.nodes)[target];
     if (sourceNode && targetNode) {
       // add neighborNodes
       sourceNode.childNodes = _.union(sourceNode.childNodes, [targetNode.id]);

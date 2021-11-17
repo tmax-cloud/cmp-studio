@@ -74,6 +74,12 @@ export class WorkspaceMainService
     return folderUri;
   }
 
+  async getFolderNameByWorkspaceId(workspaceId: string) {
+    const folderName =
+      this.workspaceManagementService.getFolderNameByWorkspaceId(workspaceId);
+    return folderName;
+  }
+
   private registerListeners() {
     ipcMain.handle(
       'studio:createNewFolderAndWorkspace',
@@ -126,6 +132,18 @@ export class WorkspaceMainService
     );
 
     ipcMain.handle(
+      'studio:getFolderNameByWorkspaceId',
+      async (
+        event,
+        arg: WorkspaceTypes.WorkspaceGetFolderUriArgs
+      ): Promise<any> => {
+        const { workspaceId } = arg;
+        const folderUri = await this.getFolderNameByWorkspaceId(workspaceId);
+        return folderUri;
+      }
+    );
+
+    ipcMain.handle(
       'studio:openExistFolder',
       async (
         event,
@@ -138,7 +156,6 @@ export class WorkspaceMainService
           ) {
             const uid = await this.getWorkspaceMetaOfExistFolder(folderUri);
             this.workspacesHistoryService.addWorkspaceToStorage(folderUri);
-            // TODO : 지금은 uid만 반환해주는데 열리는 부분은 어떻게 처리하지? win size도 바꿔줘야 함
             return {
               status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
               data: { uid },

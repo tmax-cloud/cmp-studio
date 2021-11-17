@@ -28,7 +28,7 @@ import {
   setSelectedObjectInfo,
 } from '@renderer/features/codeSlice';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
-import parseJson from '../form/utils/json2JsonSchemaParser';
+import parseJson from './state/form/utils/json2JsonSchemaParser';
 import { ModuleImportModal } from './modal';
 
 const getIcon = (type: string) => {

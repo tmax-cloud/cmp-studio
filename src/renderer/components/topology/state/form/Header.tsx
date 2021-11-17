@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as _ from 'lodash-es';
 import { IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { getIcon } from '../../topology/TopologySidebar';
+import { getIcon } from '../../TopologySidebar';
 
 const FormHeader = (props: FormHeaderProps) => {
   const { toggleSidePanel, title } = props;

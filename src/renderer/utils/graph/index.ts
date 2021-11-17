@@ -15,33 +15,7 @@ import {
   getBgColor,
 } from './draw';
 
-export const getModuleNodeByName = (
-  gData: GraphData,
-  name: string
-): NodeData | undefined =>
-  gData.nodes.find(
-    (node) =>
-      (node as NodeData).type === 'module' &&
-      (node as NodeData).simpleName === name
-  ) as NodeData;
-
-/*export const getPrunedGraph = (
-  gData: GraphData,
-  id: number | string
-): GraphData => {
-  const visibleNodes = new Set<NodeData>();
-  const visibleLinks = new Set<LinkData>();
-  traverseGraph(gData.nodes, id, (node) => {
-    visibleNodes.add(node);
-    if (!node.childLinks) {
-      return;
-    }
-    node.childLinks.forEach((childLink: LinkData) => {
-      visibleLinks.add(childLink);
-    });
-  });
-  return { nodes: [...visibleNodes], links: [...visibleLinks] };
-};*/
+export const QUICK_START = 'CMP Studio 시작하기';
 
 /*export const getModulePath = (gData: GraphData): ModulePath[] => {
   const modulePaths: ModulePath[] = [];
@@ -92,6 +66,7 @@ export const getGraphData = async (
 ): Promise<GraphData> => {
   const tfGraph = await getTerraformGraphData(workspaceUid);
   const rawGraph = await getRawGraph(tfGraph);
+  //console.log('## raw data: ', rawGraph);
   const graph = getRefinedGraph(rawGraph);
   //console.log('graph data: ', graph);
   //console.log('path: ', getModulePath(graph));
@@ -114,19 +89,16 @@ export const hasLink = (links: LinkObject[], link: LinkObject) => {
   return !!_.find(links, { source, target });
 };
 
-export const sethighlightElements = (
-  nodes: NodeData[],
-  id: string | number
-) => {
-  const highlightNodes: NodeData[] = [];
-  const highlightLinks: LinkData[] = [];
+export const getPrunedGraph = (nodes: NodeObject[], id: string | number) => {
+  const newNodes = new Set<NodeData>();
+  const newLinks = new Set<LinkData>();
   (function traverse(n = nodesById(nodes)[id]) {
     if (!n) {
       return;
     }
-    highlightNodes.push(n);
+    newNodes.add(n);
     n.childNodes?.forEach((child: string | number) => {
-      highlightLinks.push({ source: n.id, target: child });
+      newLinks.add({ source: n.id, target: child });
     });
     if (n.childNodes) {
       [...n.childNodes]
@@ -136,8 +108,19 @@ export const sethighlightElements = (
         .forEach(traverse);
     }
   })();
-  return { highlightNodes, highlightLinks };
+  return {
+    nodes: [...newNodes],
+    links: [...newLinks],
+  };
 };
+
+export const getModuleNodeByName = (
+  nodes: NodeObject[],
+  name: string
+): NodeData | undefined =>
+  (nodes as NodeData[]).find(
+    (node) => node.type === 'module' && node.simpleName === name
+  ) as NodeData;
 
 export const drawNode = (
   ctx: CanvasRenderingContext2D,
@@ -148,11 +131,11 @@ export const drawNode = (
 ) => {
   const x = node?.x || 0;
   const y = node?.y || 0;
-  const lineWidth = kind === 'focus' ? 2 : 1;
+  const lineWidth = kind === 'selected' ? 2 : 1;
   const opacity = kind === 'blur' ? 0.5 : 1;
   const bgColor = getBgColor(kind);
   const strokeColor = getStrokeColor(kind);
-  const shadow = kind === 'focus' || kind === 'highlight';
+  const shadow = kind === 'hover';
 
   drawRoundRect(
     ctx,
@@ -167,16 +150,11 @@ export const drawNode = (
     shadow
   );
 
-  const cirlceSize = 16;
-  const iconColor = getIconColor(node.type, opacity);
+  const cirlceSize = 12;
+  const iconColor = getIconColor(opacity, node.type, node.dataSource);
+  drawCircle(ctx, x, y - cirlceSize / 2, cirlceSize, iconColor);
+  drawImage(ctx, node.icon, x - cirlceSize / 2, y - cirlceSize, cirlceSize);
+
   const padding = 4;
-  drawCircle(ctx, x, y - padding, cirlceSize, iconColor);
-  drawImage(
-    ctx,
-    node.icon,
-    x - cirlceSize / 2,
-    y - cirlceSize + padding,
-    cirlceSize
-  );
   drawTexts(ctx, node.simpleName, x, y + cirlceSize + padding, w - padding * 2);
 };

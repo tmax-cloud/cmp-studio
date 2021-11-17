@@ -115,23 +115,32 @@ export const drawTexts = (
   ctx.fillText(newText, x, y);
 };
 
-export const getIconColor = (type: NodeKind, opacity: number) => {
+export const getIconColor = (
+  opacity: number,
+  type: NodeKind,
+  dataSource?: boolean
+) => {
   switch (type) {
     case 'module':
       return `rgba(255, 173, 48, ${opacity})`;
     case 'provider':
       return `rgba(255, 87, 134, ${opacity})`;
-    case 'datasource':
-      return `rgba(144, 157, 255, ${opacity})`;
     default:
+      if (dataSource) {
+        return `rgba(144, 157, 255, ${opacity})`; // datasource
+      }
       return `rgba(0, 183, 189, ${opacity})`; // resource
   }
 };
 
 export const getBgColor = (kind: DrawingKind) => {
   switch (kind) {
-    case 'focus':
+    case 'selected':
+      return '#D6E4FC';
+    case 'hover':
       return '#F6F7F9';
+    case 'drag':
+      return '#B4CDF8';
     default:
       return '#FFF';
   }
@@ -139,11 +148,13 @@ export const getBgColor = (kind: DrawingKind) => {
 
 export const getStrokeColor = (kind: DrawingKind) => {
   switch (kind) {
-    case 'focus':
+    case 'selected':
       return '#1968EC';
+    case 'drag':
+      return 'rgba(25, 104, 236, 0.20)';
     default:
       return 'rgba(201, 207, 219, 0.5)';
   }
 };
 
-export type DrawingKind = 'normal' | 'focus' | 'highlight' | 'blur';
+export type DrawingKind = 'normal' | 'selected' | 'hover' | 'blur' | 'drag';

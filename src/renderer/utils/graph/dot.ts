@@ -3,7 +3,7 @@
 import Viz from 'viz.js';
 import { Module, render } from 'viz.js/full.render.js';
 import { GraphData } from 'react-force-graph-2d';
-import { LinkData, NodeData, ROOT } from '@renderer/types/graph';
+import { LinkData, NodeData, ROOT_NAME } from '@renderer/types/graph';
 
 const parseDOT = async (src: string): Promise<object> => {
   const viz = new Viz({ Module, render });
@@ -14,7 +14,7 @@ const parseDOT = async (src: string): Promise<object> => {
 
 const getRawNode = (jsonObject: any): NodeData[] => {
   return jsonObject.objects
-    ?.filter((node: any) => node.name !== ROOT)
+    ?.filter((node: any) => node.name !== ROOT_NAME)
     .map((node: any) => {
       const fullName = node.name.replace('[root] ', '');
       return { id: node._gvid, fullName };

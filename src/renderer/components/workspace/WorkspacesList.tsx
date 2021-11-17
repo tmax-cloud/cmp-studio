@@ -17,8 +17,6 @@ import {
   removeWorkspaceHistoryItem,
 } from '../../utils/ipc/workspaceIpcUtils';
 
-// TODO : 검색 구현하기
-
 const useStyles = makeStyles<Theme>((theme) =>
   createStyles({
     searchBarContainer: {

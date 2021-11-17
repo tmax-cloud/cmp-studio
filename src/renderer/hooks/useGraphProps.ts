@@ -11,28 +11,42 @@ import {
   drawNode,
   hasLink,
   hasNode,
-  sethighlightElements,
+  getPrunedGraph,
 } from '@renderer/utils/graph';
 import { DrawingKind } from '@renderer/utils/graph/draw';
-import { useAppSelector } from '@renderer/app/store';
-import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import {
+  selectSelectedData,
+  selectSelectedModule,
+  selectSelectedNode,
+} from '@renderer/features/graphSliceInputSelectors';
+import {
+  setSelectedData,
+  setSelectedModule,
+  setSelectedNode,
+} from '@renderer/features/graphSlice';
 
 const initialConfig: GraphConfig = {
   isMounted: false,
   zoomLevel: 1,
+  dragNode: null,
   hoverNode: null,
   highlightNodes: [],
   highlightLinks: [],
-  nodeDrawingkind: 'normal',
-  linkDrawingkind: 'normal',
+  clickCount: 0,
 };
 
 const NODE_RADIUS = 30;
 
 export const useGraphProps = () => {
   const graphRef = React.useRef<ForceGraphMethods>();
-  const graphData = useAppSelector(selectGraphData);
   const configRef = React.useRef<GraphConfig>(initialConfig);
+
+  const graphData = useAppSelector(selectSelectedData);
+  const selectedNode = useAppSelector(selectSelectedNode);
+  const selectedModule = useAppSelector(selectSelectedModule);
+
+  const dispatch = useAppDispatch();
 
   const nodeLabel = (obj: NodeObject) => {
     const node = obj as NodeData;
@@ -46,34 +60,45 @@ export const useGraphProps = () => {
     const node = obj as NodeData;
     const width = NODE_RADIUS * 2;
     const height = NODE_RADIUS * 2;
-    let { nodeDrawingkind } = configRef.current;
-    if (nodeDrawingkind !== 'normal') {
-      if (!hasNode(configRef.current.highlightNodes, node)) {
-        nodeDrawingkind = 'blur';
-      }
-      if (node === configRef.current.hoverNode) {
-        nodeDrawingkind = 'focus';
-      }
+    const { dragNode, hoverNode, highlightNodes } = configRef.current;
+    let drawingKind: DrawingKind = 'normal';
+    if (hoverNode) {
+      drawingKind = hasNode(highlightNodes, node) ? 'hover' : 'blur';
     }
-    drawNode(ctx, node, nodeDrawingkind, width, height);
+    if (node.id === selectedNode?.id) {
+      drawingKind = 'selected';
+    }
+    if (node === dragNode) {
+      drawingKind = 'drag';
+    }
+    drawNode(ctx, node, drawingKind, width, height);
   };
 
   const linkVisibility = (link: LinkObject) => {
-    return configRef.current.linkDrawingkind === 'normal'
-      ? true
-      : hasLink(configRef.current.highlightLinks, link);
+    if (!configRef.current.hoverNode) {
+      return true;
+    }
+    return hasLink(configRef.current.highlightLinks, link);
   };
 
   const linkWidth = (link: LinkObject) => {
     return hasLink(configRef.current.highlightLinks, link) ? 5 : 1;
   };
 
+  const linkColor = (link: LinkObject) => {
+    return '#d3d3d3';
+  };
+
+  const linkDirectionalArrowColor = (link: LinkObject) => {
+    return '#bababa';
+  };
+
   const handleZoomIn = () => {
-    graphRef.current?.zoom(configRef.current.zoomLevel + 1, 500);
+    graphRef.current?.zoom(configRef.current.zoomLevel + 0.1, 500);
   };
 
   const handleZoomOut = () => {
-    graphRef.current?.zoom(configRef.current.zoomLevel - 1, 500);
+    graphRef.current?.zoom(configRef.current.zoomLevel - 0.1, 500);
   };
 
   const handleZoomEnd = (transform: { k: number; x: number; y: number }) => {
@@ -86,6 +111,35 @@ export const useGraphProps = () => {
     graphRef.current?.zoomToFit(500);
   };
 
+  const handleNodeDoubleClick = (node: NodeData) => {
+    if (node && node.id && node.type === 'module') {
+      const newData = getPrunedGraph(graphData.nodes, node.id);
+      const selectedPath = selectedModule?.modules.join('/');
+      const newPath = node.modules?.join('/');
+      if (selectedPath !== newPath) {
+        dispatch(setSelectedData(newData));
+        dispatch(setSelectedModule(node));
+        dispatch(setSelectedNode(null));
+      }
+    }
+  };
+
+  const handleNodeClick = (obj: NodeObject, event: MouseEvent) => {
+    const node = obj as NodeData;
+
+    configRef.current.clickCount += 1;
+    setTimeout(() => {
+      if (configRef.current.clickCount === 2) {
+        handleNodeDoubleClick(node);
+      }
+      configRef.current.clickCount = 0;
+    }, 300);
+
+    if (selectedNode?.id !== node.id) {
+      dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
+    }
+  };
+
   const handleNodeHover = (
     obj: NodeObject | null,
     previousNode: NodeObject | null
@@ -93,22 +147,33 @@ export const useGraphProps = () => {
     graphRef.current?.d3ReheatSimulation(); // redraw
     const node = obj as NodeData;
     if (node && node.id) {
-      const { highlightNodes, highlightLinks } = sethighlightElements(
-        graphData.nodes,
-        node.id
-      );
+      const { nodes, links } = getPrunedGraph(graphData.nodes, node.id);
       configRef.current.hoverNode = node || null;
-      configRef.current.highlightNodes = _.uniqWith(highlightNodes, _.isEqual);
-      configRef.current.highlightLinks = _.uniqWith(highlightLinks, _.isEqual);
-      configRef.current.nodeDrawingkind = 'highlight';
-      configRef.current.linkDrawingkind = 'highlight';
+      configRef.current.highlightNodes = nodes;
+      configRef.current.highlightLinks = links;
     } else {
       configRef.current.hoverNode = null;
       configRef.current.highlightNodes = [];
       configRef.current.highlightLinks = [];
-      configRef.current.nodeDrawingkind = 'normal';
-      configRef.current.linkDrawingkind = 'normal';
     }
+  };
+
+  const handleNodeDrag = (
+    obj: NodeObject,
+    translate: { x: number; y: number }
+  ) => {
+    const node = obj as NodeData;
+    configRef.current.dragNode = node;
+    dispatch(setSelectedNode(null));
+  };
+
+  const handleNodeDragEnd = (
+    obj: NodeObject,
+    translate: { x: number; y: number }
+  ) => {
+    const node = obj as NodeData;
+    configRef.current.dragNode = null;
+    dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
   };
 
   const handleEngineTick = () => {
@@ -136,6 +201,8 @@ export const useGraphProps = () => {
     nodeCanvasObject,
     linkVisibility,
     linkWidth,
+    linkColor,
+    linkDirectionalArrowColor,
     linkDirectionalArrowLength: 5,
     linkDirectionalArrowRelPos: 1,
     linkCurvature: 0.25,
@@ -147,7 +214,10 @@ export const useGraphProps = () => {
     onEngineTick: handleEngineTick,
     onEngineStop: handleEngineStop,
     onZoomEnd: handleZoomEnd,
+    onNodeClick: handleNodeClick,
     onNodeHover: handleNodeHover,
+    onNodeDrag: handleNodeDrag,
+    onNodeDragEnd: handleNodeDragEnd,
   };
 
   const graphHandler = {
@@ -164,9 +234,9 @@ type DagMode = 'td' | 'bu' | 'lr' | 'rl' | 'radialout' | 'radialin';
 interface GraphConfig {
   isMounted: boolean;
   zoomLevel: number;
+  dragNode: NodeData | null;
   hoverNode: NodeData | null;
   highlightNodes: NodeData[];
   highlightLinks: LinkData[];
-  nodeDrawingkind: DrawingKind;
-  linkDrawingkind: DrawingKind;
+  clickCount: number;
 }

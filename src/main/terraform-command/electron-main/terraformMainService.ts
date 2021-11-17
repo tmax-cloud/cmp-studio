@@ -10,6 +10,7 @@ import {
   TerraformInitArgs,
   TerraformVersionArgs,
   TerraformCheckExeArgs,
+  TerraformPlanArgs,
 } from '../common/terraform';
 import {
   WorkspaceIdentifier,
@@ -161,6 +162,7 @@ export class TerraformMainService {
         graphData += chunk;
         // graphData += iconv.decode(chunk, 'euc-kr');
       }
+      console.log('graphData: ', graphData);
 
       let graphError = '';
       for await (const chunk of graphCmd.stderr) {
@@ -176,6 +178,39 @@ export class TerraformMainService {
         reject(graphError);
       }
       resolve(graphData);
+    });
+  }
+
+  doTerraformPlan(folderUri: string, tfExePath: string): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+      const appTfExePath = this.appConfigurationMainService.getItem(
+        TERRAFORM_EXE_PATH_KEY
+      );
+      const tfPlanCmd = spawn(
+        `"${appTfExePath}" -chdir="${folderUri}" plan -no-color`,
+        {
+          shell: true,
+        }
+      );
+      let planData = '';
+      for await (const chunk of tfPlanCmd.stdout) {
+        planData += chunk;
+        // graphData += iconv.decode(chunk, 'euc-kr');
+      }
+
+      let planError = '';
+      for await (const chunk of tfPlanCmd.stderr) {
+        planError += chunk;
+      }
+
+      const planExitCode = await new Promise((resolve, reject) => {
+        tfPlanCmd.on('close', resolve);
+      });
+
+      if (planExitCode) {
+        reject(planError);
+      }
+      resolve(planData);
     });
   }
 
@@ -280,6 +315,31 @@ export class TerraformMainService {
         } catch (message: any) {
           return {
             status: TerraformStatusType.ERROR,
+            data: { message },
+          };
+        }
+      }
+    );
+    ipcMain.handle(
+      'studio:getTerraformPlan',
+      async (event, arg: TerraformPlanArgs): Promise<TerraformResponse> => {
+        const { workspaceUid } = arg;
+
+        const workspaceConfig: WorkspaceIdentifier =
+          this.workspaceMainService.workspaceManagementService.getWorkspaceConfig(
+            workspaceUid
+          );
+
+        const folderUri = workspaceConfig.workspaceRealPath;
+        try {
+          const planData: string = await this.doTerraformPlan(folderUri, '');
+          return {
+            status: TerraformStatusType.SUCCESS,
+            data: { planData },
+          };
+        } catch (message: any) {
+          return {
+            status: TerraformStatusType.ERROR_PLAN,
             data: { message },
           };
         }
