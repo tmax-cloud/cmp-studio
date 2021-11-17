@@ -2,10 +2,14 @@ import * as React from 'react';
 import * as _ from 'lodash-es';
 import { IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import { useAppDispatch } from '@renderer/app/store';
+import { setSidePanel } from '@renderer/features/uiSlice';
 import { getIcon } from '../../TopologySidebar';
 
 const FormHeader = (props: FormHeaderProps) => {
-  const { toggleSidePanel, title } = props;
+  const { title } = props;
+  const dispatch = useAppDispatch();
+
   return (
     <div
       style={{
@@ -20,7 +24,7 @@ const FormHeader = (props: FormHeaderProps) => {
       <IconButton
         aria-label="Close"
         onClick={() => {
-          toggleSidePanel(false);
+          dispatch(setSidePanel(false));
         }}
       >
         <Close />
@@ -30,7 +34,6 @@ const FormHeader = (props: FormHeaderProps) => {
 };
 
 type FormHeaderProps = {
-  toggleSidePanel: any;
   title: string;
 };
 

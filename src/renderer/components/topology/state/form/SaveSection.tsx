@@ -12,6 +12,7 @@ import {
 } from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import { setFileObjects } from '@renderer/features/codeSlice';
+import { setSidePanel } from '@renderer/features/uiSlice';
 import { setTerraformState } from '@renderer/features/commonSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
 
@@ -41,7 +42,7 @@ const useStyles = makeStyles({
 });
 
 const SaveSection = (props: SaveSectionProps) => {
-  const { saveLabel, cancelLabel, toggleSidePanel, formState } = props;
+  const { saveLabel, cancelLabel, formState } = props;
   const classes = useStyles();
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const objectId = useAppSelector(selectCodeSelectedObjectInfoId);
@@ -78,7 +79,7 @@ const SaveSection = (props: SaveSectionProps) => {
       return cur;
     });
     dispatch(setFileObjects(newFileObjects));
-    toggleSidePanel(false);
+    dispatch(setSidePanel(false));
   };
 
   return (
@@ -90,7 +91,7 @@ const SaveSection = (props: SaveSectionProps) => {
         <Button
           className={classes.cancelBtn}
           variant="outlined"
-          onClick={() => toggleSidePanel(false)}
+          onClick={() => dispatch(setSidePanel(false))}
         >
           {cancelLabel || '취소'}
         </Button>
@@ -160,7 +161,6 @@ const SaveSection = (props: SaveSectionProps) => {
 type SaveSectionProps = {
   saveLabel: string;
   cancelLabel: string;
-  toggleSidePanel: any;
   formState: any;
 };
 

@@ -38,12 +38,7 @@ const EditorTab = (props: EditorTabProps) => {
         />
       </div>
       <AddFieldSection formData={formData} />
-      <SaveSection
-        saveLabel="저장"
-        cancelLabel="취소"
-        toggleSidePanel={toggleSidePanel}
-        formState={formState}
-      />
+      <SaveSection saveLabel="저장" cancelLabel="취소" formState={formState} />
     </>
   );
 };
@@ -52,7 +47,6 @@ type EditorTabProps = {
   schema: any;
   formData: any;
   uiSchema: any;
-  toggleSidePanel: any;
 };
 
 export default EditorTab;

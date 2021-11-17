@@ -18,7 +18,8 @@ import {
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+// import { useSelector, useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
@@ -33,6 +34,8 @@ import {
   setSelectedObjectInfo,
   setFileObjects,
 } from '../../features/codeSlice';
+import { setSidePanel } from '../../features/uiSlice';
+
 import { setWorkspaceUid } from '../../features/commonSlice';
 import CreateWorkspaceModal from '../workspace/CreateWorkspaceModal';
 import StudioTheme from '../../theme';
@@ -111,15 +114,14 @@ interface Item {
   type: string;
 }
 
-const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
-  const { setIsSidePanelOpen } = props;
+const TopologySidebar = () => {
   const classes = useStyles();
   const history = useHistory();
   const [items, setItems] = React.useState<Item[]>([]);
   const [prjContextMenuOpen, setPrjContextMenuOpen] = React.useState(false);
   const [prjAnchorEl, setPrjAnchorEl] = React.useState(null);
   const [tabIndex, setTabIndex] = React.useState(0);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const handleTabChange = (event: any, newValue: number) => {
     setTabIndex(newValue);
   };
@@ -151,7 +153,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
   const objResult: any[] = [];
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
-  const fileObjects = useSelector(selectCodeFileObjects);
+  const fileObjects = useAppSelector(selectCodeFileObjects);
   fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
     // eslint-disable-next-line guard-for-in
     for (const currKey in file.fileJson) {
@@ -261,7 +263,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                   };
 
                   dispatch(setSelectedObjectInfo(object));
-                  setIsSidePanelOpen((currState: boolean) => true);
+                  dispatch(setSidePanel(true));
                 }}
               >
                 {item.resourceName}
@@ -374,11 +376,5 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
     </>
   );
 };
-type TopologySidebarProps = {
-  setIsSidePanelOpen: any;
-};
 
 export default TopologySidebar;
-function doSomething(key: any) {
-  throw new Error('Function not implemented.');
-}
