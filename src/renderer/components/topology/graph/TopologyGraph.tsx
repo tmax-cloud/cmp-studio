@@ -9,8 +9,8 @@ import { useAppSelector } from '@renderer/app/store';
 import { useGraphData, useGraphInitOutput } from '@renderer/hooks/useGraphData';
 import {
   selectErrorMsg,
-  selectGraphData,
   selectLoadingMsg,
+  selectSelectedData,
 } from '@renderer/features/graphSliceInputSelectors';
 import { INIT_FINISHED } from '@renderer/utils/graph/terraform';
 import Box from '@mui/material/Box';
@@ -20,8 +20,8 @@ import { GraphLoadingModal } from '../modal';
 const TopologyGraph = (props: TopologyGraphProps) => {
   const { width, height, graphRef, graphOptions } = props;
 
-  const originGraphData = useAppSelector(selectGraphData);
-  const graphData = useGraphData(originGraphData);
+  const selectedData = useAppSelector(selectSelectedData);
+  const graphData = useGraphData(selectedData);
 
   const initOutputMsg = useGraphInitOutput();
   const loadingMsg = useAppSelector(selectLoadingMsg);
