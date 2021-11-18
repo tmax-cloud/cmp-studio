@@ -6,6 +6,7 @@ import { useGraphProps } from '@renderer/hooks/useGraphProps';
 import { fetchGraphData } from '@renderer/features/graphSlice';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
+import { selectUiToggleSidePanel } from '@renderer/features/uiSliceInputSelectors';
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 import TopologyToolbar from './toolbar/TopologyToolbar';
@@ -35,8 +36,8 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
 );
 
 export const TopologyPage = () => {
-  const [isSidePanelOpen, setIsSidePanelOpen] = React.useState(false);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
+  const isSidePanelOpen = useAppSelector(selectUiToggleSidePanel);
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
@@ -44,7 +45,7 @@ export const TopologyPage = () => {
   }, [dispatch, workspaceUid]);
 
   if (!localStorage.getItem('schemaJson')) {
-    const schemaJson = parseJson('aws');
+    const schemaJson = parseJson(['aws', 'tls']);
     setSchemaMap(JSON.stringify(Array.from(schemaJson.entries())));
   }
   const { graphRef, graphOption, graphHandler } = useGraphProps();
@@ -54,7 +55,7 @@ export const TopologyPage = () => {
   return (
     <TopologyLayoutRoot>
       <Box sx={{ width: SIDEBAR_WIDTH }}>
-        <TopologySidebar setIsSidePanelOpen={setIsSidePanelOpen} />
+        <TopologySidebar />
       </Box>
       <Box
         sx={{
@@ -66,10 +67,7 @@ export const TopologyPage = () => {
         <TopologyToolbar handlers={graphHandler} />
         <div className={classes.topologyLayoutWrapper}>
           <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
-          <TopologySidePanel
-            isSidePanelOpen={isSidePanelOpen}
-            toggleSidePanel={setIsSidePanelOpen}
-          />
+          <TopologySidePanel />
         </div>
       </Box>
     </TopologyLayoutRoot>
