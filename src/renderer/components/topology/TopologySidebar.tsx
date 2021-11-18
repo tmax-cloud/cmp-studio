@@ -169,6 +169,22 @@ const TopologySidebar = () => {
   React.useEffect(() => {
     const itemsList: Item[] = [];
     objResult
+      .filter((result) => {
+        const { type, ...object } = result;
+        const resourceName = Object.keys(object)[0];
+        const instanceName =
+          type === 'module' ||
+          type === 'provider' ||
+          type === 'variable' ||
+          type === 'output'
+            ? Object.keys(object)[0]
+            : Object.keys(object[resourceName])[0];
+        if (instanceName) {
+          return true;
+        } else {
+          return false;
+        }
+      })
       .map((result) => {
         const { type, ...object } = result;
         const resourceName = Object.keys(object)[0];
@@ -179,7 +195,7 @@ const TopologySidebar = () => {
           type === 'output'
             ? Object.keys(object)[0]
             : Object.keys(object[resourceName])[0];
-        const title = type + '-' + resourceName;
+        const title = type + '/' + resourceName;
         return { type, resourceName, title, instanceName };
       })
       .forEach((i: Item) => {
@@ -243,7 +259,7 @@ const TopologySidebar = () => {
                   const content = objResult.filter((cur: any) => {
                     const { type } = cur;
                     const resourceName = Object.keys(cur)[0];
-                    if (item.title === type + '-' + resourceName) {
+                    if (item.title === type + '/' + resourceName) {
                       if (
                         type === 'provider' ||
                         type === 'module' ||

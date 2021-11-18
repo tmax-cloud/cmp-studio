@@ -54,31 +54,41 @@ const SaveSection = (props: SaveSectionProps) => {
 
   const onDeleteObject = () => {
     const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
-      if (_.get(cur.fileJson, objectId.split('-').join('.'))) {
+      if (_.get(cur.fileJson, objectId.split('/').join('.'))) {
         return true;
       } else {
         return false;
       }
     });
-    const [type, resourceName] = objectId.split('-');
+    const [type, resourceName] = objectId.split('/');
     const newFileObjects = fileObjects.map((cur: any, idx: number) => {
-      // const deletedObject = _.defaultsDeep(cur.fileJson[type]);
-      // if (idx === fileIdx) {
-      //   delete deletedObject[resourceName];
-      // }
-      // return deletedObject;
       if (idx === fileIdx) {
-        const newObject = Object.entries(cur.fileJson[type])
-          .filter(([key, value]) => key !== resourceName)
-          .reduce((obj, item) => {
-            return { ...obj, [item[0]]: item[1] };
-          }, {});
-
-        return { ...cur, fileJson: { fileJson: { [type]: newObject } } };
+        if (_.size(cur.fileJson) > 1) {
+          // 타입이 여러개인 경우 (상관 안해도 됨.)
+          if (_.size(cur.fileJson[type]) > 1) {
+            return _.omit(cur, [`fileJson.${type}.${resourceName}`]);
+          }
+          return _.omit(cur, [`fileJson.${type}`]);
+        } else {
+          // 타입이 하나인 경우 (해당 타입의 리소스가 없을 경우에 대해 분기 처리 해줘야함.)
+          if (_.size(cur.fileJson[type]) > 1) {
+            // 리소스가 여러개인 경우 (상관 없음
+            return _.omit(cur, [`fileJson.${type}.${resourceName}`]);
+          }
+          //리소스가 하나인 경우
+          return null;
+        }
       }
       return cur;
     });
-    dispatch(setFileObjects(newFileObjects));
+
+    dispatch(
+      setFileObjects(
+        newFileObjects[fileIdx] === null
+          ? _.without(newFileObjects, newFileObjects[fileIdx])
+          : newFileObjects
+      )
+    );
     dispatch(setSidePanel(false));
   };
 

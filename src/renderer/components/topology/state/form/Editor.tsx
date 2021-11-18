@@ -7,7 +7,7 @@ import DynamicForm from './index';
 import AddFieldSection from './AddFieldSection';
 
 const EditorTab = (props: EditorTabProps) => {
-  const { schema, formData, uiSchema, toggleSidePanel } = props;
+  const { schema, formData, uiSchema } = props;
 
   const [formState, setFormState] = React.useState(formData);
   const resoureId = useAppSelector(selectCodeSelectedObjectInfoId);
