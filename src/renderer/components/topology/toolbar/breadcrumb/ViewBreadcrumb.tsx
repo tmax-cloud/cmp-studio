@@ -2,6 +2,17 @@ import * as React from 'react';
 import { Box, Breadcrumbs, Link, Tooltip, Typography } from '@mui/material';
 import FolderIcon from '@mui/icons-material/Folder';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import {
+  selectGraphData,
+  selectSelectedModule,
+} from '@renderer/features/graphSliceInputSelectors';
+import {
+  setSelectedData,
+  setSelectedModule,
+  setSelectedNode,
+} from '@renderer/features/graphSlice';
+import { getModuleNodeByName, getPrunedGraph } from '@renderer/utils/graph';
 
 const ViewLink = (props: ViewLinkProps) => {
   const { text, onClick } = props;
@@ -44,11 +55,29 @@ const ViewText = (props: ViewTextProps) => {
 const ViewBreadcrumbs = (props: ViewBreadcrumbProps) => {
   const { workspaceName } = props;
 
+  const paths = useAppSelector(selectSelectedModule)?.modules || [];
+  const graphData = useAppSelector(selectGraphData);
+
+  const dispatch = useAppDispatch();
+
   const handleClick = (event: React.MouseEvent<any>) => {
     event.preventDefault();
+    const name = (event.target as HTMLElement).innerText;
+    const selectedModule = getModuleNodeByName(graphData.nodes, name);
+    if (selectedModule && selectedModule.id) {
+      const selectedData = getPrunedGraph(graphData.nodes, selectedModule.id);
+      dispatch(setSelectedData(selectedData));
+      dispatch(setSelectedNode(null));
+      dispatch(setSelectedModule(selectedModule));
+    }
   };
 
-  const paths: string[] = [];
+  const handleRootClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    dispatch(setSelectedData(graphData));
+    dispatch(setSelectedNode(null));
+    dispatch(setSelectedModule(null));
+  };
 
   const root = !!workspaceName
     ? workspaceName
@@ -68,17 +97,15 @@ const ViewBreadcrumbs = (props: ViewBreadcrumbProps) => {
         sx={{ p: 1 }}
       >
         {paths.length === 0 ? (
-          <ViewText key="path-root" text={root} />
+          <ViewText key={root} text={root} />
         ) : (
-          <ViewLink key="path-root" text={root} onClick={handleClick} />
+          <ViewLink key={root} text={root} onClick={handleRootClick} />
         )}
         {paths.map((path, index) => {
           if (index === paths.length - 1) {
-            return <ViewText key={`path-${index}`} text={path} />;
+            return <ViewText key={path} text={path} />;
           }
-          return (
-            <ViewLink key={`path-${index}`} text={path} onClick={handleClick} />
-          );
+          return <ViewLink key={path} text={path} onClick={handleClick} />;
         })}
       </Breadcrumbs>
     </Box>

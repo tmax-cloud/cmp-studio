@@ -53,7 +53,7 @@ const GraphLoadingModal = (props: GraphLoadingModalProps) => {
 export interface GraphLoadingModalProps {
   isOpen: boolean;
   initMsg?: string;
-  loadingMsg?: string;
+  loadingMsg: string | null;
 }
 
 export default GraphLoadingModal;
