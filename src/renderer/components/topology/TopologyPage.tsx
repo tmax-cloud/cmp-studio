@@ -47,7 +47,7 @@ export const TopologyPage = () => {
   }, [dispatch, workspaceUid]);
 
   if (!localStorage.getItem('schemaJson')) {
-    const schemaJson = parseJson('aws');
+    const schemaJson = parseJson(['aws', 'tls']);
     setSchemaMap(JSON.stringify(Array.from(schemaJson.entries())));
   }
   const { graphRef, graphOption, graphHandler } = useGraphProps();
