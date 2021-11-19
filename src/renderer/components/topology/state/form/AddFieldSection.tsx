@@ -76,7 +76,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                   setAdditionalSchema(e.target.value);
                 }}
               >
-                {sourceSchema &&
+                {!_.isEmpty(sourceSchema) &&
                   Object.keys(sourceSchema?.properties).map((cur) => (
                     <MenuItem key={cur} value={cur}>
                       {cur}

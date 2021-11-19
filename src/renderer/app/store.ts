@@ -10,7 +10,7 @@ import uiReducer from '../features/uiSlice';
 
 const rootPersistConfig = {
   key: 'root',
-  blacklist: ['code', 'graph'],
+  blacklist: ['code', 'graph', 'ui'],
   storage,
 };
 
