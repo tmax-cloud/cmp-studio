@@ -37,19 +37,21 @@ const preDefinedFileObjects = (
       const makePath = prevPath
         ? `${prevPath}.properties.${currKey}`
         : `properties.${currKey}`;
+      const changedProperty = _.last(makePath.split('.')) as string;
+      const prefix = makePath.replace(changedProperty, '');
+      const customPath =
+        prefix +
+        specialKey({
+          resourceType,
+          resourceName,
+          instanceName,
+          propertyName: currKey,
+        });
 
       const setSchema = (fixedValue: SchemaField, propertyType: string) => {
-        const changedProperty = _.last(makePath.split('.')) as string;
-        const prefix = makePath.replace(changedProperty, '');
-        const customPath =
-          prefix +
-          specialKey({
-            resourceType,
-            resourceName,
-            instanceName,
-            propertyName: currKey,
-          });
         if (propertyType === 'object' || propertyType === 'map') {
+          _.set(jsonSchema, customPath, _.get(jsonSchema, makePath));
+          _.omit(jsonSchema, [`${makePath}`]);
           _.set(customizedSchema, customPath, fixedValue);
         } else {
           _.set(customizedSchema, makePath, fixedValue);
@@ -106,7 +108,7 @@ const preDefinedFileObjects = (
         'properties' in _.get(jsonSchema, makePath)
       ) {
         setSchema(_.get(jsonSchema, makePath), 'object');
-        makeCustomizedSchema(obj[currKey], makePath);
+        makeCustomizedSchema(obj[currKey], customPath);
       } else if (_.get(jsonSchema, makePath + '.type') === 'map') {
         setSchema(
           {

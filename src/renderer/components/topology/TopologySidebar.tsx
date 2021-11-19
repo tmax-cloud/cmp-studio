@@ -39,6 +39,8 @@ import TopologyLibrary from './TopologyLibrary';
 import {
   setSelectedObjectInfo,
   setFileObjects,
+  setMapObjectTypeCollection,
+  setFileSchema,
 } from '../../features/codeSlice';
 import { setSidePanel } from '../../features/uiSlice';
 
@@ -142,9 +144,11 @@ const TopologySidebar = () => {
         if (uid) {
           const projectJsonRes = await getProjectJson(args);
           const terraformSchemaMap = getSchemaMap();
+          const mapObjectTypeCollection = {};
 
           const parse = (fileObjects: any[]) => {
-            fileObjects.map((fileObject: any) => {
+            return fileObjects.map((fileObject: any) => {
+              let result: any = {};
               _.toPairs(fileObject.fileJson).forEach(
                 ([resourceType, resource]: [string, any]) => {
                   _.toPairs(resource).forEach(
@@ -167,20 +171,49 @@ const TopologySidebar = () => {
                           resourceName,
                           Object.keys(resourceValue as any)[0]
                         );
-                      console.log(
-                        'id',
-                        id,
-                        '=> ',
-                        mapObjectTypeList,
-                        customizedSchema
-                      );
+
+                      Object.values(mapObjectTypeList).forEach((value) => {
+                        _.assign(mapObjectTypeCollection, value);
+                      });
+
+                      if (!!resourceName) {
+                        result = {
+                          fileJson: {
+                            ...result.fileJson,
+                            [resourceType]: {
+                              [resourceName]: {
+                                [Object.keys(resourceValue as any)[0]]:
+                                  customizedSchema,
+                              },
+                            },
+                          },
+                        };
+                      } else {
+                        result = {
+                          ...result,
+                          fileJson: {
+                            ...result.fileJson,
+                            [resourceType]: {
+                              [Object.keys(resourceValue as any)[0]]:
+                                customizedSchema,
+                            },
+                          },
+                        };
+                      }
                     }
                   );
                 }
               );
+              return { ...result, filePath: fileObject.filePath };
             });
           };
-          parse(projectJsonRes.data);
+          console.log(
+            '제발 되라!!!: ',
+            mapObjectTypeCollection,
+            parse(projectJsonRes.data)
+          );
+          dispatch(setMapObjectTypeCollection(mapObjectTypeCollection));
+          dispatch(setFileSchema(parse(projectJsonRes.data)));
           dispatch(setFileObjects(projectJsonRes.data));
           history.push(`/main/${uid}`);
           dispatch(setWorkspaceUid(uid));
