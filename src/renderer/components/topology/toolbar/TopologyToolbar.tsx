@@ -11,6 +11,7 @@ import { useWorkspaceName } from '@renderer/hooks/useWorkspaceName';
 import {
   FitScreenButton,
   SaveButton,
+  SelectModuleButton,
   ZoomInButton,
   ZoomOutButton,
 } from './button';
@@ -23,7 +24,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
   const { handlers } = props;
   const [openModuleListModal, setOpenModuleListModal] = React.useState(false);
 
-  //const handleModuleListModalOpen = () => setOpenModuleListModal(true);
+  const handleModuleListModalOpen = () => setOpenModuleListModal(true);
   const handleModuleListModalClose = () => setOpenModuleListModal(false);
 
   const fileObjects = useAppSelector(selectCodeFileObjects);
@@ -61,7 +62,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
             console.log('[INFO] File export result : ', result);
           }}
         />
-        {/* <SelectModuleButton onClick={handleModuleListModalOpen} /> */}
+        <SelectModuleButton onClick={handleModuleListModalOpen} />
         <ModuleListModal
           isOpen={openModuleListModal}
           onClose={handleModuleListModalClose}

@@ -137,6 +137,8 @@ export const useGraphProps = () => {
 
     if (selectedNode?.id !== node.id) {
       dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
+    } else {
+      dispatch(setSelectedNode(null));
     }
   };
 

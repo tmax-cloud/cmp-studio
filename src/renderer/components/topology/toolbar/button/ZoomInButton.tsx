@@ -1,13 +1,17 @@
 import * as React from 'react';
 import { ReactElement } from 'react';
-import Tooltip from '@mui/material/Tooltip';
+import { styled, Tooltip } from '@mui/material';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomInOutlinedIcon from '@mui/icons-material/ZoomInOutlined';
+
+const ZoomInButtonIcon = styled(ZoomInOutlinedIcon)(({ theme }) => ({
+  color: theme.palette.toolbar.button,
+}));
 
 const ZoomInButton = (props: ZoomInButtonProps) => {
   const {
     label = '확대',
-    icon = <ZoomInIcon />,
+    icon = <ZoomInButtonIcon fontSize="small" />,
     onClick,
     className,
     ...rest

@@ -1,13 +1,17 @@
 import * as React from 'react';
 import { ReactElement } from 'react';
-import Tooltip from '@mui/material/Tooltip';
+import { styled, Tooltip } from '@mui/material';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+
+const SelectModuleButtonIcon = styled(AccountTreeOutlinedIcon)(({ theme }) => ({
+  color: theme.palette.toolbar.button,
+}));
 
 const SelectModuleButton = (props: SelectModuleButtonProps) => {
   const {
     label = '모듈',
-    icon = <AccountTreeIcon />,
+    icon = <SelectModuleButtonIcon fontSize="small" />,
     onClick,
     className,
     ...rest

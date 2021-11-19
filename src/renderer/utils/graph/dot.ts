@@ -23,7 +23,7 @@ const getRawNode = (jsonObject: any): NodeData[] => {
 
 const getRawLink = (jsonObject: any): LinkData[] => {
   return jsonObject.edges?.map((link: any) => {
-    return { source: link.tail, target: link.head };
+    return { source: link.head, target: link.tail };
   });
 };
 

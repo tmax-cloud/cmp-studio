@@ -1,13 +1,17 @@
 import * as React from 'react';
 import { ReactElement } from 'react';
-import Tooltip from '@mui/material/Tooltip';
+import { styled, Tooltip } from '@mui/material';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import FitScreenIcon from '@mui/icons-material/FitScreen';
+import ZoomOutMapOutlinedIcon from '@mui/icons-material/ZoomOutMapOutlined';
+
+const FitScreenButtonIcon = styled(ZoomOutMapOutlinedIcon)(({ theme }) => ({
+  color: theme.palette.toolbar.button,
+}));
 
 const FitScreenButton = (props: FitScreenButtonProps) => {
   const {
     label = '화면에 맞춤',
-    icon = <FitScreenIcon />,
+    icon = <FitScreenButtonIcon fontSize="small" />,
     onClick,
     className,
     ...rest
