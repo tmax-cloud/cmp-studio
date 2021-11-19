@@ -25,15 +25,15 @@ const getIconImage = (type: NodeKind, name: string, dataSource?: boolean) => {
   }
 };
 
-const parseNodeSimpleName = (str: string, status?: string) =>
-  status ? str.replace(`(${status})`, '').trim() : str;
+const parseNodeSimpleName = (str: string, state?: string) =>
+  state ? str.replace(`(${state})`, '').trim() : str;
 
-const parseNodeStatus = (str: string) => str.match(/\((.*)\)/)?.pop();
+const parseNodeState = (str: string) => str.match(/\((.*)\)/)?.pop();
 
 const parseNodeFullName = (str: string) => {
   let simpleName = '';
   let type = '';
-  let status;
+  let state;
   let dataSource;
   const modules = [];
 
@@ -66,8 +66,8 @@ const parseNodeFullName = (str: string) => {
 
     const part2 = parts.shift();
     if (part2) {
-      status = parseNodeStatus(part2);
-      simpleName = parseNodeSimpleName(part2, status);
+      state = parseNodeState(part2);
+      simpleName = parseNodeSimpleName(part2, state);
       isModule && simpleName && modules.push(simpleName);
     }
   }
@@ -77,7 +77,7 @@ const parseNodeFullName = (str: string) => {
   return {
     simpleName,
     type,
-    status,
+    state,
     modules,
     icon,
     dataSource,
@@ -100,16 +100,28 @@ const setNeighborElements = (gData: GraphData) => {
   return gData;
 };
 
-const removeUtilElements = (gData: GraphData) => {
-  const utilNodeList = ['root', 'meta.count-boundary (EachMode fixup)'];
+const removeNodeList = (node: NodeData) => {
+  // 유틸성 노드 제거
+  const fullNames = ['root', 'meta.count-boundary (EachMode fixup)'];
+  // output & variable 노드 제거
+  const types = ['output', 'var'];
+  // close 상태인 노드 제거
+  const states = ['close'];
+  return (
+    fullNames.includes(node.fullName) ||
+    types.includes(node.type) ||
+    states.includes(node.state || '')
+  );
+};
+
+const removeElements = (gData: GraphData) => {
   let newNodes = _.cloneDeep(gData.nodes) as NodeData[];
   let newLinks = _.cloneDeep(gData.links) as LinkData[];
-  const addLinks: LinkData[] = [];
-  utilNodeList.forEach((fullName) => {
-    const removeNode = newNodes.find(
-      (node) => (node as NodeData).fullName === fullName
-    ) as NodeData;
-    if (removeNode) {
+
+  gData.nodes.forEach((n) => {
+    const removeNode = n as NodeData;
+    if (removeNodeList(removeNode)) {
+      const addLinks: LinkData[] = [];
       newLinks.forEach((link) => {
         // connecting with a new node
         if (link.source === removeNode.id) {
@@ -129,37 +141,6 @@ const removeUtilElements = (gData: GraphData) => {
     }
   });
   return { nodes: newNodes, links: newLinks };
-};
-
-const removeVarElements = (gData: GraphData) => {
-  let newNodes = _.cloneDeep(gData.nodes) as NodeData[];
-  const newLinks: LinkData[] = [];
-
-  gData.links.forEach((link) => {
-    const { source, target } = link;
-    const sourceNode =
-      source && typeof source !== 'object' && nodesById(newNodes)[source];
-    const targetNode =
-      target && typeof target !== 'object' && nodesById(newNodes)[target];
-    if (
-      sourceNode.type !== 'output' &&
-      sourceNode.type !== 'var' &&
-      targetNode.type !== 'output' &&
-      targetNode.type !== 'var'
-    ) {
-      newLinks.push(link);
-    }
-  });
-
-  newNodes = newNodes.filter(
-    (node) => node.type !== 'output' && node.type !== 'var'
-  );
-
-  return { nodes: newNodes, links: newLinks };
-};
-
-const removeElements = (gData: GraphData) => {
-  return removeVarElements(removeUtilElements(gData));
 };
 
 export const getRefinedGraph = (gData: GraphData) => {

@@ -14,6 +14,9 @@ const theme = createTheme({
       primary: '#172b4d',
       secondary: '#6b778c',
     },
+    toolbar: {
+      button: '#5b6c7f',
+    },
   },
   shadows: [
     'none',

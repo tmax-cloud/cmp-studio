@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { GraphData, LinkObject, NodeObject } from 'react-force-graph-2d';
-import { LinkData, NodeData } from '@renderer/types/graph';
+import { LinkData, ModuleData, NodeData } from '@renderer/types/graph';
 import { getRawGraph } from './dot';
 import { getRefinedGraph, nodesById } from './parse';
 import { getTerraformGraphData } from './terraform';
@@ -17,59 +17,15 @@ import {
 
 export const QUICK_START = 'CMP Studio 시작하기';
 
-/*export const getModulePath = (gData: GraphData): ModulePath[] => {
-  const modulePaths: ModulePath[] = [];
-  const paths = new Set<string>();
-  const rootId = getRootNode(gData)?.id;
-
-  if (!rootId) {
-    return modulePaths;
-  }
-
-  traverseGraph(gData, rootId, (node) => {
-    const { modules } = node;
-    if (!modules) {
-      return;
-    }
-    const modulePath = modules.join('/');
-    const isDuplicate = [...paths].some((path) => _.isEqual(path, modulePath));
-    if (isDuplicate) {
-      return;
-    }
-    paths.add(modulePath);
-    const name = modules.pop();
-    const path =
-      name === ROOT
-        ? modulePath.replace('root', '/')
-        : modulePath.replace('root', '');
-    if (name) {
-      modulePaths.push({ name, path });
-    }
-  });
-
-  [...modulePaths].forEach((module) => {
-    if (module.name === ROOT) {
-      module.id = getRootNode(gData)?.id;
-    } else {
-      module.id = getModuleNodeByName(gData, module.name)?.id;
-    }
-    if (module.id) {
-      module.size = getPrunedGraph(gData, module.id).nodes.length;
-    }
-  });
-
-  return modulePaths;
-};*/
-
 export const getGraphData = async (
   workspaceUid: string
 ): Promise<GraphData> => {
   const tfGraph = await getTerraformGraphData(workspaceUid);
+  // console.log('## raw dot data: ', tfGraph);
   const rawGraph = await getRawGraph(tfGraph);
-  //console.log('## raw data: ', rawGraph);
+  // console.log('## raw json data: ', rawGraph);
   const graph = getRefinedGraph(rawGraph);
-  //console.log('graph data: ', graph);
-  //console.log('path: ', getModulePath(graph));
+  // console.log('## graph data: ', graph);
   return graph;
 };
 
@@ -105,7 +61,7 @@ export const getPrunedGraph = (nodes: NodeObject[], id: string | number) => {
         .map((child: string | number) => {
           return nodesById(nodes)[child];
         })
-        .forEach(traverse);
+        .forEach(traverse); // 재귀 수행
     }
   })();
   return {
@@ -121,6 +77,48 @@ export const getModuleNodeByName = (
   (nodes as NodeData[]).find(
     (node) => node.type === 'module' && node.simpleName === name
   ) as NodeData;
+
+export const getModuleData = (nodes: NodeObject[]): ModuleData[] => {
+  const data: ModuleData[] = [];
+  data.push({
+    root: true,
+    id: 0,
+    name: 'Project Root',
+    path: '/',
+    size: nodes.length,
+  });
+
+  const paths = new Set<string>();
+
+  nodes.forEach((node) => {
+    // 부모 노드가 없는 노드, 즉 루트 노드만 foreach 문 수행
+    if (_.isEmpty((node as NodeData).parentNodes) && node.id) {
+      (function traverse(n = nodesById(nodes)[node.id]) {
+        const { id, simpleName, type, modules, childNodes } = n;
+        if (type !== 'module') {
+          return;
+        }
+
+        const path = `/${modules.join('/')}`;
+        if (!paths.has(path)) {
+          paths.add(path);
+          const size = getPrunedGraph(nodes, id).nodes.length;
+          data.push({ root: false, id, name: simpleName, path, size });
+        }
+
+        if (childNodes) {
+          [...childNodes]
+            .map((child: string | number) => {
+              return nodesById(nodes)[child];
+            })
+            .forEach(traverse); // 재귀 수행
+        }
+      })();
+    }
+  });
+
+  return data;
+};
 
 export const drawNode = (
   ctx: CanvasRenderingContext2D,

@@ -1,13 +1,17 @@
 import * as React from 'react';
 import { ReactElement } from 'react';
-import Tooltip from '@mui/material/Tooltip';
+import { styled, Tooltip } from '@mui/material';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import ZoomOutOutlinedIcon from '@mui/icons-material/ZoomOutOutlined';
+
+const ZoomOutButtonIcon = styled(ZoomOutOutlinedIcon)(({ theme }) => ({
+  color: theme.palette.toolbar.button,
+}));
 
 const ZoomOutButton = (props: ZoomOutButtonProps) => {
   const {
     label = '축소',
-    icon = <ZoomOutIcon />,
+    icon = <ZoomOutButtonIcon fontSize="small" />,
     onClick,
     className,
     ...rest

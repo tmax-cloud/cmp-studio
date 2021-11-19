@@ -41,9 +41,7 @@ export const TopologyPage = () => {
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
-    (async () => {
-      dispatch(fetchGraphData(workspaceUid));
-    })();
+    dispatch(fetchGraphData(workspaceUid));
   }, [dispatch, workspaceUid]);
 
   if (!localStorage.getItem('schemaJson')) {
