@@ -353,6 +353,7 @@ const TopologyLibrary: React.FC<any> = (props) => {
       });
     });
 
+  /*
   React.useEffect(() => {
     const localList: Item[] = [];
     const localItems = getLocalModuleList(itemsList);
@@ -364,6 +365,7 @@ const TopologyLibrary: React.FC<any> = (props) => {
     });
     setLocalModuleItems(localList);
   }, [objResult]);
+  */
 
   React.useEffect(() => {
     let schemaMap;
@@ -413,7 +415,7 @@ const TopologyLibrary: React.FC<any> = (props) => {
         }
       }
     });
-    /*
+
     const localList: Item[] = [];
     const localItems = getLocalModuleList(itemsList);
 
@@ -423,14 +425,13 @@ const TopologyLibrary: React.FC<any> = (props) => {
       }
     });
     setLocalModuleItems(localList);
-    */
     setDefaltItems(defaultList);
     setResourceItems(resourceList);
     setdatasourceItems(datasourceList);
     //setTerraformModuleItems(moduleList);
 
     if (
-      //localList.length ||
+      localList.length ||
       defaultList.length ||
       resourceList.length ||
       datasourceList.length ||
