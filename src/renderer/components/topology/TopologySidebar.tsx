@@ -24,7 +24,10 @@ import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
-import { getObjectNameInfo } from './state/form/utils/getResourceInfo';
+import {
+  getObjectNameInfo,
+  noResourceNameTypeList,
+} from './state/form/utils/getResourceInfo';
 import preDefinedFileObjects from './state/form/utils/preDefinedFileObjects';
 import {
   openExistFolder,
@@ -138,6 +141,46 @@ const TopologySidebar = () => {
         const uid = response?.data?.uid;
         if (uid) {
           const projectJsonRes = await getProjectJson(args);
+          const terraformSchemaMap = getSchemaMap();
+
+          const parse = (fileObjects: any[]) => {
+            fileObjects.map((fileObject: any) => {
+              _.toPairs(fileObject.fileJson).forEach(
+                ([resourceType, resource]: [string, any]) => {
+                  _.toPairs(resource).forEach(
+                    ([resourceName, resourceValue]) => {
+                      const id = resourceType + '-' + resourceName;
+                      const currentSchema = terraformSchemaMap.get(id);
+                      const hasNoResourceName = !!noResourceNameTypeList.find(
+                        (currType) => resourceType === currType
+                      );
+                      const content = hasNoResourceName
+                        ? resourceValue
+                        : Object.values(resourceValue as any)[0];
+
+                      // 여기서 preDefiendData 해서 애초에 redux로 갖고있고 sidepanel에서도 그거 참조해서 하는게 좋을듯
+                      const { mapObjectTypeList = {}, customizedSchema = {} } =
+                        preDefinedFileObjects(
+                          resourceType,
+                          currentSchema as JSONSchema7,
+                          content,
+                          resourceName,
+                          Object.keys(resourceValue as any)[0]
+                        );
+                      console.log(
+                        'id',
+                        id,
+                        '=> ',
+                        mapObjectTypeList,
+                        customizedSchema
+                      );
+                    }
+                  );
+                }
+              );
+            });
+          };
+          parse(projectJsonRes.data);
           dispatch(setFileObjects(projectJsonRes.data));
           history.push(`/main/${uid}`);
           dispatch(setWorkspaceUid(uid));
