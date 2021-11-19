@@ -5,10 +5,24 @@ declare module '@mui/material/styles' {
     toolbar: {
       button: string;
     };
+    object: {
+      accordion: string;
+      accordionHeader: {
+        primary: string;
+        secondary: string;
+      };
+    };
   }
   export interface PaletteOptions {
     toolbar: {
       button: string;
+    };
+    object: {
+      accordion: string;
+      accordionHeader: {
+        primary: string;
+        secondary: string;
+      };
     };
   }
 }

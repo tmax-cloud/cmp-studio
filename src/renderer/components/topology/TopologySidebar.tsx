@@ -3,9 +3,7 @@ import * as ReactDOM from 'react-dom';
 import _ from 'lodash';
 import {
   Box,
-  Button,
   Drawer,
-  List,
   Tabs,
   Tab,
   Popper,
@@ -30,15 +28,13 @@ import {
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import TopologyLibrary from './TopologyLibrary';
-import {
-  setSelectedObjectInfo,
-  setFileObjects,
-} from '../../features/codeSlice';
-import { setSidePanel } from '../../features/uiSlice';
+import { setFileObjects } from '../../features/codeSlice';
 
 import { setWorkspaceUid } from '../../features/commonSlice';
 import CreateWorkspaceModal from '../workspace/CreateWorkspaceModal';
 import StudioTheme from '../../theme';
+import { TopologyObject } from './object';
+import { Item } from './object/TopologyObject';
 
 export const SIDEBAR_WIDTH = '300px';
 
@@ -88,7 +84,7 @@ const TabPanel: React.FC<TabPanelProps> = (props) => {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 2 }}>{children}</Box>}
     </div>
   );
 };
@@ -104,14 +100,6 @@ function a11yProps(index: number) {
     id: `simple-tab-${index}`,
     'aria-controls': `simple-tabpanel-${index}`,
   };
-}
-
-interface Item {
-  provider?: string;
-  title: string;
-  resourceName: string;
-  instanceName: string;
-  type: string;
 }
 
 const TopologySidebar = () => {
@@ -241,52 +229,15 @@ const TopologySidebar = () => {
         >
           <Tab
             className={classes.tab}
-            label="Object"
+            label="오브젝트"
             {...a11yProps(0)}
             onMouseDown={onObjectTabClick}
           />
-          <Tab className={classes.tab} label="Library" {...a11yProps(1)} />
+          <Tab className={classes.tab} label="라이브러리" {...a11yProps(1)} />
         </Tabs>
       </Box>
       <TabPanel value={tabIndex} index={0}>
-        <List>
-          {items.map((item, index) => {
-            return (
-              <Button
-                key={`button-${index}`}
-                startIcon={getIcon(item.type)}
-                onClick={() => {
-                  const content = objResult.filter((cur: any) => {
-                    const { type } = cur;
-                    const resourceName = Object.keys(cur)[0];
-                    if (item.title === type + '/' + resourceName) {
-                      if (
-                        type === 'provider' ||
-                        type === 'module' ||
-                        type === 'variable' ||
-                        type === 'output'
-                      ) {
-                        return cur[resourceName];
-                      } else {
-                        return cur[resourceName][item.instanceName];
-                      }
-                    }
-                  });
-                  const object = {
-                    id: item.title,
-                    instanceName: item.instanceName,
-                    content: content[0],
-                  };
-
-                  dispatch(setSelectedObjectInfo(object));
-                  dispatch(setSidePanel(true));
-                }}
-              >
-                {item.resourceName}
-              </Button>
-            );
-          })}
-        </List>
+        <TopologyObject items={items} objResult={objResult} />
       </TabPanel>
       <TabPanel value={tabIndex} index={1}>
         <TopologyLibrary />
