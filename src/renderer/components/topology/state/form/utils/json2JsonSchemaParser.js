@@ -1,6 +1,6 @@
 import terraformSchema from '../terraform_schema.json';
 
-function parseJson(cloud) {
+function parseJson(clouds) {
   function renameKey(obj, oldKey, newKey) {
     if (oldKey in obj) {
       obj[newKey] = obj[oldKey];
@@ -116,37 +116,38 @@ function parseJson(cloud) {
   let schemaList;
   const schemaArray = [];
   let tmpPath;
-  for (const type of typeList) {
-    if (type === 'provider') {
-      schemaList = [terraformSchema.provider_schemas[cloud].provider];
-      tmpPath = terraformSchema.provider_schemas[cloud].provider;
-    } else if (type === 'resource') {
-      schemaList = Object.getOwnPropertyNames(
-        terraformSchema.provider_schemas[cloud].resource_schemas
-      );
-      tmpPath = terraformSchema.provider_schemas[cloud].resource_schemas;
-    } else if (type === 'datasource') {
-      schemaList = Object.getOwnPropertyNames(
-        terraformSchema.provider_schemas[cloud].data_source_schemas
-      );
-      tmpPath = terraformSchema.provider_schemas[cloud].data_source_schemas;
-    }
-    for (let key of schemaList) {
-      let schemaData = {};
+  for (const cloud of clouds) {
+    for (const type of typeList) {
       if (type === 'provider') {
-        schemaData = tmpPath.block;
-        key = cloud;
-      } else {
-        schemaData = tmpPath[key].block;
+        schemaList = [terraformSchema.provider_schemas[cloud].provider];
+        tmpPath = terraformSchema.provider_schemas[cloud].provider;
+      } else if (type === 'resource') {
+        schemaList = Object.getOwnPropertyNames(
+          terraformSchema.provider_schemas[cloud].resource_schemas
+        );
+        tmpPath = terraformSchema.provider_schemas[cloud].resource_schemas;
+      } else if (type === 'datasource') {
+        schemaList = Object.getOwnPropertyNames(
+          terraformSchema.provider_schemas[cloud].data_source_schemas
+        );
+        tmpPath = terraformSchema.provider_schemas[cloud].data_source_schemas;
       }
-      console.log(schemaData);
-      renameKey(schemaData, 'attributes', 'properties');
-      mergeKey(schemaData, 'block_types', 'properties');
+      for (let key of schemaList) {
+        let schemaData = {};
+        if (type === 'provider') {
+          schemaData = tmpPath.block;
+          key = cloud;
+        } else {
+          schemaData = tmpPath[key].block;
+        }
+        renameKey(schemaData, 'attributes', 'properties');
+        mergeKey(schemaData, 'block_types', 'properties');
 
-      buildSchema(schemaData);
-      schemaData.title = type + '-' + key;
-      schemaArray.push(schemaData);
-      schemaMap.set(schemaData.title, schemaData);
+        Object.keys(schemaData).length === 0 && buildSchema(schemaData);
+        schemaData.title = type + '-' + key;
+        schemaArray.push(schemaData);
+        schemaMap.set(schemaData.title, schemaData);
+      }
     }
   }
 

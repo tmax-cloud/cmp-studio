@@ -1,13 +1,17 @@
 import * as React from 'react';
 import { ReactElement } from 'react';
-import Tooltip from '@mui/material/Tooltip';
+import { styled, Tooltip } from '@mui/material';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import SaveIcon from '@mui/icons-material/Save';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+
+const SaveButtonIcon = styled(SaveOutlinedIcon)(({ theme }) => ({
+  color: theme.palette.toolbar.button,
+}));
 
 const SaveButton = (props: SaveButtonProps) => {
   const {
     label = '저장',
-    icon = <SaveIcon />,
+    icon = <SaveButtonIcon fontSize="small" />,
     onClick,
     className,
     ...rest

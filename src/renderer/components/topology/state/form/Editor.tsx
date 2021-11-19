@@ -7,7 +7,7 @@ import DynamicForm from './index';
 import AddFieldSection from './AddFieldSection';
 
 const EditorTab = (props: EditorTabProps) => {
-  const { schema, formData, uiSchema, toggleSidePanel } = props;
+  const { schema, formData, uiSchema } = props;
 
   const [formState, setFormState] = React.useState(formData);
   const resoureId = useAppSelector(selectCodeSelectedObjectInfoId);
@@ -25,7 +25,7 @@ const EditorTab = (props: EditorTabProps) => {
       <div
         style={{
           paddingTop: '12px',
-          height: '650px',
+          height: '676px',
           overflowY: 'auto',
           overflowX: 'hidden',
         }}
@@ -38,12 +38,7 @@ const EditorTab = (props: EditorTabProps) => {
         />
       </div>
       <AddFieldSection formData={formData} />
-      <SaveSection
-        saveLabel="저장"
-        cancelLabel="취소"
-        toggleSidePanel={toggleSidePanel}
-        formState={formState}
-      />
+      <SaveSection saveLabel="저장" cancelLabel="취소" formState={formState} />
     </>
   );
 };
@@ -52,7 +47,6 @@ type EditorTabProps = {
   schema: any;
   formData: any;
   uiSchema: any;
-  toggleSidePanel: any;
 };
 
 export default EditorTab;
