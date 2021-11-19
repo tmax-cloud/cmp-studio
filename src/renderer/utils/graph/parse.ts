@@ -1,29 +1,11 @@
 /* eslint-disable no-continue */
 import * as _ from 'lodash';
 import { GraphData, NodeObject } from 'react-force-graph-2d';
-import { LinkData, NodeData, NodeKind } from '@renderer/types/graph';
-import AWSProviderIcon from '../../../../assets/images/graph-provider-aws-icon.svg';
-import DatasourceTypeIcon from '../../../../assets/images/graph-datasource-type-icon.svg';
-import DefaultTypeIcon from '../../../../assets/images/graph-default-type-icon.svg';
-import ModuleTypeIcon from '../../../../assets/images/graph-module-type-icon.svg';
-import ResourceTypeIcon from '../../../../assets/images/graph-resource-type-icon.svg';
+import { LinkData, NodeData } from '@renderer/types/graph';
+import { getIcon } from '../iconUtil';
 
 export const nodesById = (nodes: NodeObject[]) =>
   Object.fromEntries(nodes.map((node) => [node.id, node]));
-
-const getIconImage = (type: NodeKind, name: string, dataSource?: boolean) => {
-  switch (type) {
-    case 'module':
-      return ModuleTypeIcon;
-    case 'provider':
-      if (name === 'aws') {
-        return AWSProviderIcon;
-      }
-      return DefaultTypeIcon;
-    default:
-      return dataSource ? DatasourceTypeIcon : ResourceTypeIcon;
-  }
-};
 
 const parseNodeSimpleName = (str: string, state?: string) =>
   state ? str.replace(`(${state})`, '').trim() : str;
@@ -72,7 +54,7 @@ const parseNodeFullName = (str: string) => {
     }
   }
 
-  const icon = getIconImage(type, simpleName, dataSource);
+  const icon = getIcon(false, type, simpleName, dataSource);
 
   return {
     simpleName,

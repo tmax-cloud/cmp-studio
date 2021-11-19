@@ -314,7 +314,7 @@ const TopologySidebar = () => {
         </List>
       </TabPanel>
       <TabPanel value={tabIndex} index={1}>
-        <TopologyLibrary items={items} />
+        <TopologyLibrary />
       </TabPanel>
     </Box>
   );
