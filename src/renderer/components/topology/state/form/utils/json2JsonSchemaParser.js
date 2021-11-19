@@ -8,22 +8,16 @@ function parseJson(clouds) {
     }
   }
   function mergeKey(obj, oldKey, newKey) {
-    if (oldKey in obj) {
-      Object.assign(obj[newKey], obj[oldKey]);
-      delete obj[oldKey];
-    }
+    Object.assign(obj[newKey], obj[oldKey]);
+    delete obj[oldKey];
   }
   function renameKey2(obj, oldKey1, oldKey2, newKey) {
-    if (oldKey1 in obj && oldKey2 in obj) {
-      obj[newKey] = obj[oldKey1][oldKey2];
-      delete obj[oldKey1][oldKey2];
-    }
+    obj[newKey] = obj[oldKey1][oldKey2];
+    delete obj[oldKey1][oldKey2];
   }
   function mergeKey2(obj, oldKey1, oldKey2, newKey) {
-    if (oldKey1 in obj && oldKey2 in obj) {
-      Object.assign(obj[newKey], obj[oldKey1][oldKey2]);
-      delete obj[oldKey1][oldKey2];
-    }
+    Object.assign(obj[newKey], obj[oldKey1][oldKey2]);
+    delete obj[oldKey1][oldKey2];
   }
   function parseKey(obj, oldKey1, oldKey2, newKey) {
     if (obj.hasOwnProperty(newKey)) {

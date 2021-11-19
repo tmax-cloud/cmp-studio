@@ -26,20 +26,26 @@ const TopologySidePanel = () => {
     () => getSchemaMap(),
     []
   );
-  const currentSchema = React.useMemo(
-    () => terraformSchemaMap.get(id),
-    [terraformSchemaMap, id]
-  );
-  if (_.isEmpty(sourceSchema)) {
-    dispatch(setSelectedSourceSchema(currentSchema));
-  }
+  const currentSchema = _.isEmpty(sourceSchema)
+    ? terraformSchemaMap.get(id.replace('/', '-'))
+    : sourceSchema;
+  // if (_.isEmpty(sourceSchema)) {
+  //   return terraformSchemaMap.get(id.replace('/', '-'));
+  // }
+  // return sourceSchema;
+
+  // if (_.isEmpty(sourceSchema)) {
+  //   dispatch(setSelectedSourceSchema(currentSchema));
+  // }
   // schema
   const {
     customUISchema = {},
     formData = {},
     fixedSchema = {},
-  } = id && preDefinedData(sourceSchema, content);
-
+  } = id && preDefinedData(currentSchema, content);
+  React.useEffect(() => {
+    dispatch(setSelectedSourceSchema(fixedSchema));
+  }, [id]);
   return (
     <>
       <Drawer
