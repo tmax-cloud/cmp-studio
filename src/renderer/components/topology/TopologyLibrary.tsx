@@ -126,17 +126,6 @@ function getModuleList(items: Item[]) {
 }
 */
 
-function getLocalModuleList(items: Item[]) {
-  //Module 중 Local Module 구분하는 isLocalModule 구현 필요
-  const localItems: Item[] = [];
-  items.forEach((item) => {
-    if (item?.type === 'module' && isLocalModule(item)) {
-      localItems.push(item);
-    }
-  });
-  return localItems;
-}
-
 const ShowItemList: React.FC<ShowItemListProps> = ({
   items,
   title,
@@ -297,7 +286,6 @@ const TopologyLibrary: React.FC<any> = (props) => {
   const providerHandleChange = (event: any) => {
     setProvider(event.target.value);
   };
-  const [localModuleItems, setLocalModuleItems] = React.useState<Item[]>([]);
   //const [terraformModuleItems, setTerraformModuleItems] = React.useState<Item[]>([]);
   const [searchText, setSearchText] = React.useState('');
   const searchTextChange = (event: any) => {
@@ -379,7 +367,7 @@ const TopologyLibrary: React.FC<any> = (props) => {
     });
     const resourceList: Item[] = [];
     const datasourceList: Item[] = [];
-    const moduleList: Item[] = [];
+
     items.forEach((i: Item) => {
       if (seartchByName(searchText, i.resourceName)) {
         if (i.type === 'resource') {
@@ -403,14 +391,6 @@ const TopologyLibrary: React.FC<any> = (props) => {
       }
     });
 
-    const localList: Item[] = [];
-    const localItems = getLocalModuleList(itemsList);
-
-    localItems.forEach((localItem: Item) => {
-      if (seartchByName(searchText, localItem.resourceName)) {
-        localList.push(localItem);
-      }
-    });
     setDefaltItems(defaultList);
     setResourceItems(resourceList);
     setdatasourceItems(datasourceList);
@@ -463,7 +443,7 @@ const TopologyLibrary: React.FC<any> = (props) => {
         </div>
         <ShowItemList
           items={itemsList.filter((item) => {
-            return item.type === 'module';
+            return item?.type === 'module' && isLocalModule(item);
           })}
           title="로컬 모듈"
           provider={provider}
