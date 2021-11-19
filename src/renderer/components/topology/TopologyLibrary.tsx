@@ -28,6 +28,7 @@ import {
   setFileObjects,
   setSelectedObjectInfo,
 } from '@renderer/features/codeSlice';
+import { setSidePanel } from '@renderer/features/uiSlice';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { getModuleNodeByName, getPrunedGraph } from '@renderer/utils/graph';
@@ -251,7 +252,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
                           content: newFileObjects[0].fileJson,
                         };
                         dispatch(setSelectedObjectInfo(object));
-                        //setIsSidePanelOpen((currState: boolean) => true);
+                        dispatch(setSidePanel(true));
                       }
                     }}
                     fullWidth
@@ -353,25 +354,11 @@ const TopologyLibrary: React.FC<any> = (props) => {
       });
     });
 
-  /*
-  React.useEffect(() => {
-    const localList: Item[] = [];
-    const localItems = getLocalModuleList(itemsList);
-
-    localItems.forEach((localItem: Item) => {
-      if (seartchByName(searchText, localItem.resourceName)) {
-        localList.push(localItem);
-      }
-    });
-    setLocalModuleItems(localList);
-  }, [objResult]);
-  */
-
   React.useEffect(() => {
     let schemaMap;
 
     try {
-      schemaMap = parseJson(provider);
+      schemaMap = parseJson([provider]);
     } catch (e) {
       console.log('Cannot get schema in ' + provider);
       schemaMap = new Map();
@@ -424,19 +411,12 @@ const TopologyLibrary: React.FC<any> = (props) => {
         localList.push(localItem);
       }
     });
-    setLocalModuleItems(localList);
     setDefaltItems(defaultList);
     setResourceItems(resourceList);
     setdatasourceItems(datasourceList);
     //setTerraformModuleItems(moduleList);
 
-    if (
-      localList.length ||
-      defaultList.length ||
-      resourceList.length ||
-      datasourceList.length ||
-      moduleList.length
-    ) {
+    if (resourceList.length || datasourceList.length) {
       setIsSearchResultEmpty(false);
     } else {
       setIsSearchResultEmpty(true);
@@ -457,6 +437,7 @@ const TopologyLibrary: React.FC<any> = (props) => {
           style={{ marginTop: '10px' }}
         >
           <MenuItem value="aws">AWS</MenuItem>
+          <MenuItem value="tls">TLS</MenuItem>
           <MenuItem value="azure">Microsoft Azure</MenuItem>
           <MenuItem value="gcp">Google Cloud Platform</MenuItem>
           <MenuItem value="openstack">OpenStack</MenuItem>
@@ -480,23 +461,26 @@ const TopologyLibrary: React.FC<any> = (props) => {
             }}
           />
         </div>
+        <ShowItemList
+          items={itemsList.filter((item) => {
+            return item.type === 'module';
+          })}
+          title="로컬 모듈"
+          provider={provider}
+        />
+        <ShowItemList
+          items={defaltItems}
+          title="테라폼 디폴트"
+          provider={provider}
+        />
         {isSearchResultEmpty ? (
           <div>
+            <InputLabel>------</InputLabel>
             <InputLabel>{searchText}</InputLabel>
             <InputLabel>검색 결과가 없습니다.</InputLabel>
           </div>
         ) : (
           <>
-            <ShowItemList
-              items={localModuleItems}
-              title="로컬 모듈"
-              provider={provider}
-            />
-            <ShowItemList
-              items={defaltItems}
-              title="테라폼 디폴트"
-              provider={provider}
-            />
             {/* 모듈 추후 추가 */}
             {/*
             <ShowItemList
@@ -516,15 +500,12 @@ const TopologyLibrary: React.FC<any> = (props) => {
               title="테라폼 데이터소스"
               provider={provider}
             />
-            {/* 테스트용 Object 표시 */}
-            <InputLabel>Object 표시 - 임시</InputLabel>
-            <ShowItemList
-              items={itemsList}
-              title="Object"
-              provider={provider}
-            />
           </>
         )}
+        {/* 테스트용 Object 표시 */}
+        <InputLabel>------</InputLabel>
+        <InputLabel>Object 표시 - 임시</InputLabel>
+        <ShowItemList items={itemsList} title="Object" provider={provider} />
         <Button onClick={handleModuleListModalOpen} value="test1">
           Modal Test
         </Button>
