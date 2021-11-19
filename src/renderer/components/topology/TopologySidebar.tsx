@@ -244,20 +244,15 @@ const TopologySidebar = () => {
                 startIcon={getIcon(item.type)}
                 onClick={() => {
                   const content = objResult.filter((cur: any) => {
-                    const { type } = cur;
+                    const { type, ...obj } = cur;
                     const { resourceName, instanceName } = getObjectNameInfo(
-                      cur,
+                      obj,
                       type
                     );
-                    if (
-                      item.title === resourceName
-                        ? type + '/' + resourceName
-                        : type + '/' + instanceName
-                    ) {
-                      return !!resourceName
-                        ? cur[resourceName][instanceName]
-                        : cur[instanceName];
-                    }
+                    const title = !!resourceName
+                      ? type + '/' + resourceName
+                      : type + '/' + instanceName;
+                    return item.title === title;
                   });
                   const object = {
                     id: item.title,
