@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useHistory } from 'react-router-dom';
 import _ from 'lodash';
 import {
   Box,
@@ -28,8 +29,25 @@ import {
   setSelectedObjectInfo,
 } from '@renderer/features/codeSlice';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import * as WorkspaceTypes from '@main/workspaces/common/workspace';
+import { getModuleNodeByName, getPrunedGraph } from '@renderer/utils/graph';
+import {
+  selectGraphData,
+  selectSelectedModule,
+} from '@renderer/features/graphSliceInputSelectors';
+import {
+  setSelectedData,
+  setSelectedModule,
+  setSelectedNode,
+} from '@renderer/features/graphSlice';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import {
+  openExistFolder,
+  getProjectJson,
+} from '../../utils/ipc/workspaceIpcUtils';
 import parseJson from './state/form/utils/json2JsonSchemaParser';
 import { ModuleImportModal } from './modal';
+import { setWorkspaceUid } from '../../features/commonSlice';
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -106,6 +124,7 @@ function getModuleList(items: Item[]) {
   });
 }
 */
+
 function getLocalModuleList(items: Item[]) {
   //Module 중 Local Module 구분하는 isLocalModule 구현 필요
   const localItems: Item[] = [];
@@ -120,22 +139,49 @@ function getLocalModuleList(items: Item[]) {
 const ShowItemList: React.FC<ShowItemListProps> = ({
   items,
   title,
-  setIsSidePanelOpen,
   provider,
 }) => {
+  const dispatch = useDispatch();
+  //const history = useHistory();
+  /*
+  const openWorkspaceFromTopologyLibrary = async (folderUri: string) => {
+    const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
+      folderUri,
+    };
+    openExistFolder(args)
+      .then(async (response: any) => {
+        const uid = response?.data?.uid;
+        if (uid) {
+          const projectJsonRes = await getProjectJson(args);
+          dispatch(setFileObjects(projectJsonRes.data));
+          history.push(`/main/${uid}`);
+          dispatch(setWorkspaceUid(uid));
+        }
+        return response;
+      })
+      .catch((err: any) => {
+        console.log('[Error] Failed to open exist folder : ', err);
+      });
+  };
+  */
+
   const [isShow, setIsShow] = React.useState(false);
   const fileObjects = useSelector(selectCodeFileObjects);
-  const originPath = '.';
+  /*
+  const folderUri = window.electron.ipcRenderer.on(
+    'studio:dirPathToOpen',
+    (res: { canceled: boolean; filePaths: string[] }) => {
+      const { filePaths, canceled } = res;
+      if (!canceled) {
+        openWorkspaceFromTopologyLibrary(filePaths[0]);
+      }
+    }
+  );
+  */
+  const folderUri = './';
   const addedObjectJSON = {}; //temp
-  const dispatch = useDispatch();
-  let schemaMap;
-
-  try {
-    schemaMap = parseJson(provider);
-  } catch (e) {
-    console.log('Cannot get schema in ' + provider);
-    schemaMap = new Map();
-  }
+  const paths = useAppSelector(selectSelectedModule)?.modules || [];
+  const graphData = useAppSelector(selectGraphData);
 
   return (
     <>
@@ -161,35 +207,52 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
                     key={`button-${index}`}
                     startIcon={getIcon(item.type)}
                     onClick={() => {
-                      const newInstanceName =
-                        'new-' +
-                        item.type +
-                        '-' +
-                        item.resourceName +
-                        '-' +
-                        fileObjects.length;
-                      const newFileObjects = [
-                        {
-                          filePath: `${originPath}/${item.type}/${newInstanceName}.tf`,
-                          fileJson: {
-                            [item.type]: {
-                              [item.resourceName]: {
-                                [newInstanceName]: addedObjectJSON,
+                      if (item.type === 'module') {
+                        const name = item.resourceName;
+                        const selectedModule = getModuleNodeByName(
+                          graphData.nodes,
+                          name
+                        );
+                        if (selectedModule && selectedModule.id) {
+                          const selectedData = getPrunedGraph(
+                            graphData.nodes,
+                            selectedModule.id
+                          );
+                          dispatch(setSelectedData(selectedData));
+                          dispatch(setSelectedNode(null));
+                          dispatch(setSelectedModule(selectedModule));
+                        }
+                      } else {
+                        const newInstanceName =
+                          'new-' +
+                          item.type +
+                          '-' +
+                          item.resourceName +
+                          '-' +
+                          fileObjects.length;
+                        const newFileObjects = [
+                          {
+                            filePath: `${folderUri}${item.type}/${newInstanceName}.tf`,
+                            fileJson: {
+                              [item.type]: {
+                                [item.resourceName]: {
+                                  [newInstanceName]: addedObjectJSON,
+                                },
                               },
                             },
                           },
-                        },
-                      ];
-                      dispatch(
-                        setFileObjects(fileObjects.concat(newFileObjects))
-                      );
-                      const object = {
-                        id: item.title,
-                        instanceName: newInstanceName,
-                        content: newFileObjects[0].fileJson,
-                      };
-                      dispatch(setSelectedObjectInfo(object));
-                      setIsSidePanelOpen((currState: boolean) => true);
+                        ];
+                        dispatch(
+                          setFileObjects(fileObjects.concat(newFileObjects))
+                        );
+                        const object = {
+                          id: item.title,
+                          instanceName: newInstanceName,
+                          content: newFileObjects[0].fileJson,
+                        };
+                        dispatch(setSelectedObjectInfo(object));
+                        //setIsSidePanelOpen((currState: boolean) => true);
+                      }
                     }}
                     fullWidth
                     style={{ textAlign: 'left' }}
@@ -209,7 +272,6 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
 type ShowItemListProps = {
   items: Item[];
   title: string;
-  setIsSidePanelOpen: any;
   provider: string;
 };
 
@@ -225,8 +287,8 @@ interface Item {
   version?: string;
 }
 let selectedProvider = '';
-const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
-  const { setIsSidePanelOpen } = props;
+//const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
+const TopologyLibrary: React.FC<any> = (props) => {
   const [provider, setProvider] = React.useState(selectedProvider || 'aws');
   const [defaltItems, setDefaltItems] = React.useState<Item[]>([]);
   const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
@@ -292,6 +354,18 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
     });
 
   React.useEffect(() => {
+    const localList: Item[] = [];
+    const localItems = getLocalModuleList(itemsList);
+
+    localItems.forEach((localItem: Item) => {
+      if (seartchByName(searchText, localItem.resourceName)) {
+        localList.push(localItem);
+      }
+    });
+    setLocalModuleItems(localList);
+  }, [objResult]);
+
+  React.useEffect(() => {
     let schemaMap;
 
     try {
@@ -339,6 +413,7 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
         }
       }
     });
+    /*
     const localList: Item[] = [];
     const localItems = getLocalModuleList(itemsList);
 
@@ -348,13 +423,14 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
       }
     });
     setLocalModuleItems(localList);
+    */
     setDefaltItems(defaultList);
     setResourceItems(resourceList);
     setdatasourceItems(datasourceList);
     //setTerraformModuleItems(moduleList);
 
     if (
-      localList.length ||
+      //localList.length ||
       defaultList.length ||
       resourceList.length ||
       datasourceList.length ||
@@ -413,13 +489,11 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
             <ShowItemList
               items={localModuleItems}
               title="로컬 모듈"
-              setIsSidePanelOpen={setIsSidePanelOpen}
               provider={provider}
             />
             <ShowItemList
               items={defaltItems}
               title="테라폼 디폴트"
-              setIsSidePanelOpen={setIsSidePanelOpen}
               provider={provider}
             />
             {/* 모듈 추후 추가 */}
@@ -434,13 +508,11 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
             <ShowItemList
               items={resourceItems}
               title="테라폼 리소스"
-              setIsSidePanelOpen={setIsSidePanelOpen}
               provider={provider}
             />
             <ShowItemList
               items={datasourceItems}
               title="테라폼 데이터소스"
-              setIsSidePanelOpen={setIsSidePanelOpen}
               provider={provider}
             />
             {/* 테스트용 Object 표시 */}
@@ -448,7 +520,6 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
             <ShowItemList
               items={itemsList}
               title="Object"
-              setIsSidePanelOpen={setIsSidePanelOpen}
               provider={provider}
             />
           </>
@@ -464,10 +535,10 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
             dispatch(
               setFileObjects([
                 {
-                  filePath: './test.tf',
+                  filePath: 'test.tf',
                   fileJson: {
                     module: {
-                      'test-network-configs': {
+                      'aws-network-configs': {
                         source: './network-configs',
                       },
                     },
@@ -479,7 +550,7 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
                   },
                 },
                 {
-                  filePath: './a.tf',
+                  filePath: 'a.tf',
                   fileJson: {
                     resource: {
                       aws_instance: {
@@ -506,7 +577,7 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
                   },
                 },
                 {
-                  filePath: './b.tf',
+                  filePath: 'b.tf',
                   fileJson: {
                     resource: {
                       aws_key_pair: {
@@ -547,8 +618,9 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
     </>
   );
 };
-
+/*
 type TopologyLibraryProps = {
   setIsSidePanelOpen: any;
 };
+*/
 export default TopologyLibrary;
