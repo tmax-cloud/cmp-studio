@@ -137,6 +137,7 @@ const TopologyObject = (props: TopologyObjectProps) => {
           <AccordionDetails sx={{ backgroundColor: 'white', padding: 0 }}>
             <List>
               {accordion.content.map((item, index) => {
+                const name = item.resourceName || item.instanceName;
                 return (
                   <ListItem disablePadding key={`item-${index}`}>
                     <ListItemButton
@@ -145,12 +146,10 @@ const TopologyObject = (props: TopologyObjectProps) => {
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         <img
                           style={{ width: 24 }}
-                          src={getIcon(true, item.type, item.resourceName)}
+                          src={getIcon(true, item.type, name)}
                         />
                       </ListItemIcon>
-                      <ListItemName>
-                        {item.resourceName || item.instanceName}
-                      </ListItemName>
+                      <ListItemName>{name}</ListItemName>
                     </ListItemButton>
                   </ListItem>
                 );
