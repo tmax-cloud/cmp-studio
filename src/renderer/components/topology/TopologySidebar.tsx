@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import _ from 'lodash';
+import { JSONSchema7 } from 'json-schema';
 import {
   Box,
   Button,
@@ -17,11 +18,17 @@ import {
 } from '@mui/material';
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import {
+  getObjectNameInfo,
+  noResourceNameTypeList,
+} from './state/form/utils/getResourceInfo';
+import preDefinedFileObjects from './state/form/utils/preDefinedFileObjects';
 import {
   openExistFolder,
   getProjectJson,
@@ -32,7 +39,10 @@ import TopologyLibrary from './TopologyLibrary';
 import {
   setSelectedObjectInfo,
   setFileObjects,
+  setMapObjectTypeCollection,
 } from '../../features/codeSlice';
+import { setSidePanel } from '../../features/uiSlice';
+
 import { setWorkspaceUid } from '../../features/commonSlice';
 import CreateWorkspaceModal from '../workspace/CreateWorkspaceModal';
 import StudioTheme from '../../theme';
@@ -111,15 +121,14 @@ interface Item {
   type: string;
 }
 
-const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
-  const { setIsSidePanelOpen } = props;
+const TopologySidebar = () => {
   const classes = useStyles();
   const history = useHistory();
   const [items, setItems] = React.useState<Item[]>([]);
   const [prjContextMenuOpen, setPrjContextMenuOpen] = React.useState(false);
   const [prjAnchorEl, setPrjAnchorEl] = React.useState(null);
   const [tabIndex, setTabIndex] = React.useState(0);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const handleTabChange = (event: any, newValue: number) => {
     setTabIndex(newValue);
   };
@@ -133,7 +142,72 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
         const uid = response?.data?.uid;
         if (uid) {
           const projectJsonRes = await getProjectJson(args);
-          dispatch(setFileObjects(projectJsonRes.data));
+          const terraformSchemaMap = getSchemaMap();
+          const mapObjectTypeCollection = {};
+
+          const parse = (fileObjects: any[]) => {
+            return fileObjects.map((fileObject: any) => {
+              let result: any = {};
+              _.toPairs(fileObject.fileJson).forEach(
+                ([resourceType, resource]: [string, any]) => {
+                  _.toPairs(resource).forEach(
+                    ([resourceName, resourceValue]) => {
+                      const id = resourceType + '-' + resourceName;
+                      const currentSchema = terraformSchemaMap.get(id);
+                      const hasNoResourceName = !!noResourceNameTypeList.find(
+                        (currType) => resourceType === currType
+                      );
+                      const content = hasNoResourceName
+                        ? resourceValue
+                        : Object.values(resourceValue as any)[0];
+
+                      // 여기서 preDefiendData 해서 애초에 redux로 갖고있고 sidepanel에서도 그거 참조해서 하는게 좋을듯
+                      const { mapObjectTypeList = {}, customizedObject = {} } =
+                        preDefinedFileObjects(
+                          resourceType,
+                          currentSchema as JSONSchema7,
+                          content,
+                          resourceName,
+                          Object.keys(resourceValue as any)[0]
+                        );
+
+                      Object.values(mapObjectTypeList).forEach((value) => {
+                        _.assign(mapObjectTypeCollection, value);
+                      });
+
+                      if (!!resourceName) {
+                        result = {
+                          fileJson: {
+                            ...result.fileJson,
+                            [resourceType]: {
+                              [resourceName]: {
+                                [Object.keys(resourceValue as any)[0]]:
+                                  customizedObject,
+                              },
+                            },
+                          },
+                        };
+                      } else {
+                        result = {
+                          ...result,
+                          fileJson: {
+                            ...result.fileJson,
+                            [resourceType]: {
+                              [Object.keys(resourceValue as any)[0]]:
+                                customizedObject,
+                            },
+                          },
+                        };
+                      }
+                    }
+                  );
+                }
+              );
+              return { ...result, filePath: fileObject.filePath };
+            });
+          };
+          dispatch(setMapObjectTypeCollection(mapObjectTypeCollection));
+          dispatch(setFileObjects(parse(projectJsonRes.data)));
           history.push(`/main/${uid}`);
           dispatch(setWorkspaceUid(uid));
         }
@@ -151,28 +225,33 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
   const objResult: any[] = [];
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
-  useSelector(selectCodeFileObjects).forEach(
-    (file: { filePath: string; fileJson: any }) => {
-      // eslint-disable-next-line guard-for-in
-      for (const currKey in file.fileJson) {
-        objResult.push(
-          ..._.entries(file.fileJson[currKey]).map((object) => ({
-            [object[0]]: object[1],
-            type: currKey,
-          }))
-        );
-      }
+  const fileObjects = useAppSelector(selectCodeFileObjects);
+  fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
+    // eslint-disable-next-line guard-for-in
+    for (const currKey in file.fileJson) {
+      objResult.push(
+        ..._.entries(file.fileJson[currKey]).map((object) => ({
+          [object[0]]: object[1],
+          type: currKey,
+        }))
+      );
     }
-  );
+  });
 
   React.useEffect(() => {
     const itemsList: Item[] = [];
     objResult
+      .filter((result) => {
+        const { type, ...object } = result;
+        const { instanceName } = getObjectNameInfo(object, type);
+        return !!instanceName;
+      })
       .map((result) => {
         const { type, ...object } = result;
-        const resourceName = Object.keys(object)[0];
-        const instanceName = Object.keys(object[resourceName])[0];
-        const title = type + '-' + resourceName;
+        const { resourceName, instanceName } = getObjectNameInfo(object, type);
+        const title = !!resourceName
+          ? type + '/' + resourceName
+          : type + '/' + instanceName;
         return { type, resourceName, title, instanceName };
       })
       .forEach((i: Item) => {
@@ -186,7 +265,7 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
       });
     setItems(itemsList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history.location.pathname]);
+  }, [history.location.pathname, fileObjects]);
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on(
@@ -234,15 +313,15 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                 startIcon={getIcon(item.type)}
                 onClick={() => {
                   const content = objResult.filter((cur: any) => {
-                    const { type } = cur;
-                    const resourceName = Object.keys(cur)[0];
-                    if (item.title === type + '-' + resourceName) {
-                      if (type === 'provider' || type === 'module') {
-                        return cur[resourceName];
-                      } else {
-                        return cur[resourceName][item.instanceName];
-                      }
-                    }
+                    const { type, ...obj } = cur;
+                    const { resourceName, instanceName } = getObjectNameInfo(
+                      obj,
+                      type
+                    );
+                    const title = !!resourceName
+                      ? type + '/' + resourceName
+                      : type + '/' + instanceName;
+                    return item.title === title;
                   });
                   const object = {
                     id: item.title,
@@ -251,17 +330,17 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
                   };
 
                   dispatch(setSelectedObjectInfo(object));
-                  setIsSidePanelOpen((currState: boolean) => true);
+                  dispatch(setSidePanel(true));
                 }}
               >
-                {item.resourceName}
+                {item.resourceName ? item.resourceName : item.instanceName}
               </Button>
             );
           })}
         </List>
       </TabPanel>
       <TabPanel value={tabIndex} index={1}>
-        <TopologyLibrary items={items} />
+        <TopologyLibrary />
       </TabPanel>
     </Box>
   );
@@ -364,11 +443,5 @@ const TopologySidebar: React.FC<TopologySidebarProps> = (props) => {
     </>
   );
 };
-type TopologySidebarProps = {
-  setIsSidePanelOpen: any;
-};
 
 export default TopologySidebar;
-function doSomething(key: any) {
-  throw new Error('Function not implemented.');
-}

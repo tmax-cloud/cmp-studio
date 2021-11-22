@@ -1,24 +1,60 @@
-/* eslint-disable  @typescript-eslint/ban-types */
 import * as React from 'react';
-import Modal from '@mui/material/Modal';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
+import {
+  Box,
+  IconButton,
+  Link,
+  Modal,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import Typography from '@mui/material/Typography';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Link from '@mui/material/Link';
-import { ModulePath } from '@renderer/types/graph';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
+import { getModuleData, getPrunedGraph } from '@renderer/utils/graph';
+import { ModuleData } from '@renderer/types/graph';
+import {
+  setSelectedData,
+  setSelectedModule,
+  setSelectedNode,
+} from '@renderer/features/graphSlice';
+import { nodesById } from '@renderer/utils/graph/parse';
 
-const Error = () => <caption>구현 예정</caption>;
+const Empty = () => (
+  <caption style={{ textAlign: 'center' }}>
+    불러올 모듈 목록이 없습니다.
+  </caption>
+);
+
+const ModuleLink = (props: ModuleLinkProps) => {
+  const { text, onClick } = props;
+  return (
+    <Link underline="hover" href="/" onClick={onClick}>
+      <Tooltip title={text}>
+        <Typography
+          color="inherit"
+          noWrap
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            maxWidth: '10rem',
+          }}
+        >
+          {text}
+        </Typography>
+      </Tooltip>
+    </Link>
+  );
+};
 
 const ModuleListModal = (props: ModuleListModalProps) => {
-  const { isOpen, onClose, rowData } = props;
+  const { isOpen, onClose } = props;
 
   const columns = [
     { id: 'name', label: '이름', width: 180 },
@@ -26,9 +62,24 @@ const ModuleListModal = (props: ModuleListModalProps) => {
     { id: 'size', label: '오브젝트 개수', width: 120 },
   ];
 
-  const rows = rowData?.map((data) => {
-    return { name: data.name, path: data.path, size: data.size };
-  });
+  const graphData = useAppSelector(selectGraphData);
+  const rows = getModuleData(graphData.nodes);
+  const dispatch = useAppDispatch();
+
+  const handleClick = (event: React.MouseEvent<any>, item: ModuleData) => {
+    event.preventDefault();
+    if (item.root) {
+      // 루트 경로일 경우
+      dispatch(setSelectedData(graphData));
+      dispatch(setSelectedModule(null));
+    } else {
+      const selectedData = getPrunedGraph(graphData.nodes, item.id);
+      dispatch(setSelectedData(selectedData));
+      dispatch(setSelectedModule(nodesById(graphData.nodes)[item.id]));
+    }
+    dispatch(setSelectedNode(null));
+    onClose();
+  };
 
   return (
     <Modal
@@ -57,9 +108,9 @@ const ModuleListModal = (props: ModuleListModalProps) => {
             <CloseIcon />
           </IconButton>
         </Toolbar>
-        <TableContainer component={Box} sx={{ width: 600, maxHeight: 400 }}>
+        <TableContainer component={Box} sx={{ width: 600, maxHeight: 300 }}>
           <Table stickyHeader sx={{ border: 0 }}>
-            {(!rows || rows?.length === 0) && <Error />}
+            {(!rows || rows?.length === 0) && <Empty />}
             <TableHead>
               <TableRow>
                 {columns.map((column) => (
@@ -77,9 +128,12 @@ const ModuleListModal = (props: ModuleListModalProps) => {
             </TableHead>
             <TableBody>
               {rows?.map((row) => (
-                <TableRow key={row.name}>
+                <TableRow key={row.id}>
                   <TableCell component="th" scope="row" sx={{ border: 0 }}>
-                    <Link href="#link"> {row.name}</Link>
+                    <ModuleLink
+                      text={row.name}
+                      onClick={(event) => handleClick(event, row)}
+                    />
                   </TableCell>
                   <TableCell sx={{ border: 0 }}>{row.path}</TableCell>
                   <TableCell align="center" sx={{ border: 0 }}>
@@ -95,10 +149,13 @@ const ModuleListModal = (props: ModuleListModalProps) => {
   );
 };
 
+interface ModuleLinkProps {
+  text: string;
+  onClick: (event: React.MouseEvent<any>) => void;
+}
 export interface ModuleListModalProps {
   isOpen: boolean;
   onClose: () => void;
-  rowData?: ModulePath[];
 }
 
 export default ModuleListModal;

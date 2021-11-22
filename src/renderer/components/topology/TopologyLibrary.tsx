@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useHistory } from 'react-router-dom';
+import _ from 'lodash';
 import {
   Box,
   Button,
@@ -18,9 +20,34 @@ import {
   ArrowUpward,
   Delete,
   Explore,
+  Devices,
 } from '@mui/icons-material';
-import terraformSchema from './state/form/terraform_schema.json';
+import { useSelector, useDispatch } from 'react-redux';
+//import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import {
+  setFileObjects,
+  setSelectedObjectInfo,
+} from '@renderer/features/codeSlice';
+import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import * as WorkspaceTypes from '@main/workspaces/common/workspace';
+import { getModuleNodeByName, getPrunedGraph } from '@renderer/utils/graph';
+import {
+  selectGraphData,
+  selectSelectedModule,
+} from '@renderer/features/graphSliceInputSelectors';
+import {
+  setSelectedData,
+  setSelectedModule,
+  setSelectedNode,
+} from '@renderer/features/graphSlice';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import {
+  openExistFolder,
+  getProjectJson,
+} from '../../utils/ipc/workspaceIpcUtils';
 import parseJson from './state/form/utils/json2JsonSchemaParser';
+import { ModuleImportModal } from './modal';
+import { setWorkspaceUid } from '../../features/commonSlice';
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -34,73 +61,141 @@ const getIcon = (type: string) => {
       return <Mode />;
     case 'localModule':
       return <Explore />;
+    case 'default':
+      return <Devices />;
     default:
       return <Circle />;
   }
 };
+const defaultList = [
+  {
+    title: 'defaults-provider',
+    instanceName: 'provider',
+    resourceName: 'provider',
+    type: 'default',
+  },
+  {
+    title: 'defaults-variable',
+    instanceName: 'variable',
+    resourceName: 'variable',
+    type: 'default',
+  },
+  {
+    title: 'defaults-output',
+    instanceName: 'output',
+    resourceName: 'output',
+    type: 'default',
+  },
+  {
+    title: 'defaults-terraform',
+    instanceName: 'terraform',
+    resourceName: 'terraform',
+    type: 'default',
+  },
+  {
+    title: 'defaults-locals',
+    instanceName: 'locals',
+    resourceName: 'locals',
+    type: 'default',
+  },
+];
 
-function seartchDisplayName(searchText: string, displayName: string) {
-  if (displayName.toUpperCase().indexOf(searchText.toUpperCase()) !== -1) {
+function seartchByName(searchText: string, name: string) {
+  if (name.toUpperCase().indexOf(searchText.toUpperCase()) !== -1) {
     return true;
   } else {
     return false;
   }
 }
+function isLocalModule(item: Item) {
+  return true;
+}
+/*
+function getModuleList(items: Item[]) {
+  //get Module 구현 필요
+  //test Module
+  items.push({
+    provider: 'aws',
+    title: 'module-security-group',
+    displayName: 'security-group',
+    type: 'module',
+    source: 'terraform-aws-modules/security-group/aws',
+    version: '4.4.0',
+  });
+}
+*/
 
-const Modal: React.FC<ModalProps> = ({ title, confirmText, cancelText }) => {
-  return (
-    <div>
-      <InputLabel>{title || 'Title'}</InputLabel>
-      <InputLabel>{confirmText || 'Confirm'}</InputLabel>
-      <InputLabel>{cancelText || 'Cancel'}</InputLabel>
-    </div>
-  );
-};
-type ModalProps = {
-  title: string;
-  confirmText: string;
-  cancelText: string;
-};
-function openSidePanel(obj: { id: string }) {
-  alert('OpenForm ' + obj.id);
-}
-function clickLocalModule(afterAction: any, obj: { id: string }) {
-  alert('Local Module ' + obj.id);
-  afterAction(obj);
-}
-function clickDefault(afterAction: any, obj: { id: string }) {
-  alert('Default ' + obj.id);
-  afterAction(obj);
-}
-function clickModule(afterAction: any, obj: { id: string }) {
-  alert('Module ' + obj.id);
-  afterAction(obj);
-}
-function clickResource(afterAction: any, obj: { id: string }) {
-  alert('Resource ' + obj.id);
-  afterAction(obj);
-}
-function clickDatasource(afterAction: any, obj: { id: string }) {
-  alert('Data Source ' + obj.id);
-  afterAction(obj);
+function getLocalModuleList(items: Item[]) {
+  //Module 중 Local Module 구분하는 isLocalModule 구현 필요
+  const localItems: Item[] = [];
+  items.forEach((item) => {
+    if (item?.type === 'module' && isLocalModule(item)) {
+      localItems.push(item);
+    }
+  });
+  return localItems;
 }
 
 const ShowItemList: React.FC<ShowItemListProps> = ({
   items,
   title,
-  clickAction,
-  afterAction,
+  provider,
 }) => {
+  const dispatch = useDispatch();
+  //const history = useHistory();
+  /*
+  const openWorkspaceFromTopologyLibrary = async (folderUri: string) => {
+    const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
+      folderUri,
+    };
+    openExistFolder(args)
+      .then(async (response: any) => {
+        const uid = response?.data?.uid;
+        if (uid) {
+          const projectJsonRes = await getProjectJson(args);
+          dispatch(setFileObjects(projectJsonRes.data));
+          history.push(`/main/${uid}`);
+          dispatch(setWorkspaceUid(uid));
+        }
+        return response;
+      })
+      .catch((err: any) => {
+        console.log('[Error] Failed to open exist folder : ', err);
+      });
+  };
+  */
+
   const [isShow, setIsShow] = React.useState(false);
+  const fileObjects = useSelector(selectCodeFileObjects);
+  /*
+  const folderUri = window.electron.ipcRenderer.on(
+    'studio:dirPathToOpen',
+    (res: { canceled: boolean; filePaths: string[] }) => {
+      const { filePaths, canceled } = res;
+      if (!canceled) {
+        openWorkspaceFromTopologyLibrary(filePaths[0]);
+      }
+    }
+  );
+  */
+  const folderUri = './';
+  const addedObjectJSON = {}; //temp
+  const paths = useAppSelector(selectSelectedModule)?.modules || [];
+  const graphData = useAppSelector(selectGraphData);
 
   return (
     <>
       {items.length > 0 && (
         <>
-          <Button onClick={() => setIsShow(!isShow)} color="inherit" fullWidth>
+          <Button
+            onClick={() => setIsShow(!isShow)}
+            color="inherit"
+            fullWidth
+            style={{ textAlign: 'left', alignContent: 'left' }}
+          >
             {title}
             {'(' + items.length + ')'}
-            <span style={{ marginRight: '10px', float: 'right' }}>
+            <span style={{ marginLeft: '10px', float: 'left' }}>
               {isShow ? <ArrowUpward /> : <ArrowDownward />}
             </span>
           </Button>
@@ -112,12 +207,59 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
                     key={`button-${index}`}
                     startIcon={getIcon(item.type)}
                     onClick={() => {
-                      clickAction(afterAction, { id: item.title });
+                      if (item.type === 'module') {
+                        const name = item.resourceName;
+                        const selectedModule = getModuleNodeByName(
+                          graphData.nodes,
+                          name
+                        );
+                        if (selectedModule && selectedModule.id) {
+                          const selectedData = getPrunedGraph(
+                            graphData.nodes,
+                            selectedModule.id
+                          );
+                          dispatch(setSelectedData(selectedData));
+                          dispatch(setSelectedNode(null));
+                          dispatch(setSelectedModule(selectedModule));
+                        }
+                      } else {
+                        const newInstanceName =
+                          'new-' +
+                          item.type +
+                          '-' +
+                          item.resourceName +
+                          '-' +
+                          fileObjects.length;
+                        const newFileObjects = [
+                          {
+                            filePath: `${folderUri}${item.type}/${newInstanceName}.tf`,
+                            fileJson: {
+                              [item.type]: {
+                                [item.resourceName]: {
+                                  [newInstanceName]: addedObjectJSON,
+                                },
+                              },
+                            },
+                          },
+                        ];
+                        dispatch(
+                          setFileObjects(fileObjects.concat(newFileObjects))
+                        );
+                        const object = {
+                          id: item.title,
+                          instanceName: newInstanceName,
+                          content: newFileObjects[0].fileJson,
+                        };
+                        dispatch(setSelectedObjectInfo(object));
+                        //setIsSidePanelOpen((currState: boolean) => true);
+                      }
                     }}
                     fullWidth
                     style={{ textAlign: 'left' }}
                   >
-                    {item.type === 'localModule' ? item.path : item.displayName}
+                    {item.type === 'localModule'
+                      ? item.path
+                      : item.resourceName}
                   </Button>
                 );
               })}
@@ -130,8 +272,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
 type ShowItemListProps = {
   items: Item[];
   title: string;
-  clickAction: any;
-  afterAction: any;
+  provider: string;
 };
 
 interface Item {
@@ -139,21 +280,24 @@ interface Item {
   objectCount?: number;
   provider?: string;
   title: string;
-  displayName: string;
+  instanceName: string;
+  resourceName: string;
   type: string;
+  source?: string;
+  version?: string;
 }
-const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
-  const [provider, setProvider] = React.useState('aws');
-  const [providerItems, setProviderItems] = React.useState<Item[]>([]);
+let selectedProvider = '';
+//const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
+const TopologyLibrary: React.FC<any> = (props) => {
+  const [provider, setProvider] = React.useState(selectedProvider || 'aws');
+  const [defaltItems, setDefaltItems] = React.useState<Item[]>([]);
   const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
   const [datasourceItems, setdatasourceItems] = React.useState<Item[]>([]);
   const providerHandleChange = (event: any) => {
     setProvider(event.target.value);
   };
   const [localModuleItems, setLocalModuleItems] = React.useState<Item[]>([]);
-  const [terraformModuleItems, setTerraformModuleItems] = React.useState<
-    Item[]
-  >([]);
+  //const [terraformModuleItems, setTerraformModuleItems] = React.useState<Item[]>([]);
   const [searchText, setSearchText] = React.useState('');
   const searchTextChange = (event: any) => {
     setSearchText(event.target.value);
@@ -163,117 +307,132 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
   };
   const [isSearchResultEmpty, setIsSearchResultEmpty] = React.useState(false);
 
-  React.useEffect(() => {
-    let schemaMap;
-    if (provider === 'aws') {
-      schemaMap = parseJson('aws');
-    } else {
-      schemaMap = new Map();
-    }
+  const [openModuleListModal, setOpenModuleListModal] = React.useState(false);
+  const [importModule, setImportModule] = React.useState('');
 
-    const items2: Item[] = [];
-    schemaMap.forEach((schema) => {
-      const schemaProvider = provider;
-      const schemaTitle = schema.title;
-      const schemaDisplayName = schema.title.split('-')[1];
-      const schemaType = schema.title.split('-')[0];
-      items2.push({
-        provider: schemaProvider,
-        title: schemaTitle,
-        displayName: schemaDisplayName,
-        type: schemaType,
+  const handleModuleListModalOpen = (event: any) => {
+    setImportModule(event.target?.value || event);
+    setOpenModuleListModal(true);
+  };
+  const handleModuleListModalClose = () => setOpenModuleListModal(false);
+  const dispatch = useDispatch();
+
+  const objResult: any[] = [];
+
+  // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
+  useSelector(selectCodeFileObjects).forEach(
+    (file: { filePath: string; fileJson: any }) => {
+      // eslint-disable-next-line guard-for-in
+      for (const currKey in file.fileJson) {
+        objResult.push(
+          ..._.entries(file.fileJson[currKey]).map((object) => ({
+            [object[0]]: object[1],
+            type: currKey,
+          }))
+        );
+      }
+    }
+  );
+
+  const itemsList: Item[] = [];
+  objResult
+    .map((result) => {
+      const { type, ...object } = result;
+      const resourceName = Object.keys(object)[0];
+      const instanceName = Object.keys(object[resourceName])[0];
+      const title = type + '-' + resourceName;
+      return { type, resourceName, title, instanceName };
+    })
+    .forEach((i: Item) => {
+      itemsList.push({
+        provider: i.resourceName.split('_')[0],
+        title: i.title,
+        instanceName: i.instanceName,
+        resourceName: i.resourceName,
+        type: i.type,
       });
     });
 
-    const providerList: Item[] = [];
-    const resourceList: Item[] = [];
-    const datasourceList: Item[] = [];
-    const moduleList: Item[] = [];
-    items2.forEach((i: Item) => {
-      if (i.provider === provider) {
-        if (seartchDisplayName(searchText, i.displayName)) {
-          if (i.type === 'provider') {
-            providerList.push({
-              provider: i.provider,
-              title: i.title,
-              displayName: i.displayName,
-              type: i.type,
-            });
-          }
-          if (i.type === 'resource') {
-            resourceList.push({
-              provider: i.provider,
-              title: i.title,
-              displayName: i.displayName,
-              type: i.type,
-            });
-          }
-          if (i.type === 'datasource') {
-            datasourceList.push({
-              provider: i.provider,
-              title: i.title,
-              displayName: i.displayName,
-              type: i.type,
-            });
-          }
-          if (i.type === 'module') {
-            moduleList.push({
-              provider: i.provider,
-              title: i.title,
-              displayName: i.displayName,
-              type: i.type,
-            });
-          }
-        }
-      }
-    });
+  /*
+  React.useEffect(() => {
     const localList: Item[] = [];
-    const localItems = [
-      {
-        path: '/',
-        title: 'localModule-Project_Root',
-        objectCount: 20,
-        displayName: 'Project_root',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config',
-        title: 'localModule-Network-config',
-        objectCount: 12,
-        displayName: 'Network-config',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config2',
-        title: 'localModule-Network-config-2',
-        objectCount: 3,
-        displayName: 'Network-config 2',
-        type: 'localModule',
-      },
-      {
-        path: '/Network-config/defaultName',
-        title: 'localModule-defaultName',
-        objectCount: 13,
-        displayName: 'defaultName',
-        type: 'localModule',
-      },
-    ];
+    const localItems = getLocalModuleList(itemsList);
+
     localItems.forEach((localItem: Item) => {
-      if (seartchDisplayName(searchText, localItem.displayName)) {
+      if (seartchByName(searchText, localItem.resourceName)) {
         localList.push(localItem);
       }
     });
     setLocalModuleItems(localList);
+  }, [objResult]);
+  */
 
-    //setFilteredItems(filteredList);
-    setProviderItems(providerList);
+  React.useEffect(() => {
+    let schemaMap;
+
+    try {
+      schemaMap = parseJson(provider);
+    } catch (e) {
+      console.log('Cannot get schema in ' + provider);
+      schemaMap = new Map();
+    }
+    const items: Item[] = [];
+    schemaMap.forEach((schema) => {
+      const schemaProvider = provider;
+      const schemaTitle = schema.title;
+      const schemaResourceName = schema.title.split('-')[1];
+      const schemaType = schema.title.split('-')[0];
+      items.push({
+        provider: schemaProvider,
+        title: schemaTitle,
+        instanceName: schemaResourceName,
+        resourceName: schemaResourceName,
+        type: schemaType,
+      });
+    });
+    const resourceList: Item[] = [];
+    const datasourceList: Item[] = [];
+    const moduleList: Item[] = [];
+    items.forEach((i: Item) => {
+      if (seartchByName(searchText, i.resourceName)) {
+        if (i.type === 'resource') {
+          resourceList.push({
+            provider: i.provider,
+            title: i.title,
+            instanceName: i.instanceName,
+            resourceName: i.resourceName,
+            type: i.type,
+          });
+        }
+        if (i.type === 'datasource') {
+          datasourceList.push({
+            provider: i.provider,
+            title: i.title,
+            instanceName: i.instanceName,
+            resourceName: i.resourceName,
+            type: i.type,
+          });
+        }
+      }
+    });
+
+    const localList: Item[] = [];
+    const localItems = getLocalModuleList(itemsList);
+
+    localItems.forEach((localItem: Item) => {
+      if (seartchByName(searchText, localItem.resourceName)) {
+        localList.push(localItem);
+      }
+    });
+    setLocalModuleItems(localList);
+    setDefaltItems(defaultList);
     setResourceItems(resourceList);
     setdatasourceItems(datasourceList);
-    setTerraformModuleItems(moduleList);
+    //setTerraformModuleItems(moduleList);
 
     if (
       localList.length ||
-      providerList.length ||
+      defaultList.length ||
       resourceList.length ||
       datasourceList.length ||
       moduleList.length
@@ -282,6 +441,7 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
     } else {
       setIsSearchResultEmpty(true);
     }
+    selectedProvider = provider;
   }, [provider, searchText]);
 
   return (
@@ -301,7 +461,6 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
           <MenuItem value="gcp">Google Cloud Platform</MenuItem>
           <MenuItem value="openstack">OpenStack</MenuItem>
           <MenuItem value="vmware">Vmware vSphere</MenuItem>
-          <MenuItem value="test">TEST</MenuItem>
         </Select>
         <div>
           <TextField
@@ -316,7 +475,7 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
             style={{
               marginTop: '25px',
               position: 'absolute',
-              right: '25px',
+              right: '30px',
               color: 'gray',
             }}
           />
@@ -331,41 +490,138 @@ const TopologyLibrary: React.FC<TopologyLibraryProps> = ({ items }) => {
             <ShowItemList
               items={localModuleItems}
               title="로컬 모듈"
-              clickAction={clickLocalModule}
-              afterAction={openSidePanel}
+              provider={provider}
             />
             <ShowItemList
-              items={providerItems}
+              items={defaltItems}
               title="테라폼 디폴트"
-              clickAction={clickDefault}
-              afterAction={openSidePanel}
+              provider={provider}
             />
+            {/* 모듈 추후 추가 */}
+            {/*
             <ShowItemList
               items={terraformModuleItems}
               title="테라폼 모듈"
-              clickAction={clickModule}
-              afterAction={openSidePanel}
+              setIsSidePanelOpen={setIsSidePanelOpen}
+              provider={provider}
             />
+            */}
             <ShowItemList
               items={resourceItems}
               title="테라폼 리소스"
-              clickAction={clickResource}
-              afterAction={openSidePanel}
+              provider={provider}
             />
             <ShowItemList
               items={datasourceItems}
               title="테라폼 데이터소스"
-              clickAction={clickDatasource}
-              afterAction={openSidePanel}
+              provider={provider}
+            />
+            {/* 테스트용 Object 표시 */}
+            <InputLabel>Object 표시 - 임시</InputLabel>
+            <ShowItemList
+              items={itemsList}
+              title="Object"
+              provider={provider}
             />
           </>
         )}
+        <Button onClick={handleModuleListModalOpen} value="test1">
+          Modal Test
+        </Button>
+        <Button onClick={() => dispatch(setFileObjects([]))} value="test2">
+          Delete Object for Test
+        </Button>
+        <Button
+          onClick={() =>
+            dispatch(
+              setFileObjects([
+                {
+                  filePath: 'test.tf',
+                  fileJson: {
+                    module: {
+                      'aws-network-configs': {
+                        source: './network-configs',
+                      },
+                    },
+                    provider: {
+                      aws: {
+                        region: 'test-region',
+                      },
+                    },
+                  },
+                },
+                {
+                  filePath: 'a.tf',
+                  fileJson: {
+                    resource: {
+                      aws_instance: {
+                        'ubuntu-ssh-server': {
+                          ami: 'ami-0b9064170e32bde34',
+                          associate_public_ip_address: true,
+                          count: 1,
+                          instance_type: 't2.micro',
+                          key_name: '{var.key_pair}',
+                          subnet_id:
+                            '{module.aws-network-configs.test-subnet-a-id}',
+                          tags: { Naem: 'test-instance' },
+                          vpc_security_group_ids: [
+                            '{module.aws-network-configs.test-sg-id}',
+                          ],
+                        },
+                      },
+                    },
+                    variable: {
+                      key_pair: {
+                        default: 'aws-key',
+                      },
+                    },
+                  },
+                },
+                {
+                  filePath: 'b.tf',
+                  fileJson: {
+                    resource: {
+                      aws_key_pair: {
+                        'terraform-key': {
+                          key_name: 'aws-key',
+                          public_key:
+                            '{tls_private_key.example.public_key_openssh}',
+                        },
+                      },
+                      tls_private_key: {
+                        example: {
+                          algorithm: 'RSA',
+                          provisioner: {
+                            'local-exec': {
+                              command:
+                                "echo '@@@{self.private_key_pem}@@@' > ./aws-key.pem",
+                            },
+                            rsa_bits: 4096,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              ])
+            )
+          }
+          value="test3"
+        >
+          Set Object for Test
+        </Button>
+        <ModuleImportModal
+          isOpen={openModuleListModal}
+          onClose={handleModuleListModalClose}
+          moduleName={importModule}
+        />
       </Box>
     </>
   );
 };
-
+/*
 type TopologyLibraryProps = {
-  items: any;
+  setIsSidePanelOpen: any;
 };
+*/
 export default TopologyLibrary;

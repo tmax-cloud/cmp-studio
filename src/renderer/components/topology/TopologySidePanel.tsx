@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux';
 import { Drawer } from '@mui/material';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { selectCode } from '@renderer/features/codeSliceInputSelectors';
-import { useAppDispatch } from '@renderer/app/store';
+import { selectUiToggleSidePanel } from '@renderer/features/uiSliceInputSelectors';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import FormHeader from './state/form/Header';
 import FormTabs from './state/StateTabs';
@@ -14,33 +15,28 @@ import { TOPOLOGY_TOOLBAR_HEIGHT } from './toolbar/TopologyToolbar';
 
 export const SIDEPANEL_WIDTH = 500;
 // 저장 버튼 누르면 redux objects에 content 덮어씌우기나이ㅓㄻ
-const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
-  isSidePanelOpen,
-  toggleSidePanel,
-}) => {
+const TopologySidePanel = () => {
   const {
     selectedObjectInfo: { id, content, sourceSchema, instanceName },
   } = useSelector(selectCode);
 
   const dispatch = useAppDispatch();
+  const isSidePanelOpen = useAppSelector(selectUiToggleSidePanel);
   const terraformSchemaMap: Map<any, any> = React.useMemo(
     () => getSchemaMap(),
     []
   );
-  const currentSchema = React.useMemo(
-    () => terraformSchemaMap.get(id),
-    [terraformSchemaMap, id]
-  );
-  if (_.isEmpty(sourceSchema)) {
-    dispatch(setSelectedSourceSchema(currentSchema));
-  }
-  // schema
+  const currentSchema = _.isEmpty(sourceSchema)
+    ? terraformSchemaMap.get(id.replace('/', '-'))
+    : sourceSchema;
   const {
     customUISchema = {},
     formData = {},
     fixedSchema = {},
-  } = id && preDefinedData(sourceSchema, content);
-
+  } = id && preDefinedData(currentSchema, content);
+  React.useEffect(() => {
+    dispatch(setSelectedSourceSchema(fixedSchema));
+  }, [id]);
   return (
     <>
       <Drawer
@@ -57,21 +53,15 @@ const TopologySidePanel: React.FC<TopologySidePanelProps> = ({
         anchor="right"
         variant="persistent"
       >
-        <FormHeader title={instanceName} toggleSidePanel={toggleSidePanel} />
+        <FormHeader title={instanceName} />
         <FormTabs
           schema={fixedSchema}
           formData={formData}
           uiSchema={customUISchema}
-          toggleSidePanel={toggleSidePanel}
         />
       </Drawer>
     </>
   );
-};
-
-type TopologySidePanelProps = {
-  isSidePanelOpen: boolean;
-  toggleSidePanel: any;
 };
 
 export default TopologySidePanel;

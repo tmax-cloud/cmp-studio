@@ -7,7 +7,9 @@ import {
   Select,
   Button,
   MenuItem,
+  InputLabel,
   TextField,
+  FormControl,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import {
@@ -61,23 +63,27 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               padding: '16px 0 0 16px',
             }}
           >
-            <Select
-              id={id}
-              sx={{ width: '250px' }}
-              className={classes.root}
-              label="스키마"
-              value={additionalSchema}
-              onChange={(e) => {
-                setAdditionalSchema(e.target.value);
-              }}
-            >
-              {sourceSchema &&
-                Object.keys(sourceSchema?.properties).map((cur) => (
-                  <MenuItem key={cur} value={cur}>
-                    {cur}
-                  </MenuItem>
-                ))}
-            </Select>
+            <FormControl fullWidth>
+              <InputLabel id="schema-label">스키마</InputLabel>
+              <Select
+                labelId="schema-label"
+                id={id}
+                sx={{ width: '220px' }}
+                className={classes.root}
+                label="Schema"
+                value={additionalSchema}
+                onChange={(e) => {
+                  setAdditionalSchema(e.target.value);
+                }}
+              >
+                {!_.isEmpty(sourceSchema) &&
+                  Object.keys(sourceSchema?.properties).map((cur) => (
+                    <MenuItem key={cur} value={cur}>
+                      {cur}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
             <Button
               onClick={() => {
                 const result = addSchemaBasedField(
@@ -99,23 +105,26 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               padding: '16px 0 0 16px',
             }}
           >
-            <Select
-              id={id}
-              sx={{ width: '250px' }}
-              className={classes.root}
-              label="타입"
-              value={customFieldType}
-              onChange={(e) => {
-                setCustomFieldType(e.target.value);
-              }}
-            >
-              {sourceSchema &&
-                inputTypeList.map((cur) => (
-                  <MenuItem key={cur} value={cur}>
-                    {cur}
-                  </MenuItem>
-                ))}
-            </Select>
+            <FormControl fullWidth>
+              <InputLabel id="schema-label">타입</InputLabel>
+              <Select
+                id={id}
+                sx={{ width: '220px' }}
+                className={classes.root}
+                label="타입"
+                value={customFieldType}
+                onChange={(e) => {
+                  setCustomFieldType(e.target.value);
+                }}
+              >
+                {sourceSchema &&
+                  inputTypeList.map((cur) => (
+                    <MenuItem key={cur} value={cur}>
+                      {cur}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
             <TextField
               id={id}
               sx={{ width: '250px', marginLeft: '16px' }}
