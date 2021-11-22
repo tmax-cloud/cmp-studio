@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import _ from 'lodash';
+import { JSONSchema7 } from 'json-schema';
 import {
   Box,
   Drawer,
@@ -15,12 +16,17 @@ import {
 } from '@mui/material';
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { useHistory } from 'react-router-dom';
-// import { useSelector, useDispatch } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import {
+  getObjectNameInfo,
+  noResourceNameTypeList,
+} from './state/form/utils/getResourceInfo';
+import preDefinedFileObjects from './state/form/utils/preDefinedFileObjects';
 import {
   openExistFolder,
   getProjectJson,
@@ -28,7 +34,12 @@ import {
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import TopologyLibrary from './TopologyLibrary';
-import { setFileObjects } from '../../features/codeSlice';
+import {
+  setSelectedObjectInfo,
+  setFileObjects,
+  setMapObjectTypeCollection,
+} from '../../features/codeSlice';
+import { setSidePanel } from '../../features/uiSlice';
 
 import { setWorkspaceUid } from '../../features/commonSlice';
 import CreateWorkspaceModal from '../workspace/CreateWorkspaceModal';
@@ -123,7 +134,72 @@ const TopologySidebar = () => {
         const uid = response?.data?.uid;
         if (uid) {
           const projectJsonRes = await getProjectJson(args);
-          dispatch(setFileObjects(projectJsonRes.data));
+          const terraformSchemaMap = getSchemaMap();
+          const mapObjectTypeCollection = {};
+
+          const parse = (fileObjects: any[]) => {
+            return fileObjects.map((fileObject: any) => {
+              let result: any = {};
+              _.toPairs(fileObject.fileJson).forEach(
+                ([resourceType, resource]: [string, any]) => {
+                  _.toPairs(resource).forEach(
+                    ([resourceName, resourceValue]) => {
+                      const id = resourceType + '-' + resourceName;
+                      const currentSchema = terraformSchemaMap.get(id);
+                      const hasNoResourceName = !!noResourceNameTypeList.find(
+                        (currType) => resourceType === currType
+                      );
+                      const content = hasNoResourceName
+                        ? resourceValue
+                        : Object.values(resourceValue as any)[0];
+
+                      // 여기서 preDefiendData 해서 애초에 redux로 갖고있고 sidepanel에서도 그거 참조해서 하는게 좋을듯
+                      const { mapObjectTypeList = {}, customizedObject = {} } =
+                        preDefinedFileObjects(
+                          resourceType,
+                          currentSchema as JSONSchema7,
+                          content,
+                          resourceName,
+                          Object.keys(resourceValue as any)[0]
+                        );
+
+                      Object.values(mapObjectTypeList).forEach((value) => {
+                        _.assign(mapObjectTypeCollection, value);
+                      });
+
+                      if (!!resourceName) {
+                        result = {
+                          fileJson: {
+                            ...result.fileJson,
+                            [resourceType]: {
+                              [resourceName]: {
+                                [Object.keys(resourceValue as any)[0]]:
+                                  customizedObject,
+                              },
+                            },
+                          },
+                        };
+                      } else {
+                        result = {
+                          ...result,
+                          fileJson: {
+                            ...result.fileJson,
+                            [resourceType]: {
+                              [Object.keys(resourceValue as any)[0]]:
+                                customizedObject,
+                            },
+                          },
+                        };
+                      }
+                    }
+                  );
+                }
+              );
+              return { ...result, filePath: fileObject.filePath };
+            });
+          };
+          dispatch(setMapObjectTypeCollection(mapObjectTypeCollection));
+          dispatch(setFileObjects(parse(projectJsonRes.data)));
           history.push(`/main/${uid}`);
           dispatch(setWorkspaceUid(uid));
         }
@@ -159,31 +235,15 @@ const TopologySidebar = () => {
     objResult
       .filter((result) => {
         const { type, ...object } = result;
-        const resourceName = Object.keys(object)[0];
-        const instanceName =
-          type === 'module' ||
-          type === 'provider' ||
-          type === 'variable' ||
-          type === 'output'
-            ? Object.keys(object)[0]
-            : Object.keys(object[resourceName])[0];
-        if (instanceName) {
-          return true;
-        } else {
-          return false;
-        }
+        const { instanceName } = getObjectNameInfo(object, type);
+        return !!instanceName;
       })
       .map((result) => {
         const { type, ...object } = result;
-        const resourceName = Object.keys(object)[0];
-        const instanceName =
-          type === 'module' ||
-          type === 'provider' ||
-          type === 'variable' ||
-          type === 'output'
-            ? Object.keys(object)[0]
-            : Object.keys(object[resourceName])[0];
-        const title = type + '/' + resourceName;
+        const { resourceName, instanceName } = getObjectNameInfo(object, type);
+        const title = !!resourceName
+          ? type + '/' + resourceName
+          : type + '/' + instanceName;
         return { type, resourceName, title, instanceName };
       })
       .forEach((i: Item) => {

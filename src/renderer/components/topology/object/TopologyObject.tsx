@@ -20,6 +20,7 @@ import { setSelectedNode } from '@renderer/features/graphSlice';
 import { selectSelectedData } from '@renderer/features/graphSliceInputSelectors';
 import { getIcon } from '@renderer/utils/iconUtil';
 import { NodeData } from '@renderer/types/graph';
+import { getObjectNameInfo } from '../state/form/utils/getResourceInfo';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
   backgroundColor: theme.palette.object.accordion,
@@ -94,21 +95,12 @@ const TopologyObject = (props: TopologyObjectProps) => {
     item: Item
   ) => {
     const content = objResult.filter((cur: any) => {
-      const { type } = cur;
-      const resourceName = Object.keys(cur)[0];
-      if (item.title === type + '/' + resourceName) {
-        if (
-          type === 'provider' ||
-          type === 'module' ||
-          type === 'variable' ||
-          type === 'output'
-        ) {
-          return cur[resourceName];
-        } else {
-          return cur[resourceName][item.instanceName];
-        }
-      }
+      const { type, ...obj } = cur;
+      const { resourceName, instanceName } = getObjectNameInfo(obj, type);
+      const title = `${type}/${!!resourceName ? resourceName : instanceName}`;
+      return item.title === title;
     });
+
     const object = {
       id: item.title,
       instanceName: item.instanceName,
@@ -156,7 +148,9 @@ const TopologyObject = (props: TopologyObjectProps) => {
                           src={getIcon(true, item.type, item.resourceName)}
                         />
                       </ListItemIcon>
-                      <ListItemName>{item.resourceName}</ListItemName>
+                      <ListItemName>
+                        {item.resourceName || item.instanceName}
+                      </ListItemName>
                     </ListItemButton>
                   </ListItem>
                 );
