@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import _ from 'lodash';
+import { JSONSchema7 } from 'json-schema';
 import {
   Box,
   Button,
@@ -17,12 +18,17 @@ import {
 } from '@mui/material';
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { useHistory } from 'react-router-dom';
-// import { useSelector, useDispatch } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import {
+  getObjectNameInfo,
+  noResourceNameTypeList,
+} from './state/form/utils/getResourceInfo';
+import preDefinedFileObjects from './state/form/utils/preDefinedFileObjects';
 import {
   openExistFolder,
   getProjectJson,
@@ -33,6 +39,7 @@ import TopologyLibrary from './TopologyLibrary';
 import {
   setSelectedObjectInfo,
   setFileObjects,
+  setMapObjectTypeCollection,
 } from '../../features/codeSlice';
 import { setSidePanel } from '../../features/uiSlice';
 
@@ -135,7 +142,72 @@ const TopologySidebar = () => {
         const uid = response?.data?.uid;
         if (uid) {
           const projectJsonRes = await getProjectJson(args);
-          dispatch(setFileObjects(projectJsonRes.data));
+          const terraformSchemaMap = getSchemaMap();
+          const mapObjectTypeCollection = {};
+
+          const parse = (fileObjects: any[]) => {
+            return fileObjects.map((fileObject: any) => {
+              let result: any = {};
+              _.toPairs(fileObject.fileJson).forEach(
+                ([resourceType, resource]: [string, any]) => {
+                  _.toPairs(resource).forEach(
+                    ([resourceName, resourceValue]) => {
+                      const id = resourceType + '-' + resourceName;
+                      const currentSchema = terraformSchemaMap.get(id);
+                      const hasNoResourceName = !!noResourceNameTypeList.find(
+                        (currType) => resourceType === currType
+                      );
+                      const content = hasNoResourceName
+                        ? resourceValue
+                        : Object.values(resourceValue as any)[0];
+
+                      // 여기서 preDefiendData 해서 애초에 redux로 갖고있고 sidepanel에서도 그거 참조해서 하는게 좋을듯
+                      const { mapObjectTypeList = {}, customizedObject = {} } =
+                        preDefinedFileObjects(
+                          resourceType,
+                          currentSchema as JSONSchema7,
+                          content,
+                          resourceName,
+                          Object.keys(resourceValue as any)[0]
+                        );
+
+                      Object.values(mapObjectTypeList).forEach((value) => {
+                        _.assign(mapObjectTypeCollection, value);
+                      });
+
+                      if (!!resourceName) {
+                        result = {
+                          fileJson: {
+                            ...result.fileJson,
+                            [resourceType]: {
+                              [resourceName]: {
+                                [Object.keys(resourceValue as any)[0]]:
+                                  customizedObject,
+                              },
+                            },
+                          },
+                        };
+                      } else {
+                        result = {
+                          ...result,
+                          fileJson: {
+                            ...result.fileJson,
+                            [resourceType]: {
+                              [Object.keys(resourceValue as any)[0]]:
+                                customizedObject,
+                            },
+                          },
+                        };
+                      }
+                    }
+                  );
+                }
+              );
+              return { ...result, filePath: fileObject.filePath };
+            });
+          };
+          dispatch(setMapObjectTypeCollection(mapObjectTypeCollection));
+          dispatch(setFileObjects(parse(projectJsonRes.data)));
           history.push(`/main/${uid}`);
           dispatch(setWorkspaceUid(uid));
         }
@@ -171,31 +243,15 @@ const TopologySidebar = () => {
     objResult
       .filter((result) => {
         const { type, ...object } = result;
-        const resourceName = Object.keys(object)[0];
-        const instanceName =
-          type === 'module' ||
-          type === 'provider' ||
-          type === 'variable' ||
-          type === 'output'
-            ? Object.keys(object)[0]
-            : Object.keys(object[resourceName])[0];
-        if (instanceName) {
-          return true;
-        } else {
-          return false;
-        }
+        const { instanceName } = getObjectNameInfo(object, type);
+        return !!instanceName;
       })
       .map((result) => {
         const { type, ...object } = result;
-        const resourceName = Object.keys(object)[0];
-        const instanceName =
-          type === 'module' ||
-          type === 'provider' ||
-          type === 'variable' ||
-          type === 'output'
-            ? Object.keys(object)[0]
-            : Object.keys(object[resourceName])[0];
-        const title = type + '/' + resourceName;
+        const { resourceName, instanceName } = getObjectNameInfo(object, type);
+        const title = !!resourceName
+          ? type + '/' + resourceName
+          : type + '/' + instanceName;
         return { type, resourceName, title, instanceName };
       })
       .forEach((i: Item) => {
@@ -257,20 +313,15 @@ const TopologySidebar = () => {
                 startIcon={getIcon(item.type)}
                 onClick={() => {
                   const content = objResult.filter((cur: any) => {
-                    const { type } = cur;
-                    const resourceName = Object.keys(cur)[0];
-                    if (item.title === type + '/' + resourceName) {
-                      if (
-                        type === 'provider' ||
-                        type === 'module' ||
-                        type === 'variable' ||
-                        type === 'output'
-                      ) {
-                        return cur[resourceName];
-                      } else {
-                        return cur[resourceName][item.instanceName];
-                      }
-                    }
+                    const { type, ...obj } = cur;
+                    const { resourceName, instanceName } = getObjectNameInfo(
+                      obj,
+                      type
+                    );
+                    const title = !!resourceName
+                      ? type + '/' + resourceName
+                      : type + '/' + instanceName;
+                    return item.title === title;
                   });
                   const object = {
                     id: item.title,
@@ -282,7 +333,7 @@ const TopologySidebar = () => {
                   dispatch(setSidePanel(true));
                 }}
               >
-                {item.resourceName}
+                {item.resourceName ? item.resourceName : item.instanceName}
               </Button>
             );
           })}
