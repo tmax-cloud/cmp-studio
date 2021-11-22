@@ -40,7 +40,6 @@ import {
   setSelectedObjectInfo,
   setFileObjects,
   setMapObjectTypeCollection,
-  setFileSchema,
 } from '../../features/codeSlice';
 import { setSidePanel } from '../../features/uiSlice';
 
@@ -163,7 +162,7 @@ const TopologySidebar = () => {
                         : Object.values(resourceValue as any)[0];
 
                       // 여기서 preDefiendData 해서 애초에 redux로 갖고있고 sidepanel에서도 그거 참조해서 하는게 좋을듯
-                      const { mapObjectTypeList = {}, customizedSchema = {} } =
+                      const { mapObjectTypeList = {}, customizedObject = {} } =
                         preDefinedFileObjects(
                           resourceType,
                           currentSchema as JSONSchema7,
@@ -183,7 +182,7 @@ const TopologySidebar = () => {
                             [resourceType]: {
                               [resourceName]: {
                                 [Object.keys(resourceValue as any)[0]]:
-                                  customizedSchema,
+                                  customizedObject,
                               },
                             },
                           },
@@ -195,7 +194,7 @@ const TopologySidebar = () => {
                             ...result.fileJson,
                             [resourceType]: {
                               [Object.keys(resourceValue as any)[0]]:
-                                customizedSchema,
+                                customizedObject,
                             },
                           },
                         };
@@ -207,14 +206,8 @@ const TopologySidebar = () => {
               return { ...result, filePath: fileObject.filePath };
             });
           };
-          console.log(
-            '제발 되라!!!: ',
-            mapObjectTypeCollection,
-            parse(projectJsonRes.data)
-          );
           dispatch(setMapObjectTypeCollection(mapObjectTypeCollection));
-          dispatch(setFileSchema(parse(projectJsonRes.data)));
-          dispatch(setFileObjects(projectJsonRes.data));
+          dispatch(setFileObjects(parse(projectJsonRes.data)));
           history.push(`/main/${uid}`);
           dispatch(setWorkspaceUid(uid));
         }

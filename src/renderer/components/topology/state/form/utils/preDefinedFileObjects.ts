@@ -6,8 +6,6 @@ const supportedSchemaList = ['resource', 'provider', 'output', 'variable'];
 
 const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
 
-const isResourceType = (type: string) => type === 'resource';
-
 const specialKey = (props: {
   resourceType: string;
   resourceName: string;
@@ -26,10 +24,10 @@ const preDefinedFileObjects = (
   instanceName: string
 ) => {
   if (!jsonSchema && _.findIndex(supportedSchemaList, resourceType) >= 0) {
-    return { mapObjectTypeList: {}, customizedSchema: {} };
+    return { mapObjectTypeList: {}, customizedObject: {} };
   }
-
   const customizedSchema = {};
+  const customizedObject = {};
   const mapObjectTypeList: any[] = [];
 
   const makeCustomizedSchema = (obj: any, prevPath: string) => {
@@ -150,15 +148,36 @@ const preDefinedFileObjects = (
         !_.get(customizedSchema, makePath + '.type') &&
         'properties' in _.get(customizedSchema, makePath)
       ) {
+        _.set(
+          customizedObject,
+          makePath.replace('properties.', ''),
+          _.get(obj, makeSchemaPath.replace('properties.', ''))
+        );
         makeMapObjectTypeList(obj[currKey], makePath);
         mapObjectTypeList.push({ [makePath]: 'object' });
       } else if (_.get(customizedSchema, makePath + '.type') === 'map') {
+        _.set(
+          customizedObject,
+          makePath.replace('properties.', ''),
+          _.get(obj, makeSchemaPath.replace('properties.', ''))
+        );
         mapObjectTypeList.push({ [makePath]: 'map' });
       } else if (
         _.get(customizedSchema, makePath + '.type') === 'object' &&
         !_.get(jsonSchema, makePath + '.type')
       ) {
+        _.set(
+          customizedObject,
+          makePath.replace('properties.', ''),
+          _.get(obj, makeSchemaPath.replace('properties.', ''))
+        );
         mapObjectTypeList.push({ [makePath]: 'object' });
+      } else {
+        _.set(
+          customizedObject,
+          makePath.replace('properties.', ''),
+          _.get(obj, makePath.replace('properties.', ''))
+        );
       }
     });
   };
@@ -167,7 +186,7 @@ const preDefinedFileObjects = (
     makeCustomizedSchema(object, '');
     makeMapObjectTypeList(object, '');
   }
-  return { mapObjectTypeList, customizedSchema };
+  return { mapObjectTypeList, customizedObject };
 };
 
 type SchemaField = {

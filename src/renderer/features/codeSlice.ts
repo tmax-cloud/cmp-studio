@@ -10,14 +10,12 @@ interface ObjcectInfo {
 }
 interface CodeSlice {
   fileObjects: WorkspaceTypes.TerraformFileJsonMeta[];
-  fileSchema: JSONSchema7[];
   selectedObjectInfo: ObjcectInfo;
   mapObjectTypeCollection: any;
 }
 
 const initialState: CodeSlice = {
   fileObjects: [],
-  fileSchema: [],
   mapObjectTypeCollection: {},
   selectedObjectInfo: {
     id: '',
@@ -33,9 +31,6 @@ const codeSlice = createSlice({
   reducers: {
     setFileObjects: (state, action: PayloadAction<any>) => {
       state.fileObjects = action.payload; //_.defaultsDeep(action.payload); <- 자동으로 내부적으로 immer로 불변성 유지해준다고 함.
-    },
-    setFileSchema: (state, action: PayloadAction<any>) => {
-      state.fileSchema = action.payload;
     },
     setMapObjectTypeCollection: (state, action: PayloadAction<any>) => {
       state.mapObjectTypeCollection = action.payload;
@@ -58,7 +53,6 @@ export const {
   setSelectedObjectInfo,
   addSelectedField,
   setSelectedSourceSchema,
-  setFileSchema,
 } = codeSlice.actions;
 
 export default codeSlice.reducer;
