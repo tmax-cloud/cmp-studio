@@ -144,7 +144,9 @@ function parseJson(clouds) {
           mergeKey(schemaData, 'block_types', 'properties');
         }
 
-        Object.keys(schemaData).length === 0 && buildSchema(schemaData);
+        schemaData.properties &&
+          Object.keys(schemaData.properties).length > 0 &&
+          buildSchema(schemaData);
         schemaData.title = type + '-' + key;
         schemaArray.push(schemaData);
         schemaMap.set(schemaData.title, schemaData);
