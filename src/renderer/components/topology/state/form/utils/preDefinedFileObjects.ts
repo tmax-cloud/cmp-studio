@@ -1,6 +1,5 @@
 import { JSONSchema7 } from 'json-schema';
 import * as _ from 'lodash';
-import { getObjectNameInfo } from './getResourceInfo';
 
 const supportedSchemaList = ['resource', 'provider', 'output', 'variable'];
 
@@ -34,7 +33,7 @@ const preDefinedFileObjects = (
     Object.keys(obj).forEach((currKey) => {
       const makePath = prevPath
         ? `${prevPath}.properties.${currKey}`
-        : `properties.${currKey}`;
+        : `properties.${currKey === 'data' ? 'datasource' : currKey}`;
       const changedProperty = _.last(makePath.split('.')) as string;
       const prefix = makePath.replace(changedProperty, '');
       const customPath =
@@ -94,6 +93,7 @@ const preDefinedFileObjects = (
         }
       };
       if (
+        // !!_.get(customizedSchema, makePath) &&
         !_.get(jsonSchema, makePath) ||
         _.findIndex(supportedSchemaList, (cur) => cur === resourceType) < 0
       ) {
