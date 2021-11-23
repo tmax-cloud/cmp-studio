@@ -514,6 +514,7 @@ const TopologyLibrary = () => {
           </>
         )}
         {/* 테스트용 Object 표시 */}
+        {/* 테스트 코드 주석 처리
         <InputLabel>------</InputLabel>
         <InputLabel>Object 표시 - 임시</InputLabel>
         <ShowItemList items={itemsList} title="Object" />
@@ -605,6 +606,7 @@ const TopologyLibrary = () => {
         >
           Set Object for Test
         </Button>
+        */}
         <ModuleImportModal
           isOpen={openModuleListModal}
           onClose={handleModuleListModalClose}
