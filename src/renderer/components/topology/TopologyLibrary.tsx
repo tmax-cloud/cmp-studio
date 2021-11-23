@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import path from 'path';
 import _ from 'lodash';
 import {
   Box,
@@ -22,33 +22,24 @@ import {
   Explore,
   Devices,
 } from '@mui/icons-material';
-import { useSelector, useDispatch } from 'react-redux';
-//import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import {
   setFileObjects,
   setSelectedObjectInfo,
 } from '@renderer/features/codeSlice';
 import { setSidePanel } from '@renderer/features/uiSlice';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
-import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { getModuleNodeByName, getPrunedGraph } from '@renderer/utils/graph';
-import {
-  selectGraphData,
-  selectSelectedModule,
-} from '@renderer/features/graphSliceInputSelectors';
+import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
+import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import {
   setSelectedData,
   setSelectedModule,
   setSelectedNode,
 } from '@renderer/features/graphSlice';
-import { useAppDispatch, useAppSelector } from '@renderer/app/store';
-import {
-  openExistFolder,
-  getProjectJson,
-} from '../../utils/ipc/workspaceIpcUtils';
+import { useWorkspaceUri } from '@renderer/hooks/useWorkspaceUri';
 import parseJson from './state/form/utils/json2JsonSchemaParser';
 import { ModuleImportModal } from './modal';
-import { setWorkspaceUid } from '../../features/commonSlice';
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -71,31 +62,26 @@ const getIcon = (type: string) => {
 const defaultList = [
   {
     title: 'defaults-provider',
-    instanceName: 'provider',
     resourceName: 'provider',
     type: 'default',
   },
   {
     title: 'defaults-variable',
-    instanceName: 'variable',
     resourceName: 'variable',
     type: 'default',
   },
   {
     title: 'defaults-output',
-    instanceName: 'output',
     resourceName: 'output',
     type: 'default',
   },
   {
     title: 'defaults-terraform',
-    instanceName: 'terraform',
     resourceName: 'terraform',
     type: 'default',
   },
   {
     title: 'defaults-locals',
-    instanceName: 'locals',
     resourceName: 'locals',
     type: 'default',
   },
@@ -109,7 +95,7 @@ function seartchByName(searchText: string, name: string) {
   }
 }
 function isLocalModule(item: Item) {
-  return true;
+  return item.isLocalModule;
 }
 /*
 function getModuleList(items: Item[]) {
@@ -126,51 +112,28 @@ function getModuleList(items: Item[]) {
 }
 */
 
-const ShowItemList: React.FC<ShowItemListProps> = ({
-  items,
-  title,
-  provider,
-}) => {
-  const dispatch = useDispatch();
-  //const history = useHistory();
-  /*
-  const openWorkspaceFromTopologyLibrary = async (folderUri: string) => {
-    const args: WorkspaceTypes.WorkspaceOpenProjectArgs = {
-      folderUri,
-    };
-    openExistFolder(args)
-      .then(async (response: any) => {
-        const uid = response?.data?.uid;
-        if (uid) {
-          const projectJsonRes = await getProjectJson(args);
-          dispatch(setFileObjects(projectJsonRes.data));
-          history.push(`/main/${uid}`);
-          dispatch(setWorkspaceUid(uid));
-        }
-        return response;
-      })
-      .catch((err: any) => {
-        console.log('[Error] Failed to open exist folder : ', err);
-      });
-  };
-  */
-
+const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
+  const dispatch = useAppDispatch();
   const [isShow, setIsShow] = React.useState(false);
-  const fileObjects = useSelector(selectCodeFileObjects);
+  const fileObjects = useAppSelector(selectCodeFileObjects);
+
+  const workspaceUid = useAppSelector(selectWorkspaceUid);
+
+  const folderUri = useWorkspaceUri(workspaceUid);
+
   /*
-  const folderUri = window.electron.ipcRenderer.on(
-    'studio:dirPathToOpen',
-    (res: { canceled: boolean; filePaths: string[] }) => {
-      const { filePaths, canceled } = res;
-      if (!canceled) {
-        openWorkspaceFromTopologyLibrary(filePaths[0]);
-      }
-    }
-  );
+  const folderUri = getFolderUriByWorkspaceId(args)
+    .then((res: any) => {
+      return res;
+    })
+    .catch((err: any) => {
+      console.log('[Error] Failed to open exist folder : ', err);
+    });
+  /*
+  const folderUri =
+    'C:\\Users\\ParkHyowook\\Documents\\CMPStudioProjects\\tf-init-test'; //temp
   */
-  const folderUri = './';
-  const addedObjectJSON = {}; //temp
-  const paths = useAppSelector(selectSelectedModule)?.modules || [];
+  const addedObjectJSON = { key1: 'value1' }; //temp
   const graphData = useAppSelector(selectGraphData);
 
   return (
@@ -212,9 +175,36 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
                           dispatch(setSelectedNode(null));
                           dispatch(setSelectedModule(selectedModule));
                         }
+                      } else if (item.type === 'default') {
+                        const newInstanceName =
+                          item.resourceName + '-' + fileObjects.length;
+                        const newFileObjects = [
+                          {
+                            filePath:
+                              `${folderUri}` +
+                              path.sep +
+                              `${item.resourceName}` +
+                              path.sep +
+                              `${newInstanceName}.tf`,
+                            fileJson: {
+                              [item.resourceName]: {
+                                [newInstanceName]: addedObjectJSON,
+                              },
+                            },
+                          },
+                        ];
+                        dispatch(
+                          setFileObjects(fileObjects.concat(newFileObjects))
+                        );
+                        const object = {
+                          id: item.title,
+                          instanceName: newInstanceName,
+                          content: newFileObjects[0].fileJson,
+                        };
+                        dispatch(setSelectedObjectInfo(object));
+                        dispatch(setSidePanel(true));
                       } else {
                         const newInstanceName =
-                          'new-' +
                           item.type +
                           '-' +
                           item.resourceName +
@@ -222,7 +212,12 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
                           fileObjects.length;
                         const newFileObjects = [
                           {
-                            filePath: `${folderUri}${item.type}/${newInstanceName}.tf`,
+                            filePath:
+                              `${folderUri}` +
+                              path.sep +
+                              `${item.type}` +
+                              path.sep +
+                              `${newInstanceName}.tf`,
                             fileJson: {
                               [item.type]: {
                                 [item.resourceName]: {
@@ -232,6 +227,24 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
                             },
                           },
                         ];
+                        /*
+                        const content = objResult.filter((cur: any) => {
+                          const { type, ...obj } = cur;
+                          const { resourceName, instanceName } = getObjectNameInfo(
+                            obj,
+                            type
+                          );
+                          const title = !!resourceName
+                            ? type + '/' + resourceName
+                            : type + '/' + instanceName;
+                          return item.title === title;
+                        });
+                        const object = {
+                          id: item.title,
+                          instanceName: item.instanceName,
+                          content: content[0],
+                        };
+                        */
                         dispatch(
                           setFileObjects(fileObjects.concat(newFileObjects))
                         );
@@ -262,7 +275,6 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
 type ShowItemListProps = {
   items: Item[];
   title: string;
-  provider: string;
 };
 
 interface Item {
@@ -270,15 +282,16 @@ interface Item {
   objectCount?: number;
   provider?: string;
   title: string;
-  instanceName: string;
+  instanceName?: string;
   resourceName: string;
   type: string;
-  source?: string;
+  source?: string | any;
   version?: string;
+  isLocalModule?: boolean;
 }
 let selectedProvider = '';
-//const TopologyLibrary: React.FC<TopologyLibraryProps> = (props) => {
-const TopologyLibrary: React.FC<any> = (props) => {
+
+const TopologyLibrary = () => {
   const [provider, setProvider] = React.useState(selectedProvider || 'aws');
   const [defaltItems, setDefaltItems] = React.useState<Item[]>([]);
   const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
@@ -304,12 +317,13 @@ const TopologyLibrary: React.FC<any> = (props) => {
     setOpenModuleListModal(true);
   };
   const handleModuleListModalClose = () => setOpenModuleListModal(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const objResult: any[] = [];
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
-  useSelector(selectCodeFileObjects).forEach(
+
+  useAppSelector(selectCodeFileObjects).forEach(
     (file: { filePath: string; fileJson: any }) => {
       // eslint-disable-next-line guard-for-in
       for (const currKey in file.fileJson) {
@@ -329,17 +343,31 @@ const TopologyLibrary: React.FC<any> = (props) => {
       const { type, ...object } = result;
       const resourceName = Object.keys(object)[0];
       const instanceName = Object.keys(object[resourceName])[0];
+      const keySource = 'source';
+      const source = object[resourceName][keySource];
       const title = type + '-' + resourceName;
-      return { type, resourceName, title, instanceName };
+      return { type, resourceName, title, instanceName, source };
     })
     .forEach((i: Item) => {
-      itemsList.push({
-        provider: i.resourceName.split('_')[0],
-        title: i.title,
-        instanceName: i.instanceName,
-        resourceName: i.resourceName,
-        type: i.type,
-      });
+      if (i.type === 'module') {
+        const isLocal = i.source.charAt(0) === '.';
+
+        itemsList.push({
+          title: i.title,
+          source: i.source,
+          resourceName: i.resourceName,
+          type: i.type,
+          isLocalModule: isLocal,
+        });
+      } else {
+        itemsList.push({
+          provider: i.resourceName.split('_')[0],
+          title: i.title,
+          instanceName: i.instanceName,
+          resourceName: i.resourceName,
+          type: i.type,
+        });
+      }
     });
 
   React.useEffect(() => {
@@ -360,7 +388,6 @@ const TopologyLibrary: React.FC<any> = (props) => {
       items.push({
         provider: schemaProvider,
         title: schemaTitle,
-        instanceName: schemaResourceName,
         resourceName: schemaResourceName,
         type: schemaType,
       });
@@ -374,7 +401,6 @@ const TopologyLibrary: React.FC<any> = (props) => {
           resourceList.push({
             provider: i.provider,
             title: i.title,
-            instanceName: i.instanceName,
             resourceName: i.resourceName,
             type: i.type,
           });
@@ -383,7 +409,6 @@ const TopologyLibrary: React.FC<any> = (props) => {
           datasourceList.push({
             provider: i.provider,
             title: i.title,
-            instanceName: i.instanceName,
             resourceName: i.resourceName,
             type: i.type,
           });
@@ -446,13 +471,8 @@ const TopologyLibrary: React.FC<any> = (props) => {
             return item?.type === 'module' && isLocalModule(item);
           })}
           title="로컬 모듈"
-          provider={provider}
         />
-        <ShowItemList
-          items={defaltItems}
-          title="테라폼 디폴트"
-          provider={provider}
-        />
+        <ShowItemList items={defaltItems} title="테라폼 디폴트" />
         {isSearchResultEmpty ? (
           <div>
             <InputLabel>------</InputLabel>
@@ -462,30 +482,15 @@ const TopologyLibrary: React.FC<any> = (props) => {
         ) : (
           <>
             {/* 모듈 추후 추가 */}
-            {/*
-            <ShowItemList
-              items={terraformModuleItems}
-              title="테라폼 모듈"
-              setIsSidePanelOpen={setIsSidePanelOpen}
-              provider={provider}
-            />
-            */}
-            <ShowItemList
-              items={resourceItems}
-              title="테라폼 리소스"
-              provider={provider}
-            />
-            <ShowItemList
-              items={datasourceItems}
-              title="테라폼 데이터소스"
-              provider={provider}
-            />
+            {/* <ShowItemList items={terraformModuleItems} title="테라폼 모듈" />*/}
+            <ShowItemList items={resourceItems} title="테라폼 리소스" />
+            <ShowItemList items={datasourceItems} title="테라폼 데이터소스" />
           </>
         )}
         {/* 테스트용 Object 표시 */}
         <InputLabel>------</InputLabel>
         <InputLabel>Object 표시 - 임시</InputLabel>
-        <ShowItemList items={itemsList} title="Object" provider={provider} />
+        <ShowItemList items={itemsList} title="Object" />
         <Button onClick={handleModuleListModalOpen} value="test1">
           Modal Test
         </Button>
@@ -497,7 +502,8 @@ const TopologyLibrary: React.FC<any> = (props) => {
             dispatch(
               setFileObjects([
                 {
-                  filePath: 'test.tf',
+                  filePath:
+                    'C:\\Users\\ParkHyowook\\Documents\\CMPStudioProjects\\tf-init-test\\test.tf',
                   fileJson: {
                     module: {
                       'aws-network-configs': {
@@ -512,7 +518,8 @@ const TopologyLibrary: React.FC<any> = (props) => {
                   },
                 },
                 {
-                  filePath: 'a.tf',
+                  filePath:
+                    'C:\\Users\\ParkHyowook\\Documents\\CMPStudioProjects\\tf-init-test\\a.tf',
                   fileJson: {
                     resource: {
                       aws_instance: {
@@ -539,7 +546,8 @@ const TopologyLibrary: React.FC<any> = (props) => {
                   },
                 },
                 {
-                  filePath: 'b.tf',
+                  filePath:
+                    'C:\\Users\\ParkHyowook\\Documents\\CMPStudioProjects\\tf-init-test\\b.tf',
                   fileJson: {
                     resource: {
                       aws_key_pair: {
@@ -580,9 +588,4 @@ const TopologyLibrary: React.FC<any> = (props) => {
     </>
   );
 };
-/*
-type TopologyLibraryProps = {
-  setIsSidePanelOpen: any;
-};
-*/
 export default TopologyLibrary;
