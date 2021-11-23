@@ -3,6 +3,9 @@ import { RootState } from '@renderer/app/store';
 export const selectCodeFileObjects = (state: RootState) =>
   state.code.fileObjects;
 
+export const selectMapObjectTypeCollection = (state: RootState) =>
+  state.code.mapObjectTypeCollection;
+
 export const selectCodeSelectedObjectInfoId = (state: RootState) =>
   state.code.selectedObjectInfo.id;
 

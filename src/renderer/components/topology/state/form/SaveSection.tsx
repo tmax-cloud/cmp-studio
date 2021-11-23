@@ -9,6 +9,7 @@ import {
   selectCodeFileObjects,
   selectCodeSelectedObjectInfoInstanceName,
   selectCodeSelectedObjectInfoId,
+  selectMapObjectTypeCollection,
 } from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import { setFileObjects } from '@renderer/features/codeSlice';
@@ -45,6 +46,7 @@ const SaveSection = (props: SaveSectionProps) => {
   const { saveLabel, cancelLabel, formState } = props;
   const classes = useStyles();
   const fileObjects = useAppSelector(selectCodeFileObjects);
+  const mapObjectCollection = useAppSelector(selectMapObjectTypeCollection);
   const objectId = useAppSelector(selectCodeSelectedObjectInfoId);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
   const selectedObjectInstanceName = useAppSelector(
@@ -144,6 +146,7 @@ const SaveSection = (props: SaveSectionProps) => {
               objects: fileObjects,
               workspaceUid,
               isAllSave: false,
+              typeMap: mapObjectCollection,
             });
 
             await getTerraformPlan({ workspaceUid })
