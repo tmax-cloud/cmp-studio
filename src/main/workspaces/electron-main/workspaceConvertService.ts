@@ -38,6 +38,7 @@ export class WorkspaceConvertService
 
   convertAllJsonToHcl(
     objList: WorkspaceTypes.TerraformFileJsonMeta[],
+    typeMap: any,
     workspaceUid: string,
     isAllSave: boolean
   ) {
@@ -58,7 +59,7 @@ export class WorkspaceConvertService
       }
 
       const buf = Buffer.from(JSON.stringify(fileJson));
-      const result = Converter.JsonToHcl(buf);
+      const result = Converter.JsonToHcl(buf, JSON.stringify(typeMap || {}));
       const resultStr = Buffer.from(result).toString();
       if (!fs.existsSync(FileUtils.getDirName(targetPath))) {
         fs.mkdirSync(FileUtils.getDirName(targetPath), { recursive: true });
