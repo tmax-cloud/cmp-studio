@@ -14,7 +14,6 @@ export const addSchemaBasedField = (
     },
     content
   );
-  console.log(result);
   return result;
 };
 

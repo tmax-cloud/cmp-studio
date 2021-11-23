@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
+import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import {
   Accordion,
   AccordionSummary,
@@ -16,6 +17,7 @@ import {
   addSelectedField,
   setSelectedSourceSchema,
 } from '@renderer/features/codeSlice';
+import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { ArrowDropDown } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectCode } from '@renderer/features/codeSliceInputSelectors';
@@ -37,6 +39,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 
   const inputTypeList = ['string', 'object', 'array', 'boolean'];
   const dispatch = useAppDispatch();
+  const terraformSchemaMap: Map<string, JSONSchema7> = getSchemaMap();
 
   const [additionalSchema, setAdditionalSchema] = React.useState('');
   const [customFieldType, setCustomFieldType] = React.useState('');
@@ -45,6 +48,28 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   const {
     selectedObjectInfo: { id, content, sourceSchema },
   } = useAppSelector(selectCode);
+
+  const [currentSchemaList, setCurrentSchemaList] = React.useState<string[]>(
+    []
+  );
+
+  const initSchemaList = () => {
+    const selectedSchema = sourceSchema && Object.keys(sourceSchema.properties);
+    const schema: JSONSchema7 = terraformSchemaMap.get(
+      id.replace('/', '-')
+    ) as JSONSchema7;
+    return _.xor(
+      selectedSchema,
+      Object.keys(schema.properties as JSONSchema7Definition)
+    );
+  };
+
+  React.useEffect(() => {
+    if (sourceSchema && !_.isEmpty(sourceSchema)) {
+      setCurrentSchemaList(initSchemaList() as string[]);
+    }
+  }, [id, sourceSchema]);
+
   React.useLayoutEffect(() => {
     setAdditionalSchema('');
     setCustomFieldType('');
@@ -76,8 +101,8 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                   setAdditionalSchema(e.target.value);
                 }}
               >
-                {!_.isEmpty(sourceSchema) &&
-                  Object.keys(sourceSchema?.properties).map((cur) => (
+                {currentSchemaList &&
+                  currentSchemaList.map((cur) => (
                     <MenuItem key={cur} value={cur}>
                       {cur}
                     </MenuItem>
@@ -90,6 +115,9 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                   content,
                   formData,
                   additionalSchema
+                );
+                setCurrentSchemaList((schemaList) =>
+                  schemaList.filter((cur) => cur !== additionalSchema)
                 );
                 dispatch(addSelectedField(result));
                 setAdditionalSchema('');
@@ -117,7 +145,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                   setCustomFieldType(e.target.value);
                 }}
               >
-                {sourceSchema &&
+                {currentSchemaList &&
                   inputTypeList.map((cur) => (
                     <MenuItem key={cur} value={cur}>
                       {cur}
