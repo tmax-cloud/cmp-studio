@@ -113,13 +113,13 @@ const SaveSection = (props: SaveSectionProps) => {
           onClick={async () => {
             // redux fileObjects에 변경된 부분 저장하기
             const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
-              if (_.get(cur.fileJson, objectId.split('-').join('.'))) {
+              if (_.get(cur.fileJson, objectId.split('/').join('.'))) {
                 return true;
               } else {
                 return false;
               }
             });
-            const [type, resourceName] = objectId.split('-');
+            const [type, resourceName] = objectId.split('/');
             const newFileObjects = fileObjects.map((cur: any, idx: number) => {
               if (idx === fileIdx) {
                 return {

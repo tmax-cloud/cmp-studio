@@ -63,11 +63,9 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
     []
   );
 
-  const initSchemaList = () => {
+  const initSchemaList = (schema: JSONSchema7) => {
     const selectedSchema = sourceSchema && Object.keys(sourceSchema.properties);
-    const schema: JSONSchema7 = terraformSchemaMap.get(
-      id.replace('/', '-')
-    ) as JSONSchema7;
+
     return _.xor(
       selectedSchema,
       Object.keys(schema.properties as JSONSchema7Definition)
@@ -76,7 +74,10 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 
   React.useEffect(() => {
     if (sourceSchema && !_.isEmpty(sourceSchema)) {
-      setCurrentSchemaList(initSchemaList() as string[]);
+      const schema: JSONSchema7 = terraformSchemaMap.get(
+        id.replace('/', '-')
+      ) as JSONSchema7;
+      schema && setCurrentSchemaList(initSchemaList(schema) as string[]);
     }
   }, [id, sourceSchema]);
 

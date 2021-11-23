@@ -80,8 +80,8 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
         }
       };
       if (
-        !_.get(jsonSchema, makePath) ||
-        _.findIndex(supportedSchemaList, (cur) => cur === type) < 0
+        !_.get(jsonSchema, makePath)
+        //  || _.findIndex(supportedSchemaList, (cur) => cur === type) < 0
       ) {
         fillSchemaByFormData(obj);
         return;
