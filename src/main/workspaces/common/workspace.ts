@@ -17,6 +17,7 @@ export type WorkspaceGetProjectJsonArgs = {
 
 export type WorkspaceExportProjectArgs = {
   objects: TerraformFileJsonMeta[];
+  typeMap: any;
   workspaceUid: string;
   isAllSave: boolean;
 };
@@ -116,6 +117,7 @@ export interface WorkspaceConvertServiceInterface {
   convertAllHclToJson(folderUri: string): WorkspaceProjectJsonSuccessData;
   convertAllJsonToHcl(
     objList: TerraformFileJsonMeta[],
+    typeMap: any,
     workspaceUid: string,
     isAllSave: boolean
   ): void;

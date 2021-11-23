@@ -7,6 +7,7 @@ import DefaultTypeColorIcon from '../../../assets/images/graph-default-type-colo
 import DefaultTypeIcon from '../../../assets/images/graph-default-type-icon.svg';
 import ModuleTypeColorIcon from '../../../assets/images/graph-module-type-color-icon.svg';
 import ModuleTypeIcon from '../../../assets/images/graph-module-type-icon.svg';
+import OutputTypeColorIcon from '../../../assets/images/graph-output-type-color-icon.svg';
 import ResourceTypeColorIcon from '../../../assets/images/graph-resource-type-color-icon.svg';
 import ResourceTypeIcon from '../../../assets/images/graph-resource-type-icon.svg';
 import VariableTypeColorIcon from '../../../assets/images/graph-variable-type-color-icon.svg';
@@ -30,6 +31,7 @@ export const getIcon = (
     case 'resource':
       return color ? ResourceTypeColorIcon : ResourceTypeIcon;
     case 'output':
+      return OutputTypeColorIcon;
     case 'variable':
     case 'var':
       return VariableTypeColorIcon;

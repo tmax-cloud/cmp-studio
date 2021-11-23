@@ -4,9 +4,7 @@ import _ from 'lodash';
 import { JSONSchema7 } from 'json-schema';
 import {
   Box,
-  Button,
   Drawer,
-  List,
   Tabs,
   Tab,
   Popper,
@@ -46,6 +44,8 @@ import { setSidePanel } from '../../features/uiSlice';
 import { setWorkspaceUid } from '../../features/commonSlice';
 import CreateWorkspaceModal from '../workspace/CreateWorkspaceModal';
 import StudioTheme from '../../theme';
+import { TopologyObject } from './object';
+import { Item } from './object/TopologyObject';
 
 export const SIDEBAR_WIDTH = '300px';
 
@@ -95,7 +95,7 @@ const TabPanel: React.FC<TabPanelProps> = (props) => {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 2 }}>{children}</Box>}
     </div>
   );
 };
@@ -111,14 +111,6 @@ function a11yProps(index: number) {
     id: `simple-tab-${index}`,
     'aria-controls': `simple-tabpanel-${index}`,
   };
-}
-
-interface Item {
-  provider?: string;
-  title: string;
-  resourceName: string;
-  instanceName: string;
-  type: string;
 }
 
 const TopologySidebar = () => {
@@ -297,47 +289,15 @@ const TopologySidebar = () => {
         >
           <Tab
             className={classes.tab}
-            label="Object"
+            label="오브젝트"
             {...a11yProps(0)}
             onMouseDown={onObjectTabClick}
           />
-          <Tab className={classes.tab} label="Library" {...a11yProps(1)} />
+          <Tab className={classes.tab} label="라이브러리" {...a11yProps(1)} />
         </Tabs>
       </Box>
       <TabPanel value={tabIndex} index={0}>
-        <List>
-          {items.map((item, index) => {
-            return (
-              <Button
-                key={`button-${index}`}
-                startIcon={getIcon(item.type)}
-                onClick={() => {
-                  const content = objResult.filter((cur: any) => {
-                    const { type, ...obj } = cur;
-                    const { resourceName, instanceName } = getObjectNameInfo(
-                      obj,
-                      type
-                    );
-                    const title = !!resourceName
-                      ? type + '/' + resourceName
-                      : type + '/' + instanceName;
-                    return item.title === title;
-                  });
-                  const object = {
-                    id: item.title,
-                    instanceName: item.instanceName,
-                    content: content[0],
-                  };
-
-                  dispatch(setSelectedObjectInfo(object));
-                  dispatch(setSidePanel(true));
-                }}
-              >
-                {item.resourceName ? item.resourceName : item.instanceName}
-              </Button>
-            );
-          })}
-        </List>
+        <TopologyObject items={items} objResult={objResult} />
       </TabPanel>
       <TabPanel value={tabIndex} index={1}>
         <TopologyLibrary />

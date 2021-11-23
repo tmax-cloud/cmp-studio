@@ -17,6 +17,13 @@ const theme = createTheme({
     toolbar: {
       button: '#5b6c7f',
     },
+    object: {
+      accordion: '#F3F6FA',
+      accordionHeader: {
+        primary: '#12244A',
+        secondary: '#8790A1',
+      },
+    },
   },
   shadows: [
     'none',
