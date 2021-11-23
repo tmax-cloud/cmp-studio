@@ -37,6 +37,7 @@ export const getProjectJson = (
 
 export const exportProject = (args: {
   objects: WorkspaceTypes.TerraformFileJsonMeta[];
+  typeMap: any;
   workspaceUid: string;
   isAllSave: boolean;
 }) => window.electron.ipcRenderer.invoke('studio:exportProject', args);
