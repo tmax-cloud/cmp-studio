@@ -11,8 +11,9 @@ import {
   InputLabel,
   TextField,
   FormControl,
+  Theme,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, createStyles } from '@mui/styles';
 import {
   addSelectedField,
   setSelectedSourceSchema,
@@ -23,15 +24,24 @@ import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectCode } from '@renderer/features/codeSliceInputSelectors';
 import { addSchemaBasedField, addCustomField } from './utils/addInputField';
 
-const useStyles: any = makeStyles({
-  root: {
-    '& .css-1sqnrkk-MuiInputBase-input-MuiOutlinedInput-input': {
+const useStyles: any = makeStyles((theme) =>
+  createStyles({
+    wideSelect: {
       resize: 'vertical',
-      width: '222px',
+      width: '100%',
       minHeight: '23px',
     },
-  },
-});
+    narrowSelect: {
+      resize: 'vertical',
+      width: '220px',
+      minHeight: '23px',
+    },
+    key: {
+      width: '260px',
+      minHeight: '23px',
+    },
+  })
+);
 
 const AddFieldSection = (props: AddFieldSectionProps) => {
   const { formData } = props;
@@ -93,8 +103,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               <Select
                 labelId="schema-label"
                 id={id}
-                sx={{ width: '220px' }}
-                className={classes.root}
+                className={classes.wideSelect}
                 label="Schema"
                 value={additionalSchema}
                 onChange={(e) => {
@@ -138,7 +147,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               <Select
                 id={id}
                 sx={{ width: '220px' }}
-                className={classes.root}
+                className={classes.narrowSelect}
                 label="타입"
                 value={customFieldType}
                 onChange={(e) => {
@@ -155,8 +164,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
             </FormControl>
             <TextField
               id={id}
-              sx={{ width: '250px', marginLeft: '16px' }}
-              className={classes.root}
+              className={classes.text}
               label="키"
               value={customFieldKey}
               onChange={(e) => {
