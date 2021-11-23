@@ -2,26 +2,24 @@ import * as React from 'react';
 import path from 'path';
 import _ from 'lodash';
 import {
+  List,
+  styled,
   Box,
   Button,
-  List,
   MenuItem,
   InputLabel,
   Select,
   TextField,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
-import {
-  AcUnit,
-  FilterVintage,
-  Storage,
-  Mode,
-  Circle,
-  ArrowDownward,
-  ArrowUpward,
-  Delete,
-  Explore,
-  Devices,
-} from '@mui/icons-material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Delete } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import {
   setFileObjects,
@@ -37,28 +35,54 @@ import {
   setSelectedModule,
   setSelectedNode,
 } from '@renderer/features/graphSlice';
+import { getIcon } from '@renderer/utils/iconUtil';
 import { useWorkspaceUri } from '@renderer/hooks/useWorkspaceUri';
 import parseJson from './state/form/utils/json2JsonSchemaParser';
 import { ModuleImportModal } from './modal';
 
-const getIcon = (type: string) => {
-  switch (type) {
-    case 'provider':
-      return <AcUnit />;
-    case 'resource':
-      return <FilterVintage />;
-    case 'datasource':
-      return <Storage />;
-    case 'module':
-      return <Mode />;
-    case 'localModule':
-      return <Explore />;
-    case 'default':
-      return <Devices />;
-    default:
-      return <Circle />;
-  }
-};
+const AccordionLayout = styled(Accordion)(({ theme }) => ({
+  backgroundColor: theme.palette.object.accordion,
+  marginBottom: 4,
+  boxShadow: 'none',
+  '&.MuiAccordion-root.Mui-expanded': {
+    margin: 0,
+  },
+  '&.MuiAccordion-root:before': {
+    backgroundColor: theme.palette.object.accordion,
+  },
+}));
+
+const AccordionHeader = styled(AccordionSummary)(({ theme }) => ({
+  '&.MuiAccordionSummary-root': {
+    minHeight: 38,
+    maxHeight: 38,
+  },
+  '.MuiAccordionSummary-content': {
+    margin: '8px 0',
+  },
+}));
+
+const AccordionHeaderIcon = styled(ExpandMoreIcon)(({ theme }) => ({
+  color: theme.palette.object.accordionHeader.primary,
+}));
+
+const AccordionHeaderTitle = styled(Typography)(({ theme }) => ({
+  color: theme.palette.object.accordionHeader.primary,
+  fontSize: '0.875rem',
+}));
+
+const AccordionHeaderDesc = styled(Typography)(({ theme }) => ({
+  color: theme.palette.object.accordionHeader.secondary,
+  fontSize: '0.6875rem',
+  marginLeft: 5,
+  display: 'flex',
+  alignItems: 'center',
+}));
+const ListItemName = styled(Typography)(({ theme }) => ({
+  color: theme.palette.object.accordionHeader.primary,
+  fontSize: '0.75rem',
+}));
+
 const defaultList = [
   {
     title: 'defaults-provider',
@@ -114,120 +138,111 @@ function getModuleList(items: Item[]) {
 
 const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
   const dispatch = useAppDispatch();
-  const [isShow, setIsShow] = React.useState(false);
   const fileObjects = useAppSelector(selectCodeFileObjects);
-
   const workspaceUid = useAppSelector(selectWorkspaceUid);
-
   const folderUri = useWorkspaceUri(workspaceUid);
-
-  /*
-  const folderUri = getFolderUriByWorkspaceId(args)
-    .then((res: any) => {
-      return res;
-    })
-    .catch((err: any) => {
-      console.log('[Error] Failed to open exist folder : ', err);
-    });
-  /*
-  const folderUri =
-    'C:\\Users\\ParkHyowook\\Documents\\CMPStudioProjects\\tf-init-test'; //temp
-  */
   const addedObjectJSON = { key1: 'value1' }; //temp
   const graphData = useAppSelector(selectGraphData);
+  const accordions = [
+    {
+      id: title,
+      title,
+      content: items,
+    },
+  ];
 
   return (
     <>
-      {items.length > 0 && (
-        <>
-          <Button
-            onClick={() => setIsShow(!isShow)}
-            color="inherit"
-            fullWidth
-            style={{ textAlign: 'left', alignContent: 'left' }}
+      {accordions.map((accordion) => (
+        <AccordionLayout key={accordion.id} defaultExpanded>
+          <AccordionHeader
+            expandIcon={<AccordionHeaderIcon fontSize="small" />}
+            id={accordion.id}
+            aria-controls={accordion.id}
           >
-            {title}
-            {'(' + items.length + ')'}
-            <span style={{ marginLeft: '10px', float: 'left' }}>
-              {isShow ? <ArrowUpward /> : <ArrowDownward />}
-            </span>
-          </Button>
-          <List>
-            {isShow &&
-              items.map((item, index) => {
+            <Box sx={{ display: 'flex' }}>
+              <AccordionHeaderTitle>{accordion.title}</AccordionHeaderTitle>
+              <AccordionHeaderDesc>{`(${accordion.content.length})`}</AccordionHeaderDesc>
+            </Box>
+          </AccordionHeader>
+          <AccordionDetails sx={{ backgroundColor: 'white', padding: 0 }}>
+            <List>
+              {items.map((item, index) => {
+                const isDatasource = item.type === 'datasource';
                 return (
-                  <Button
-                    key={`button-${index}`}
-                    startIcon={getIcon(item.type)}
-                    onClick={() => {
-                      if (item.type === 'module') {
-                        const name = item.resourceName;
-                        const selectedModule = getModuleNodeByName(
-                          graphData.nodes,
-                          name
-                        );
-                        if (selectedModule && selectedModule.id) {
-                          const selectedData = getPrunedGraph(
+                  <ListItem disablePadding key={`item-${index}`}>
+                    <ListItemButton
+                      onClick={() => {
+                        if (item.type === 'module') {
+                          const name = item.resourceName;
+                          const selectedModule = getModuleNodeByName(
                             graphData.nodes,
-                            selectedModule.id
+                            name
                           );
-                          dispatch(setSelectedData(selectedData));
-                          dispatch(setSelectedNode(null));
-                          dispatch(setSelectedModule(selectedModule));
-                        }
-                      } else if (item.type === 'default') {
-                        const newInstanceName =
-                          item.resourceName + '-' + fileObjects.length;
-                        const newFileObjects = [
-                          {
-                            filePath:
-                              `${folderUri}` +
-                              path.sep +
-                              `${item.resourceName}` +
-                              path.sep +
-                              `${newInstanceName}.tf`,
-                            fileJson: {
-                              [item.resourceName]: {
-                                [newInstanceName]: addedObjectJSON,
-                              },
-                            },
-                          },
-                        ];
-                        dispatch(
-                          setFileObjects(fileObjects.concat(newFileObjects))
-                        );
-                        const object = {
-                          id: item.title,
-                          instanceName: newInstanceName,
-                          content: newFileObjects[0].fileJson,
-                        };
-                        dispatch(setSelectedObjectInfo(object));
-                        dispatch(setSidePanel(true));
-                      } else {
-                        const newInstanceName =
-                          item.type +
-                          '-' +
-                          item.resourceName +
-                          '-' +
-                          fileObjects.length;
-                        const newFileObjects = [
-                          {
-                            filePath:
-                              `${folderUri}` +
-                              path.sep +
-                              `${item.type}` +
-                              path.sep +
-                              `${newInstanceName}.tf`,
-                            fileJson: {
-                              [item.type]: {
+                          if (selectedModule && selectedModule.id) {
+                            const selectedData = getPrunedGraph(
+                              graphData.nodes,
+                              selectedModule.id
+                            );
+                            dispatch(setSelectedData(selectedData));
+                            dispatch(setSelectedNode(null));
+                            dispatch(setSelectedModule(selectedModule));
+                          }
+                        } else if (item.type === 'default') {
+                          const newInstanceName =
+                            item.resourceName + '-' + fileObjects.length;
+                          const newFileObjects = [
+                            {
+                              filePath:
+                                `${folderUri}` +
+                                path.sep +
+                                `${item.resourceName}` +
+                                path.sep +
+                                `${newInstanceName}.tf`,
+                              fileJson: {
                                 [item.resourceName]: {
                                   [newInstanceName]: addedObjectJSON,
                                 },
                               },
                             },
-                          },
-                        ];
-                        /*
+                          ];
+                          dispatch(
+                            setFileObjects(fileObjects.concat(newFileObjects))
+                          );
+                          const object = {
+                            id: item.title,
+                            instanceName: newInstanceName,
+                            content: newFileObjects[0].fileJson,
+                          };
+                          dispatch(setSelectedObjectInfo(object));
+                          dispatch(setSidePanel(true));
+                        } else {
+                          const type =
+                            item.type === 'datasource' ? 'data' : item.type;
+                          const newInstanceName =
+                            item.type +
+                            '-' +
+                            item.resourceName +
+                            '-' +
+                            fileObjects.length;
+                          const newFileObjects = [
+                            {
+                              filePath:
+                                `${folderUri}` +
+                                path.sep +
+                                `${item.type}` +
+                                path.sep +
+                                `${newInstanceName}.tf`,
+                              fileJson: {
+                                [type]: {
+                                  [item.resourceName]: {
+                                    [newInstanceName]: addedObjectJSON,
+                                  },
+                                },
+                              },
+                            },
+                          ];
+                          /*
                         const content = objResult.filter((cur: any) => {
                           const { type, ...obj } = cur;
                           const { resourceName, instanceName } = getObjectNameInfo(
@@ -245,30 +260,40 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                           content: content[0],
                         };
                         */
-                        dispatch(
-                          setFileObjects(fileObjects.concat(newFileObjects))
-                        );
-                        const object = {
-                          id: item.title,
-                          instanceName: newInstanceName,
-                          content: newFileObjects[0].fileJson,
-                        };
-                        dispatch(setSelectedObjectInfo(object));
-                        dispatch(setSidePanel(true));
-                      }
-                    }}
-                    fullWidth
-                    style={{ textAlign: 'left' }}
-                  >
-                    {item.type === 'localModule'
-                      ? item.path
-                      : item.resourceName}
-                  </Button>
+                          dispatch(
+                            setFileObjects(fileObjects.concat(newFileObjects))
+                          );
+                          const object = {
+                            id: item.title,
+                            instanceName: newInstanceName,
+                            content: newFileObjects[0].fileJson,
+                          };
+                          dispatch(setSelectedObjectInfo(object));
+                          dispatch(setSidePanel(true));
+                        }
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <img
+                          style={{ width: 24 }}
+                          src={getIcon(
+                            true,
+                            item.type,
+                            item.resourceName,
+                            isDatasource
+                          )}
+                          alt="profile"
+                        />
+                      </ListItemIcon>
+                      <ListItemName>{item.resourceName}</ListItemName>
+                    </ListItemButton>
+                  </ListItem>
                 );
               })}
-          </List>
-        </>
-      )}
+            </List>
+          </AccordionDetails>
+        </AccordionLayout>
+      ))}
     </>
   );
 };
@@ -460,6 +485,7 @@ const TopologyLibrary = () => {
             onClick={deleteSearchText}
             style={{
               marginTop: '25px',
+              marginBottom: '30px',
               position: 'absolute',
               right: '30px',
               color: 'gray',
