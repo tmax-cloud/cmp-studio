@@ -49,25 +49,8 @@ import {
 import parseJson from './state/form/utils/json2JsonSchemaParser';
 import { ModuleImportModal } from './modal';
 import { setWorkspaceUid } from '../../features/commonSlice';
+import { getIcon } from './icon/IconFactory';
 
-const getIcon = (type: string) => {
-  switch (type) {
-    case 'provider':
-      return <AcUnit />;
-    case 'resource':
-      return <FilterVintage />;
-    case 'datasource':
-      return <Storage />;
-    case 'module':
-      return <Mode />;
-    case 'localModule':
-      return <Explore />;
-    case 'default':
-      return <Devices />;
-    default:
-      return <Circle />;
-  }
-};
 const defaultList = [
   {
     title: 'defaults-provider',
@@ -195,7 +178,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({
                 return (
                   <Button
                     key={`button-${index}`}
-                    startIcon={getIcon(item.type)}
+                    startIcon={getIcon(item.resourceName, 24)}
                     onClick={() => {
                       if (item.type === 'module') {
                         const name = item.resourceName;

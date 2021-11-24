@@ -1,7 +1,11 @@
 import * as React from 'react';
+import AWSIcon from './AWSIcon';
 import CustomIcon from './CustomIcon';
 
 export const getAWSResourceIcon = (name: string, size: number) => {
+  if (name === 'aws') {
+    return <AWSIcon size={size} />;
+  }
   if (name.startsWith('aws_ami')) {
     return (
       <CustomIcon

@@ -144,7 +144,7 @@ const TopologyObject = (props: TopologyObjectProps) => {
                       onClick={(event) => handleClick(event, objResult, item)}
                     >
                       <ListItemIcon sx={{ minWidth: 36 }}>
-                        {getIcon(item.type, name, 24)}
+                        {getIcon(name, 24)}
                       </ListItemIcon>
                       <ListItemName>{name}</ListItemName>
                     </ListItemButton>
