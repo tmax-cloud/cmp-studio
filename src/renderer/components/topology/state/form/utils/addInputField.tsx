@@ -79,7 +79,12 @@ export const addCustomField = (content: any, input: any, sourceSchema: any) => {
   const { type } = content;
   const { resourceName, instanceName } = getObjectNameInfo(content, type);
   const object = _.defaultsDeep(
-    makeObject(!!resourceName, resourceName, instanceName, input),
+    makeObject({
+      isResourceNameExist: !!resourceName,
+      resourceName,
+      instanceName,
+      input,
+    }),
     content
   );
   const schema = _.defaultsDeep(
