@@ -54,20 +54,22 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   const [additionalSchema, setAdditionalSchema] = React.useState('');
   const [customFieldType, setCustomFieldType] = React.useState('');
   const [customFieldKey, setCustomFieldKey] = React.useState('');
+  const [currentSchemaList, setCurrentSchemaList] = React.useState<string[]>(
+    []
+  );
 
   const {
     selectedObjectInfo: { id, content, sourceSchema },
   } = useAppSelector(selectCode);
 
-  const [currentSchemaList, setCurrentSchemaList] = React.useState<string[]>(
-    []
-  );
-
   const initSchemaList = (schema: JSONSchema7) => {
     const selectedSchema = sourceSchema && Object.keys(sourceSchema.properties);
 
     return _.xor(
-      selectedSchema,
+      _.intersection(
+        selectedSchema,
+        Object.keys(schema.properties as JSONSchema7Definition)
+      ),
       Object.keys(schema.properties as JSONSchema7Definition)
     );
   };
