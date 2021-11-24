@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 const CustomIcon = (props: CustomIconProps) => {
-  const { size, viewBox, color, d } = props;
+  const { size, viewBox, color, transform, d } = props;
   return (
     <svg
       width={size}
@@ -11,9 +11,11 @@ const CustomIcon = (props: CustomIconProps) => {
     >
       <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
         <g fill={color}>
-          <rect x="0" y="0" width={viewBox} height={viewBox} />
+          <rect x="0" y="0" width={viewBox || size} height={viewBox || size} />
         </g>
-        <path d={d} fill="#FFFFFF" />
+        <g transform={transform} fill="#FFFFFF">
+          <path d={d} />
+        </g>
       </g>
     </svg>
   );
@@ -21,9 +23,15 @@ const CustomIcon = (props: CustomIconProps) => {
 
 interface CustomIconProps {
   size: number;
-  viewBox: number;
+  viewBox?: number;
   color: string;
+  // eslint-disable-next-line react/require-default-props
+  transform?: string;
   d: string;
 }
+
+CustomIcon.defaultProps = {
+  viewBox: 24,
+};
 
 export default CustomIcon;
