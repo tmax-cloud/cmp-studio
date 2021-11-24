@@ -152,17 +152,19 @@ const TopologySidebar = () => {
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
   const fileObjects = useAppSelector(selectCodeFileObjects);
-  fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
-    // eslint-disable-next-line guard-for-in
-    for (const currKey in file.fileJson) {
-      objResult.push(
-        ..._.entries(file.fileJson[currKey]).map((object) => ({
-          [object[0]]: object[1],
-          type: currKey,
-        }))
-      );
-    }
-  });
+  // [TODO] Error나서 string으로 들어올 때 Error 표시 기획 필요할듯
+  Array.isArray(fileObjects) &&
+    fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
+      // eslint-disable-next-line guard-for-in
+      for (const currKey in file.fileJson) {
+        objResult.push(
+          ..._.entries(file.fileJson[currKey]).map((object) => ({
+            [object[0]]: object[1],
+            type: currKey,
+          }))
+        );
+      }
+    });
 
   React.useEffect(() => {
     const itemsList: Item[] = [];

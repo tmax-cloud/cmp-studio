@@ -11,7 +11,6 @@ import {
   InputLabel,
   TextField,
   FormControl,
-  Theme,
 } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import {
@@ -173,7 +172,6 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               onChange={(e) => {
                 setCustomFieldKey(e.target.value);
               }}
-              // value={value || value === 0 ? value : ''}
             />
             <Button
               onClick={() => {

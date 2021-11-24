@@ -53,6 +53,8 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
               setSchema({ type: 'boolean' });
               break;
             }
+            // [TODO]: 사용자가 terraform schema에 없는 프로퍼티를 tf파일에 직접 정의할 경우에 대한 case 추가 필요
+            // => cmp-studio에서는 map형식의 object만 추가하는 기능만 제공하긴 함.
             case 'object': {
               if (isArray(currentValue)) {
                 setSchema({
@@ -79,10 +81,7 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
           }
         }
       };
-      if (
-        !_.get(jsonSchema, makePath)
-        //  || _.findIndex(supportedSchemaList, (cur) => cur === type) < 0
-      ) {
+      if (!_.get(jsonSchema, makePath)) {
         fillSchemaByFormData(obj);
         return;
       }
