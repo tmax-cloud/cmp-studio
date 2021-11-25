@@ -80,7 +80,9 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
     const schema: JSONSchema7 = terraformSchemaMap.get(
       id.replace('/', '-')
     ) as JSONSchema7;
-    schema && setCurrentSchemaList(initSchemaList(schema) as string[]);
+    schema
+      ? setCurrentSchemaList(initSchemaList(schema) as string[])
+      : setCurrentSchemaList([]);
   }, [id, sourceSchema]);
 
   React.useLayoutEffect(() => {
@@ -94,53 +96,51 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
           입력 필드 추가
         </AccordionSummary>
         <AccordionDetails>
-          {sourceSchema && !_.isEmpty(sourceSchema) && (
-            <div
-              style={{
-                display: 'flex',
-                marginBottom: '10px',
-                padding: '16px 0 0 16px',
-              }}
-            >
-              <FormControl fullWidth>
-                <InputLabel id="schema-label">스키마</InputLabel>
-                <Select
-                  labelId="schema-label"
-                  id={id}
-                  className={classes.wideSelect}
-                  label="Schema"
-                  value={additionalSchema}
-                  onChange={(e) => {
-                    setAdditionalSchema(e.target.value);
-                  }}
-                >
-                  {currentSchemaList &&
-                    currentSchemaList.map((cur) => (
-                      <MenuItem key={cur} value={cur}>
-                        {cur}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-
-              <Button
-                onClick={() => {
-                  const result = addSchemaBasedField(
-                    content,
-                    formData,
-                    additionalSchema
-                  );
-                  setCurrentSchemaList((schemaList) =>
-                    schemaList.filter((cur) => cur !== additionalSchema)
-                  );
-                  dispatch(addSelectedField(result));
-                  setAdditionalSchema('');
+          <div
+            style={{
+              display: 'flex',
+              marginBottom: '10px',
+              padding: '16px 0 0 16px',
+            }}
+          >
+            <FormControl fullWidth>
+              <InputLabel id="schema-label">스키마</InputLabel>
+              <Select
+                labelId="schema-label"
+                id={id}
+                className={classes.wideSelect}
+                label="Schema"
+                value={additionalSchema}
+                onChange={(e) => {
+                  setAdditionalSchema(e.target.value);
                 }}
               >
-                추가
-              </Button>
-            </div>
-          )}
+                {currentSchemaList &&
+                  currentSchemaList.map((cur) => (
+                    <MenuItem key={cur} value={cur}>
+                      {cur}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+
+            <Button
+              onClick={() => {
+                const result = addSchemaBasedField(
+                  content,
+                  formData,
+                  additionalSchema
+                );
+                setCurrentSchemaList((schemaList) =>
+                  schemaList.filter((cur) => cur !== additionalSchema)
+                );
+                dispatch(addSelectedField(result));
+                setAdditionalSchema('');
+              }}
+            >
+              추가
+            </Button>
+          </div>
           <div
             style={{
               display: 'flex',
