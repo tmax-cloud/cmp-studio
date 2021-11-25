@@ -35,10 +35,10 @@ import {
   setSelectedModule,
   setSelectedNode,
 } from '@renderer/features/graphSlice';
-import { getIcon } from '@renderer/utils/iconUtil';
 import { useWorkspaceUri } from '@renderer/hooks/useWorkspaceUri';
 import parseJson from './state/form/utils/json2JsonSchemaParser';
 import { ModuleImportModal } from './modal';
+import { getIcon } from './icon/IconFactory';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
   backgroundColor: theme.palette.object.accordion,
@@ -274,16 +274,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                       }}
                     >
                       <ListItemIcon sx={{ minWidth: 36 }}>
-                        <img
-                          style={{ width: 24 }}
-                          src={getIcon(
-                            true,
-                            item.type,
-                            item.resourceName,
-                            isDatasource
-                          )}
-                          alt="profile"
-                        />
+                        {getIcon(item.resourceName, 24)}
                       </ListItemIcon>
                       <ListItemName>{item.resourceName}</ListItemName>
                     </ListItemButton>
