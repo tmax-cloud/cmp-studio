@@ -1,7 +1,7 @@
 import { JSONSchema7 } from 'json-schema';
 import * as _ from 'lodash';
 
-const supportedSchemaList = ['resource', 'provider'];
+const supportedSchemaList = ['resource', 'provider', 'datasource'];
 
 const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
 

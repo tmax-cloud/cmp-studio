@@ -62,7 +62,10 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   } = useAppSelector(selectCode);
 
   const initSchemaList = (schema: JSONSchema7) => {
-    const selectedSchema = sourceSchema && Object.keys(sourceSchema.properties);
+    const selectedSchema =
+      sourceSchema && !_.isEmpty(sourceSchema)
+        ? Object.keys(sourceSchema.properties)
+        : [];
 
     return _.xor(
       _.intersection(
@@ -74,12 +77,10 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   };
 
   React.useEffect(() => {
-    if (sourceSchema && !_.isEmpty(sourceSchema)) {
-      const schema: JSONSchema7 = terraformSchemaMap.get(
-        id.replace('/', '-')
-      ) as JSONSchema7;
-      schema && setCurrentSchemaList(initSchemaList(schema) as string[]);
-    }
+    const schema: JSONSchema7 = terraformSchemaMap.get(
+      id.replace('/', '-')
+    ) as JSONSchema7;
+    schema && setCurrentSchemaList(initSchemaList(schema) as string[]);
   }, [id, sourceSchema]);
 
   React.useLayoutEffect(() => {
@@ -93,50 +94,53 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
           입력 필드 추가
         </AccordionSummary>
         <AccordionDetails>
-          <div
-            style={{
-              display: 'flex',
-              marginBottom: '10px',
-              padding: '16px 0 0 16px',
-            }}
-          >
-            <FormControl fullWidth>
-              <InputLabel id="schema-label">스키마</InputLabel>
-              <Select
-                labelId="schema-label"
-                id={id}
-                className={classes.wideSelect}
-                label="Schema"
-                value={additionalSchema}
-                onChange={(e) => {
-                  setAdditionalSchema(e.target.value);
-                }}
-              >
-                {currentSchemaList &&
-                  currentSchemaList.map((cur) => (
-                    <MenuItem key={cur} value={cur}>
-                      {cur}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-            <Button
-              onClick={() => {
-                const result = addSchemaBasedField(
-                  content,
-                  formData,
-                  additionalSchema
-                );
-                setCurrentSchemaList((schemaList) =>
-                  schemaList.filter((cur) => cur !== additionalSchema)
-                );
-                dispatch(addSelectedField(result));
-                setAdditionalSchema('');
+          {sourceSchema && !_.isEmpty(sourceSchema) && (
+            <div
+              style={{
+                display: 'flex',
+                marginBottom: '10px',
+                padding: '16px 0 0 16px',
               }}
             >
-              추가
-            </Button>
-          </div>
+              <FormControl fullWidth>
+                <InputLabel id="schema-label">스키마</InputLabel>
+                <Select
+                  labelId="schema-label"
+                  id={id}
+                  className={classes.wideSelect}
+                  label="Schema"
+                  value={additionalSchema}
+                  onChange={(e) => {
+                    setAdditionalSchema(e.target.value);
+                  }}
+                >
+                  {currentSchemaList &&
+                    currentSchemaList.map((cur) => (
+                      <MenuItem key={cur} value={cur}>
+                        {cur}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+
+              <Button
+                onClick={() => {
+                  const result = addSchemaBasedField(
+                    content,
+                    formData,
+                    additionalSchema
+                  );
+                  setCurrentSchemaList((schemaList) =>
+                    schemaList.filter((cur) => cur !== additionalSchema)
+                  );
+                  dispatch(addSelectedField(result));
+                  setAdditionalSchema('');
+                }}
+              >
+                추가
+              </Button>
+            </div>
+          )}
           <div
             style={{
               display: 'flex',
