@@ -14,7 +14,10 @@ const parseToCustomizeKey = (fileObjects: any[]) => {
       _.toPairs(fileObject.fileJson).forEach(
         ([resourceType, resource]: [string, any]) => {
           _.toPairs(resource).forEach(([resourceName, resourceValue]) => {
-            const id = resourceType + '-' + resourceName;
+            const id =
+              (resourceType === 'data' ? 'datasource' : resourceType) +
+              '-' +
+              resourceName;
             const currentSchema = terraformSchemaMap.get(id);
             const hasNoResourceName = !!noResourceNameTypeList.find(
               (currType) => resourceType === currType
