@@ -3,8 +3,8 @@ import * as _ from 'lodash-es';
 import { Tabs, Tab, Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import EditorTab from './form/Editor';
-// import StateTab from './state/State';
-import DiffTab from './diff/Diff';
+import StateTab from './state/State';
+// import DiffTab from './diff/Diff';
 const useStyles = makeStyles({
   root: {
     overflow: 'auto',
@@ -65,10 +65,10 @@ const FormTabs = (props: FormTabsProps) => {
         <EditorTab schema={schema} formData={formData} uiSchema={uiSchema} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <DiffTab />
-      </TabPanel>
-      {/* <TabPanel value={value} index={1}>
         <StateTab />
+      </TabPanel>
+      {/* <TabPanel value={value} index={2}>
+        <DiffTab />
       </TabPanel> */}
     </>
   );
