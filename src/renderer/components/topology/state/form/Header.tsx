@@ -7,7 +7,7 @@ import { setSidePanel } from '@renderer/features/uiSlice';
 import { getIcon } from '../../icon/IconFactory';
 
 const FormHeader = (props: FormHeaderProps) => {
-  const { title } = props;
+  const { title, resourceName } = props;
   const dispatch = useAppDispatch();
 
   return (
@@ -18,7 +18,7 @@ const FormHeader = (props: FormHeaderProps) => {
       }}
     >
       <Box sx={{ margin: '16px', display: 'flex' }}>
-        {getIcon(title.split('-')[0], 32)}
+        {getIcon(resourceName, 32)}
         <Typography variant="h3" sx={{ ml: 1.5 }}>
           {title.split('-')[0]}
         </Typography>
@@ -37,6 +37,7 @@ const FormHeader = (props: FormHeaderProps) => {
 
 type FormHeaderProps = {
   title: string;
+  resourceName: string;
 };
 
 export default FormHeader;

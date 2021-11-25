@@ -53,7 +53,7 @@ const TopologySidePanel = () => {
         anchor="right"
         variant="persistent"
       >
-        <FormHeader title={instanceName} />
+        <FormHeader title={instanceName} resourceName={id.split('/')[1]} />
         <FormTabs
           schema={fixedSchema}
           formData={formData}
