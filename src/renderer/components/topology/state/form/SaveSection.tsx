@@ -152,10 +152,13 @@ const SaveSection = (props: SaveSectionProps) => {
             await getTerraformPlan({ workspaceUid })
               .then((res: TerraformTypes.TerraformResponse) => {
                 const { status, data } = res;
-                if (status === TerraformTypes.TerraformStatusType.SUCCESS) {
-                  console.log('Data: ', data);
-                }
-                dispatch(setTerraformState(data as string));
+                dispatch(
+                  setTerraformState({
+                    status,
+                    data: data?.planData,
+                    message: data?.message,
+                  })
+                );
                 return res;
               })
               .catch((e: any) => {

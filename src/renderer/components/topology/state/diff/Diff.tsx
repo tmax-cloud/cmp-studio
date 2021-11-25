@@ -9,22 +9,22 @@ import parse from './utils/terraformPlanParser';
 import * as TerraformPlanType from '../common/terraformPlan';
 
 const DiffTab = () => {
-  const terraFormState = useAppSelector(selectTerraformState);
+  const { status, data, message } = useAppSelector(selectTerraformState);
 
   const plan: TerraformPlanType.Plan = React.useMemo(() => {
-    return parse(terraFormState);
-  }, [terraFormState]);
+    if (status === 'SUCCESS') {
+      return parse(data);
+    }
+    return message;
+  }, [data]);
 
-  if (plan.warnings.length === 0 && plan.actions.length === 0) {
-    // TODO: 파싱한 결과물에 에러가 있을 경우 보여줄 화면 렌더해주는 부분
-    // displayParsingErrorMessage();
-  }
-  console.log('pretty plan test: ', parse(terraFormState));
   return (
     <List>
-      {plan.actions.map((action, idx) => (
-        <DiffItem key={action.type + idx} action={action} />
-      ))}
+      {status === 'SUCCESS'
+        ? parse(data).actions.map((action, idx) => (
+            <DiffItem key={action.type + idx} action={action} />
+          ))
+        : message}
     </List>
   );
 };
