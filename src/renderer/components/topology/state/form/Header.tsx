@@ -32,7 +32,7 @@ const FormHeader = (props: FormHeaderProps) => {
         <img
           alt="icon"
           style={{ width: 24 }}
-          src={getIcon(true, type, title, type === 'datasource')}
+          src={getIcon(true, type, title, type === 'data')}
         />
         <h2 className={classes.title}>{title}</h2>
       </span>

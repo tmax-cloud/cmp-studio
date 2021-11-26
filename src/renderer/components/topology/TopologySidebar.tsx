@@ -72,7 +72,7 @@ export const getIcon = (type: string) => {
       return <AcUnit />;
     case 'resource':
       return <FilterVintage />;
-    case 'datasource':
+    case 'data':
       return <Storage />;
     default:
       return <Circle />;

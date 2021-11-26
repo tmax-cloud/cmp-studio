@@ -5,7 +5,7 @@ export const addSchemaBasedField = (
   object: any,
   input: string
 ) => {
-  const { type } = content; // ['provider', 'resource', 'datasource']
+  const { type } = content;
   const resourceName = Object.keys(content)[0];
   const instanceName = type && Object.keys(content[resourceName])[0];
   const result = _.merge(

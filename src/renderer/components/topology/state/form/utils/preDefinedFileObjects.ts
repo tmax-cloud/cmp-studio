@@ -6,7 +6,7 @@ const supportedSchemaList = [
   'provider',
   'output',
   'variable',
-  'datasource',
+  'data',
 ];
 
 const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
@@ -42,7 +42,7 @@ const preDefinedFileObjects = (
     Object.keys(obj).forEach((currKey) => {
       const makePath = prevPath
         ? `${prevPath}.properties.${currKey}`
-        : `properties.${currKey === 'data' ? 'datasource' : currKey}`;
+        : `properties.${currKey}`;
       const changedProperty = _.last(makePath.split('.')) as string;
       const prefix = makePath.replace(changedProperty, '');
       const customPath =

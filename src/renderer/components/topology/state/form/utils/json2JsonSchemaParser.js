@@ -107,7 +107,7 @@ function parseJson(clouds) {
     });
   }
   const schemaMap = new Map();
-  const typeList = ['provider', 'resource', 'datasource'];
+  const typeList = ['provider', 'resource', 'data'];
   let schemaList;
   const schemaArray = [];
   let tmpPath;
@@ -121,7 +121,7 @@ function parseJson(clouds) {
           terraformSchema.provider_schemas[cloud].resource_schemas
         );
         tmpPath = terraformSchema.provider_schemas[cloud].resource_schemas;
-      } else if (type === 'datasource') {
+      } else if (type === 'data') {
         schemaList = Object.getOwnPropertyNames(
           terraformSchema.provider_schemas[cloud].data_source_schemas
         );
