@@ -168,7 +168,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
           <AccordionDetails sx={{ backgroundColor: 'white', padding: 0 }}>
             <List>
               {items.map((item, index) => {
-                const isDatasource = item.type === 'datasource';
+                const isDatasource = item.type === 'data';
                 return (
                   <ListItem disablePadding key={`item-${index}`}>
                     <ListItemButton
@@ -217,8 +217,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                           dispatch(setSelectedObjectInfo(object));
                           dispatch(setSidePanel(true));
                         } else {
-                          const type =
-                            item.type === 'datasource' ? 'data' : item.type;
+                          const { type } = item;
                           const newInstanceName =
                             item.type +
                             '-' +
@@ -421,7 +420,7 @@ const TopologyLibrary = () => {
             type: i.type,
           });
         }
-        if (i.type === 'datasource') {
+        if (i.type === 'data') {
           datasourceList.push({
             provider: i.provider,
             title: i.title,
