@@ -34,10 +34,10 @@ import {
   setSelectedModule,
   setSelectedNode,
 } from '@renderer/features/graphSlice';
-import { getIcon } from '@renderer/utils/iconUtil';
 import { useWorkspaceUri } from '@renderer/hooks/useWorkspaceUri';
 import parseJson from './state/form/utils/json2JsonSchemaParser';
 import { ModuleImportModal } from './modal';
+import { getIcon } from './icon/IconFactory';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
   backgroundColor: theme.palette.object.accordion,
@@ -168,7 +168,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
           <AccordionDetails sx={{ backgroundColor: 'white', padding: 0 }}>
             <List>
               {items.map((item, index) => {
-                const isDatasource = item.type === 'datasource';
+                const isDatasource = item.type === 'data';
                 return (
                   <ListItem disablePadding key={`item-${index}`}>
                     <ListItemButton
@@ -217,8 +217,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                           dispatch(setSelectedObjectInfo(object));
                           dispatch(setSidePanel(true));
                         } else {
-                          const type =
-                            item.type === 'datasource' ? 'data' : item.type;
+                          const { type } = item;
                           const newInstanceName =
                             item.type +
                             '-' +
@@ -274,16 +273,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                       }}
                     >
                       <ListItemIcon sx={{ minWidth: 36 }}>
-                        <img
-                          style={{ width: 24 }}
-                          src={getIcon(
-                            true,
-                            item.type,
-                            item.resourceName,
-                            isDatasource
-                          )}
-                          alt="profile"
-                        />
+                        {getIcon(item.resourceName, 24)}
                       </ListItemIcon>
                       <ListItemName>{item.resourceName}</ListItemName>
                     </ListItemButton>
@@ -430,7 +420,7 @@ const TopologyLibrary = () => {
             type: i.type,
           });
         }
-        if (i.type === 'datasource') {
+        if (i.type === 'data') {
           datasourceList.push({
             provider: i.provider,
             title: i.title,

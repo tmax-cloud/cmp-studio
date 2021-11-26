@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import _ from 'lodash';
-import { JSONSchema7 } from 'json-schema';
 import {
   Box,
   Drawer,
@@ -16,17 +15,13 @@ import {
 } from '@mui/material';
 import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { useHistory } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
-import {
-  getObjectNameInfo,
-  noResourceNameTypeList,
-} from './state/form/utils/getResourceInfo';
-import preDefinedFileObjects from './state/form/utils/preDefinedFileObjects';
+import parseToCustomizeKey from './state/form/utils/parseToCustomizeKey';
+import { getObjectNameInfo } from './state/form/utils/getResourceInfo';
 import {
   openExistFolder,
   getProjectJson,
@@ -70,19 +65,6 @@ const useStyles = makeStyles({
   },
   menuItemText: { width: '120px', textAlign: 'start' },
 });
-
-export const getIcon = (type: string) => {
-  switch (type) {
-    case 'provider':
-      return <AcUnit />;
-    case 'resource':
-      return <FilterVintage />;
-    case 'datasource':
-      return <Storage />;
-    default:
-      return <Circle />;
-  }
-};
 
 const TabPanel: React.FC<TabPanelProps> = (props) => {
   const { children, value, index, ...other } = props;
@@ -134,72 +116,11 @@ const TopologySidebar = () => {
         const uid = response?.data?.uid;
         if (uid) {
           const projectJsonRes = await getProjectJson(args);
-          const terraformSchemaMap = getSchemaMap();
-          const mapObjectTypeCollection = {};
-
-          const parse = (fileObjects: any[]) => {
-            return fileObjects.map((fileObject: any) => {
-              let result: any = {};
-              _.toPairs(fileObject.fileJson).forEach(
-                ([resourceType, resource]: [string, any]) => {
-                  _.toPairs(resource).forEach(
-                    ([resourceName, resourceValue]) => {
-                      const id = resourceType + '-' + resourceName;
-                      const currentSchema = terraformSchemaMap.get(id);
-                      const hasNoResourceName = !!noResourceNameTypeList.find(
-                        (currType) => resourceType === currType
-                      );
-                      const content = hasNoResourceName
-                        ? resourceValue
-                        : Object.values(resourceValue as any)[0];
-
-                      // 여기서 preDefiendData 해서 애초에 redux로 갖고있고 sidepanel에서도 그거 참조해서 하는게 좋을듯
-                      const { mapObjectTypeList = {}, customizedObject = {} } =
-                        preDefinedFileObjects(
-                          resourceType,
-                          currentSchema as JSONSchema7,
-                          content,
-                          resourceName,
-                          Object.keys(resourceValue as any)[0]
-                        );
-
-                      Object.values(mapObjectTypeList).forEach((value) => {
-                        _.assign(mapObjectTypeCollection, value);
-                      });
-
-                      if (!!resourceName) {
-                        result = {
-                          fileJson: {
-                            ...result.fileJson,
-                            [resourceType]: {
-                              [resourceName]: {
-                                [Object.keys(resourceValue as any)[0]]:
-                                  customizedObject,
-                              },
-                            },
-                          },
-                        };
-                      } else {
-                        result = {
-                          ...result,
-                          fileJson: {
-                            ...result.fileJson,
-                            [resourceType]: {
-                              [Object.keys(resourceValue as any)[0]]:
-                                customizedObject,
-                            },
-                          },
-                        };
-                      }
-                    }
-                  );
-                }
-              );
-              return { ...result, filePath: fileObject.filePath };
-            });
-          };
+          const { mapObjectTypeCollection, data } = parseToCustomizeKey(
+            projectJsonRes.data
+          );
           dispatch(setMapObjectTypeCollection(mapObjectTypeCollection));
-          dispatch(setFileObjects(parse(projectJsonRes.data)));
+          dispatch(setFileObjects(data));
           history.push(`/main/${uid}`);
           dispatch(setWorkspaceUid(uid));
         }
@@ -218,17 +139,19 @@ const TopologySidebar = () => {
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
   const fileObjects = useAppSelector(selectCodeFileObjects);
-  fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
-    // eslint-disable-next-line guard-for-in
-    for (const currKey in file.fileJson) {
-      objResult.push(
-        ..._.entries(file.fileJson[currKey]).map((object) => ({
-          [object[0]]: object[1],
-          type: currKey,
-        }))
-      );
-    }
-  });
+  // [TODO] Error나서 string으로 들어올 때 Error 표시 기획 필요할듯
+  Array.isArray(fileObjects) &&
+    fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
+      // eslint-disable-next-line guard-for-in
+      for (const currKey in file.fileJson) {
+        objResult.push(
+          ..._.entries(file.fileJson[currKey]).map((object) => ({
+            [object[0]]: object[1],
+            type: currKey,
+          }))
+        );
+      }
+    });
 
   React.useEffect(() => {
     const itemsList: Item[] = [];

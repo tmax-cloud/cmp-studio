@@ -1,13 +1,13 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import { IconButton } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { useAppDispatch } from '@renderer/app/store';
 import { setSidePanel } from '@renderer/features/uiSlice';
-import { getIcon } from '../../TopologySidebar';
+import { getIcon } from '../../icon/IconFactory';
 
 const FormHeader = (props: FormHeaderProps) => {
-  const { title } = props;
+  const { title, resourceName } = props;
   const dispatch = useAppDispatch();
 
   return (
@@ -17,10 +17,12 @@ const FormHeader = (props: FormHeaderProps) => {
         justifyContent: 'space-between',
       }}
     >
-      <span style={{ display: 'flex', margin: '8px' }}>
-        {getIcon(title.split('-')[0])}
-        <h2>{title}</h2>
-      </span>
+      <Box sx={{ margin: '16px', display: 'flex' }}>
+        {getIcon(resourceName, 32)}
+        <Typography variant="h3" sx={{ ml: 1.5 }}>
+          {title}
+        </Typography>
+      </Box>
       <IconButton
         aria-label="Close"
         onClick={() => {
@@ -35,6 +37,7 @@ const FormHeader = (props: FormHeaderProps) => {
 
 type FormHeaderProps = {
   title: string;
+  resourceName: string;
 };
 
 export default FormHeader;
