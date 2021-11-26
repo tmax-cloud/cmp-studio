@@ -1,8 +1,13 @@
 import { JSONSchema7 } from 'json-schema';
 import * as _ from 'lodash';
-import { getObjectNameInfo } from './getResourceInfo';
 
-const supportedSchemaList = ['resource', 'provider', 'output', 'variable'];
+const supportedSchemaList = [
+  'resource',
+  'provider',
+  'output',
+  'variable',
+  'data',
+];
 
 const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
 
@@ -18,12 +23,15 @@ const specialKey = (props: {
 
 const preDefinedFileObjects = (
   resourceType: string,
-  jsonSchema: JSONSchema7,
+  jsonSchema: JSONSchema7 = {},
   object: any,
   resourceName: string,
   instanceName: string
 ) => {
-  if (!jsonSchema && _.findIndex(supportedSchemaList, resourceType) >= 0) {
+  if (
+    _.isEmpty(jsonSchema) &&
+    _.findIndex(supportedSchemaList, resourceType) >= 0
+  ) {
     return { mapObjectTypeList: {}, customizedObject: {} };
   }
   const customizedSchema = {};
@@ -50,7 +58,7 @@ const preDefinedFileObjects = (
         if (propertyType === 'object' || propertyType === 'map') {
           _.set(jsonSchema, customPath, _.get(jsonSchema, makePath));
           _.omit(jsonSchema, [`${makePath}`]);
-          _.set(customizedSchema, customPath, fixedValue);
+          _.set(customizedSchema, customPath, fixedValue || {});
         } else {
           _.set(customizedSchema, makePath, fixedValue);
         }
@@ -94,6 +102,7 @@ const preDefinedFileObjects = (
         }
       };
       if (
+        // !!_.get(customizedSchema, makePath) &&
         !_.get(jsonSchema, makePath) ||
         _.findIndex(supportedSchemaList, (cur) => cur === resourceType) < 0
       ) {
@@ -153,7 +162,13 @@ const preDefinedFileObjects = (
           makePath.replace('properties.', ''),
           _.get(obj, makeSchemaPath.replace('properties.', ''))
         );
-        makeMapObjectTypeList(obj[currKey], makePath);
+        if (Array.isArray(obj[currKey])) {
+          for (let idx = 0; idx < obj[currKey].length; idx++) {
+            makeMapObjectTypeList(obj[currKey][idx], makePath);
+          }
+        } else {
+          makeMapObjectTypeList(obj[currKey], makePath);
+        }
         mapObjectTypeList.push({ [makePath]: 'object' });
       } else if (_.get(customizedSchema, makePath + '.type') === 'map') {
         _.set(

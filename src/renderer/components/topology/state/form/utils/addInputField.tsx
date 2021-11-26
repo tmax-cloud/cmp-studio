@@ -1,11 +1,11 @@
 import * as _ from 'lodash-es';
-
+import { getObjectNameInfo } from './getResourceInfo';
 export const addSchemaBasedField = (
   content: any,
   object: any,
   input: string
 ) => {
-  const { type } = content; // ['provider', 'resource', 'datasource']
+  const { type } = content;
   const resourceName = Object.keys(content)[0];
   const instanceName = type && Object.keys(content[resourceName])[0];
   const result = _.merge(
@@ -14,7 +14,6 @@ export const addSchemaBasedField = (
     },
     content
   );
-  console.log(result);
   return result;
 };
 
@@ -53,15 +52,39 @@ const setAdditionalSchemaByType = (key: string, type: string) => {
   }
   return { properties: { [key]: newSchema } };
 };
+const makeObject = ({
+  isResourceNameExist,
+  resourceName,
+  instanceName,
+  input,
+}: makeObjectType) => {
+  if (isResourceNameExist) {
+    return {
+      [resourceName]: { [instanceName]: { [input.key]: '' } },
+    };
+  }
+  return {
+    [instanceName]: { [input.key]: '' },
+  };
+};
+
+type makeObjectType = {
+  isResourceNameExist: boolean;
+  resourceName: string;
+  instanceName: string;
+  input: any;
+};
 
 export const addCustomField = (content: any, input: any, sourceSchema: any) => {
   const { type } = content;
-  const resourceName = Object.keys(content)[0]; // ['provider', 'resource', 'datasource']
-  const instanceName = type && Object.keys(content[resourceName])[0];
+  const { resourceName, instanceName } = getObjectNameInfo(content, type);
   const object = _.defaultsDeep(
-    {
-      [resourceName]: { [instanceName]: { [input.key]: '' } },
-    },
+    makeObject({
+      isResourceNameExist: !!resourceName,
+      resourceName,
+      instanceName,
+      input,
+    }),
     content
   );
   const schema = _.defaultsDeep(

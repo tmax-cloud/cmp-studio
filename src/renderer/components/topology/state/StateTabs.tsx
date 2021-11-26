@@ -4,7 +4,7 @@ import { Tabs, Tab, Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import EditorTab from './form/Editor';
 import StateTab from './state/State';
-import DiffTab from './diff/Diff';
+// import DiffTab from './diff/Diff';
 const useStyles = makeStyles({
   root: {
     overflow: 'auto',
@@ -57,8 +57,8 @@ const FormTabs = (props: FormTabsProps) => {
           aria-label="basic tabs example"
         >
           <Tab label="에디터" {...a11yProps(0)} />
-          <Tab label="Diff (가공 전)" {...a11yProps(1)} />
-          <Tab label="Diff (가공 후 - 진행중)" {...a11yProps(2)} />
+          <Tab label="Diff" {...a11yProps(1)} />
+          {/* <Tab label="Diff (가공 전)" {...a11yProps(2)} /> */}
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -67,9 +67,9 @@ const FormTabs = (props: FormTabsProps) => {
       <TabPanel value={value} index={1}>
         <StateTab />
       </TabPanel>
-      <TabPanel value={value} index={2}>
+      {/* <TabPanel value={value} index={2}>
         <DiffTab />
-      </TabPanel>
+      </TabPanel> */}
     </>
   );
 };

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
+import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import {
   Accordion,
   AccordionSummary,
@@ -11,25 +12,35 @@ import {
   TextField,
   FormControl,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, createStyles } from '@mui/styles';
 import {
   addSelectedField,
   setSelectedSourceSchema,
 } from '@renderer/features/codeSlice';
+import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { ArrowDropDown } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectCode } from '@renderer/features/codeSliceInputSelectors';
 import { addSchemaBasedField, addCustomField } from './utils/addInputField';
 
-const useStyles: any = makeStyles({
-  root: {
-    '& .css-1sqnrkk-MuiInputBase-input-MuiOutlinedInput-input': {
+const useStyles: any = makeStyles((theme) =>
+  createStyles({
+    wideSelect: {
       resize: 'vertical',
-      width: '222px',
+      width: '100%',
       minHeight: '23px',
     },
-  },
-});
+    narrowSelect: {
+      resize: 'vertical',
+      width: '220px',
+      minHeight: '23px',
+    },
+    key: {
+      width: '260px',
+      minHeight: '23px',
+    },
+  })
+);
 
 const AddFieldSection = (props: AddFieldSectionProps) => {
   const { formData } = props;
@@ -37,14 +48,43 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 
   const inputTypeList = ['string', 'object', 'array', 'boolean'];
   const dispatch = useAppDispatch();
+  const terraformSchemaMap: Map<string, JSONSchema7> = getSchemaMap();
 
   const [additionalSchema, setAdditionalSchema] = React.useState('');
   const [customFieldType, setCustomFieldType] = React.useState('');
   const [customFieldKey, setCustomFieldKey] = React.useState('');
+  const [currentSchemaList, setCurrentSchemaList] = React.useState<string[]>(
+    []
+  );
 
   const {
     selectedObjectInfo: { id, content, sourceSchema },
   } = useAppSelector(selectCode);
+
+  const initSchemaList = (schema: JSONSchema7) => {
+    const selectedSchema =
+      sourceSchema && !_.isEmpty(sourceSchema)
+        ? Object.keys(sourceSchema.properties)
+        : [];
+
+    return _.xor(
+      _.intersection(
+        selectedSchema,
+        Object.keys(schema.properties as JSONSchema7Definition)
+      ),
+      Object.keys(schema.properties as JSONSchema7Definition)
+    );
+  };
+
+  React.useEffect(() => {
+    const schema: JSONSchema7 = terraformSchemaMap.get(
+      id.replace('/', '-')
+    ) as JSONSchema7;
+    schema
+      ? setCurrentSchemaList(initSchemaList(schema) as string[])
+      : setCurrentSchemaList([]);
+  }, [id, sourceSchema]);
+
   React.useLayoutEffect(() => {
     setAdditionalSchema('');
     setCustomFieldType('');
@@ -68,28 +108,31 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               <Select
                 labelId="schema-label"
                 id={id}
-                sx={{ width: '220px' }}
-                className={classes.root}
+                className={classes.wideSelect}
                 label="Schema"
                 value={additionalSchema}
                 onChange={(e) => {
                   setAdditionalSchema(e.target.value);
                 }}
               >
-                {!_.isEmpty(sourceSchema) &&
-                  Object.keys(sourceSchema?.properties).map((cur) => (
+                {currentSchemaList &&
+                  currentSchemaList.map((cur) => (
                     <MenuItem key={cur} value={cur}>
                       {cur}
                     </MenuItem>
                   ))}
               </Select>
             </FormControl>
+
             <Button
               onClick={() => {
                 const result = addSchemaBasedField(
                   content,
                   formData,
                   additionalSchema
+                );
+                setCurrentSchemaList((schemaList) =>
+                  schemaList.filter((cur) => cur !== additionalSchema)
                 );
                 dispatch(addSelectedField(result));
                 setAdditionalSchema('');
@@ -110,14 +153,14 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               <Select
                 id={id}
                 sx={{ width: '220px' }}
-                className={classes.root}
+                className={classes.narrowSelect}
                 label="타입"
                 value={customFieldType}
                 onChange={(e) => {
                   setCustomFieldType(e.target.value);
                 }}
               >
-                {sourceSchema &&
+                {currentSchemaList &&
                   inputTypeList.map((cur) => (
                     <MenuItem key={cur} value={cur}>
                       {cur}
@@ -127,14 +170,12 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
             </FormControl>
             <TextField
               id={id}
-              sx={{ width: '250px', marginLeft: '16px' }}
-              className={classes.root}
+              className={classes.text}
               label="키"
               value={customFieldKey}
               onChange={(e) => {
                 setCustomFieldKey(e.target.value);
               }}
-              // value={value || value === 0 ? value : ''}
             />
             <Button
               onClick={() => {

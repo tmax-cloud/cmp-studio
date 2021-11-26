@@ -17,7 +17,6 @@ const EditorTab = (props: EditorTabProps) => {
   }, [resoureId]);
 
   const onChange = React.useCallback(({ formData }, e) => {
-    console.log('formData: ', formData);
     setFormState(formData);
   }, []);
   return (

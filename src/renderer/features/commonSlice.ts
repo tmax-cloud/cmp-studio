@@ -1,6 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 // import * as _ from 'lodash-es';
 
+type TerraformStateType = {
+  status: string;
+  data: string;
+  message: string;
+};
+
 interface CommonSlice {
   workspaceUid: string;
   terraformState: any;
@@ -8,7 +14,11 @@ interface CommonSlice {
 
 const initialState: CommonSlice = {
   workspaceUid: '',
-  terraformState: '',
+  terraformState: {
+    status: '',
+    data: '',
+    message: '',
+  },
 };
 
 const commonSlice = createSlice({
@@ -18,7 +28,7 @@ const commonSlice = createSlice({
     setWorkspaceUid: (state, action: PayloadAction<string>) => {
       state.workspaceUid = action.payload;
     },
-    setTerraformState: (state, action: PayloadAction<string>) => {
+    setTerraformState: (state, action: PayloadAction<any>) => {
       state.terraformState = action.payload;
     },
   },
