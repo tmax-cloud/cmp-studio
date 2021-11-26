@@ -1,7 +1,8 @@
 import { JSONSchema7 } from 'json-schema';
 import * as _ from 'lodash';
+import { getObjectNameInfo } from './getResourceInfo';
 
-const supportedSchemaList = ['resource', 'provider', 'datasource'];
+const supportedSchemaList = ['resource', 'provider', 'data'];
 
 const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
 
@@ -9,15 +10,16 @@ const isResourceType = (type: string) => type === 'resource';
 
 const createFormData = (object: any) => {
   const { type, ...targetObject } = object;
-  const name = Object.keys(targetObject)[0];
-  const displayName = Object.keys(targetObject[name])[0];
+  // const resourceName = Object.keys(targetObject)[0];
+  // const instanceName = Object.keys(targetObject[resourceName])[0];
+  const { resourceName, instanceName } = getObjectNameInfo(object, type);
 
   if (_.isEmpty(object)) {
     return { type, formData: {} };
   }
-  const formData = isResourceType(type)
-    ? _.cloneDeep(targetObject[name][displayName])
-    : _.cloneDeep(targetObject[name]);
+  const formData = resourceName
+    ? _.cloneDeep(targetObject[resourceName][instanceName])
+    : _.cloneDeep(targetObject[resourceName]);
   return { type, formData };
 };
 
@@ -83,14 +85,18 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
       };
       if (!_.get(jsonSchema, makePath)) {
         fillSchemaByFormData(obj);
-        return;
-      }
-      if (
+      } else if (
         _.get(jsonSchema, makePath) &&
         !_.get(jsonSchema, makePath + '.type') &&
         'properties' in _.get(jsonSchema, makePath)
       ) {
-        makeFixedSchema(obj[currKey], makePath);
+        if (Array.isArray(obj[currKey])) {
+          for (let idx = 0; idx < obj[currKey].length; idx++) {
+            makeFixedSchema(obj[currKey][idx], makePath);
+          }
+        } else {
+          makeFixedSchema(obj[currKey], makePath);
+        }
       } else if (_.get(jsonSchema, makePath + '.type') === 'map') {
         setSchema({
           type: 'map',
@@ -98,6 +104,11 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
             type: 'string',
           },
         });
+      } else if (
+        _.get(jsonSchema, makePath + '.type') === 'array' &&
+        _.get(jsonSchema, makePath + '.type.items.properties')
+      ) {
+        makeFixedSchema(obj[currKey], makePath + '.type.items');
       } else {
         _.set(fixedSchema, makePath, _.get(jsonSchema, makePath));
       }
@@ -114,7 +125,13 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
         !_.get(fixedSchema, makeSchemaPath + '.type') &&
         'properties' in _.get(fixedSchema, makeSchemaPath)
       ) {
-        makeCustomUISchema(obj[currKey], makeSchemaPath);
+        if (Array.isArray(obj[currKey])) {
+          for (let idx = 0; idx < obj[currKey].length; idx++) {
+            makeCustomUISchema(obj[currKey][idx], makeSchemaPath);
+          }
+        } else {
+          makeCustomUISchema(obj[currKey], makeSchemaPath);
+        }
       } else if (_.get(fixedSchema, makeSchemaPath + '.type') === 'map') {
         _.set(customUISchema, makeUIPath, {
           [`ui:field`]: 'MapField',
