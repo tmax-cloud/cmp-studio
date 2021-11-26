@@ -1,25 +1,14 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import { createStyles, makeStyles } from '@mui/styles';
-import { IconButton } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { useAppDispatch } from '@renderer/app/store';
 import { setSidePanel } from '@renderer/features/uiSlice';
-import { getIcon } from '@renderer/utils/iconUtil';
-
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    title: {
-      marginLeft: '5px',
-      marginBottom: '6px',
-    },
-  })
-);
+import { getIcon } from '../../icon/IconFactory';
 
 const FormHeader = (props: FormHeaderProps) => {
-  const { title, type } = props;
+  const { title, resourceName } = props;
   const dispatch = useAppDispatch();
-  const classes = useStyles();
 
   return (
     <div
@@ -28,14 +17,12 @@ const FormHeader = (props: FormHeaderProps) => {
         justifyContent: 'space-between',
       }}
     >
-      <span style={{ display: 'flex', margin: '8px' }}>
-        <img
-          alt="icon"
-          style={{ width: 24 }}
-          src={getIcon(true, type, title, type === 'data')}
-        />
-        <h2 className={classes.title}>{title}</h2>
-      </span>
+      <Box sx={{ margin: '16px', display: 'flex' }}>
+        {getIcon(resourceName, 32)}
+        <Typography variant="h3" sx={{ ml: 1.5 }}>
+          {title}
+        </Typography>
+      </Box>
       <IconButton
         aria-label="Close"
         onClick={() => {
@@ -50,7 +37,7 @@ const FormHeader = (props: FormHeaderProps) => {
 
 type FormHeaderProps = {
   title: string;
-  type: string;
+  resourceName: string;
 };
 
 export default FormHeader;

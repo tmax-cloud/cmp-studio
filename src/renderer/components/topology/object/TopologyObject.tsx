@@ -18,7 +18,7 @@ import { setSelectedObjectInfo } from '@renderer/features/codeSlice';
 import { setSidePanel } from '@renderer/features/uiSlice';
 import { setSelectedNode } from '@renderer/features/graphSlice';
 import { selectSelectedData } from '@renderer/features/graphSliceInputSelectors';
-import { getIcon } from '@renderer/utils/iconUtil';
+import { getIcon } from '@renderer/components/topology/icon/IconFactory';
 import { NodeData } from '@renderer/types/graph';
 import { getObjectNameInfo } from '../state/form/utils/getResourceInfo';
 
@@ -144,10 +144,7 @@ const TopologyObject = (props: TopologyObjectProps) => {
                       onClick={(event) => handleClick(event, objResult, item)}
                     >
                       <ListItemIcon sx={{ minWidth: 36 }}>
-                        <img
-                          style={{ width: 24 }}
-                          src={getIcon(true, item.type, name)}
-                        />
+                        {getIcon(name, 24)}
                       </ListItemIcon>
                       <ListItemName>{name}</ListItemName>
                     </ListItemButton>

@@ -66,19 +66,6 @@ const useStyles = makeStyles({
   menuItemText: { width: '120px', textAlign: 'start' },
 });
 
-export const getIcon = (type: string) => {
-  switch (type) {
-    case 'provider':
-      return <AcUnit />;
-    case 'resource':
-      return <FilterVintage />;
-    case 'data':
-      return <Storage />;
-    default:
-      return <Circle />;
-  }
-};
-
 const TabPanel: React.FC<TabPanelProps> = (props) => {
   const { children, value, index, ...other } = props;
 
