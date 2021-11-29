@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import { GraphData, NodeObject } from 'react-force-graph-2d';
 import { LinkData, NodeData } from '@renderer/types/graph';
-import { getIcon } from '../iconUtil';
+import { getIconInfo } from '@renderer/components/topology/icon/IconFactory';
 
 export const nodesById = (nodes: NodeObject[]) =>
   Object.fromEntries(nodes.map((node) => [node.id, node]));
@@ -54,7 +54,8 @@ const parseNodeFullName = (str: string) => {
     }
   }
 
-  const icon = getIcon(false, type, simpleName, dataSource);
+  const name = type === 'module' || type === 'provider' ? simpleName : type;
+  const icon = getIconInfo(name);
 
   return {
     simpleName,

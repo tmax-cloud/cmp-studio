@@ -2,13 +2,23 @@ import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 const CustomIcon = (props: CustomIconProps) => {
-  const { useRect, size, viewBox, startColor, endColor, transform, d } = props;
+  const {
+    useRect,
+    width,
+    height,
+    viewBoxWidth,
+    viewBoxHeight,
+    startColor,
+    endColor,
+    transform,
+    d,
+  } = props;
   const uid = uuidv4();
   return (
     <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${viewBox} ${viewBox}`}
+      width={width}
+      height={height}
+      viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
@@ -23,8 +33,8 @@ const CustomIcon = (props: CustomIconProps) => {
             <rect
               x="0"
               y="0"
-              width={viewBox || size}
-              height={viewBox || size}
+              width={viewBoxWidth || width}
+              height={viewBoxHeight || height}
             />
           </g>
         ) : null}
@@ -38,8 +48,10 @@ const CustomIcon = (props: CustomIconProps) => {
 
 interface CustomIconProps {
   useRect?: boolean; // backgrund에 rect 요소를 사용할 지 여부
-  size: number;
-  viewBox?: number;
+  width?: number;
+  height?: number;
+  viewBoxWidth?: number;
+  viewBoxHeight?: number;
   startColor: string;
   endColor: string;
   // eslint-disable-next-line react/require-default-props
@@ -49,7 +61,10 @@ interface CustomIconProps {
 
 CustomIcon.defaultProps = {
   useRect: true,
-  viewBox: 24,
+  width: 24,
+  height: 24,
+  viewBoxWidth: 24,
+  viewBoxHeight: 24,
 };
 
 export default CustomIcon;

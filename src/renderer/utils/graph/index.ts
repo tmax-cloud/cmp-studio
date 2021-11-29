@@ -8,7 +8,7 @@ import {
   drawTexts,
   drawRoundRect,
   getIconColor,
-  drawImage,
+  drawIcon,
   drawCircle,
   getStrokeColor,
   DrawingKind,
@@ -148,10 +148,10 @@ export const drawNode = (
     shadow
   );
 
-  const cirlceSize = 12;
+  const cirlceSize = 16;
   const iconColor = getIconColor(opacity, node.type, node.dataSource);
   drawCircle(ctx, x, y - cirlceSize / 2, cirlceSize, iconColor);
-  drawImage(ctx, node.icon, x - cirlceSize / 2, y - cirlceSize, cirlceSize);
+  drawIcon(ctx, x - cirlceSize / 2, y - cirlceSize, cirlceSize, node.icon);
 
   const padding = 4;
   drawTexts(ctx, node.simpleName, x, y + cirlceSize + padding, w - padding * 2);
