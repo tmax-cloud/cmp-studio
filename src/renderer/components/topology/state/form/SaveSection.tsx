@@ -12,7 +12,7 @@ import {
   selectMapObjectTypeCollection,
 } from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
-import { setFileObjects } from '@renderer/features/codeSlice';
+import { setFileObjects, addSelectedField } from '@renderer/features/codeSlice';
 import { setSidePanel } from '@renderer/features/uiSlice';
 import { setTerraformState } from '@renderer/features/commonSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
@@ -140,6 +140,15 @@ const SaveSection = (props: SaveSectionProps) => {
               return cur;
             });
             dispatch(setFileObjects(newFileObjects));
+            dispatch(
+              addSelectedField({
+                [resourceName]: {
+                  [selectedObjectInstanceName]: {
+                    ...formState,
+                  },
+                },
+              })
+            );
 
             // TemporaryDataPath에 변경사항 저장 (terraform plan 용도)
             const result = await exportProject({
