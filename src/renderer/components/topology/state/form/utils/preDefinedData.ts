@@ -15,7 +15,7 @@ const createFormData = (object: any) => {
 
   const formData = resourceName
     ? _.cloneDeep(targetObject[resourceName][instanceName])
-    : _.cloneDeep(targetObject[resourceName]);
+    : _.cloneDeep(targetObject[instanceName]);
   return { type, formData };
 };
 
@@ -37,18 +37,19 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
       const makeSchemaPath = prevSchemaPath
         ? `${prevSchemaPath}.properties.${currKey}`
         : `properties.${currKey}`;
-      const makeObjPath = prevObjPath
-        ? `${prevObjPath}.properties.${currKey}`
-        : `properties.${currKey}`;
+      const makeObjPath = prevObjPath ? `${prevObjPath}.${currKey}` : currKey;
       const setSchema = (fixedValue: SchemaField) => {
         _.set(fixedSchema, makeSchemaPath, fixedValue);
       };
+      const setFormData = (formValue: any) => {
+        _.set(formData, makeObjPath, formValue);
+      };
 
       const fillSchemaByFormData = (obj: any) => {
-        const currentKey = makeObjPath.split('properties.');
-        const currentValue = obj[currentKey[1]];
-        if (currentKey.length > 1) {
-          switch (typeof obj[currentKey[1]]) {
+        const currentKey = makeObjPath;
+        const currentValue = obj[currentKey];
+        if (currentKey) {
+          switch (typeof obj[currentKey]) {
             case 'string': {
               setSchema({ type: 'string' });
               break;
@@ -68,6 +69,13 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
                   },
                 });
               } else {
+                const result = _.entries(_.get(formData, makeObjPath)).map(
+                  ([key, value]) => {
+                    return { [key]: value };
+                  }
+                );
+                console.log(result);
+                setFormData(result);
                 setSchema({
                   type: 'map',
                   items: {
@@ -98,7 +106,7 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
           // type이 object 프로퍼티가 중복 정의 되었을 때 -> array
           _.set(fixedSchema, makeSchemaPath, {
             type: 'array',
-            items: _.get(jsonSchema, makeObjPath),
+            items: _.get(jsonSchema, makeSchemaPath),
           });
           for (let idx = 0; idx < obj[currKey].length; idx++) {
             makeFixedSchema(
@@ -112,6 +120,13 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
         }
       } else if (_.get(jsonSchema, makeSchemaPath + '.type') === 'map') {
         // type이 map일 때
+        const result = _.entries(_.get(formData, makeObjPath)).map(
+          ([key, value]) => {
+            return { [key]: value };
+          }
+        );
+        console.log(result);
+        setFormData(result);
         setSchema({
           type: 'map',
           items: {
@@ -124,14 +139,22 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
       ) {
         _.set(fixedSchema, makeSchemaPath, {
           type: 'array',
-          items: _.get(jsonSchema, makeObjPath + '.items'),
+          items: _.get(jsonSchema, makeSchemaPath + '.items'),
         });
-        for (let idx = 0; idx < obj[currKey].length; idx++) {
+        if (!Array.isArray(obj[currKey])) {
           makeFixedSchema(
-            obj[currKey][idx],
+            obj[currKey],
             makeSchemaPath + '.items',
-            makeObjPath + `[${idx}]`
+            makeObjPath + '[0]'
           );
+        } else {
+          for (let idx = 0; idx < obj[currKey].length; idx++) {
+            makeFixedSchema(
+              obj[currKey][idx],
+              makeSchemaPath + '.items',
+              makeObjPath + `[${idx}]`
+            );
+          }
         }
       } else {
         _.set(fixedSchema, makeSchemaPath, _.get(jsonSchema, makeSchemaPath));
@@ -164,9 +187,22 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
     });
   };
 
+  //   const makeCustomFormData (obj: any, prevPath: string, prevObjPath: string) => {
+  //     Object.keys(obj).forEach((currKey) => {
+
+  //       const makeSchemaPath = prevPath
+  //         ? `${prevPath}.properties.${currKey}`
+  //         : `properties.${currKey}`;
+  //         const makeObjPath = prevObjPath
+  //           ? `${prevObjPath}.properties.${currKey}`
+  //           : `properties.${currKey}`;
+  //     })
+  //   }
+
   if (!_.isEmpty(formData)) {
     makeFixedSchema(formData, '', '');
     makeCustomUISchema(formData, '');
+    // makeCustomFormData(formData, '');
   }
   return { customUISchema, formData, fixedSchema };
 };
