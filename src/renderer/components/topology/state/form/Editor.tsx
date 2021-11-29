@@ -24,7 +24,7 @@ const EditorTab = (props: EditorTabProps) => {
       <div
         style={{
           paddingTop: '12px',
-          height: '676px',
+          height: '663px',
           overflowY: 'auto',
           overflowX: 'hidden',
         }}
