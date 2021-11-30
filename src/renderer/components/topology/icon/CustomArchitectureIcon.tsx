@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-const CustomIcon = (props: CustomIconProps) => {
+const CustomArchitectureIcon = (props: CustomArchitectureIconProps) => {
   const {
-    useRect,
     width,
     height,
     viewBoxWidth,
@@ -28,17 +27,15 @@ const CustomIcon = (props: CustomIconProps) => {
         </linearGradient>
       </defs>
       <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-        {useRect ? (
-          <g fill={`url(#lg-${uid})`}>
-            <rect
-              x="0"
-              y="0"
-              width={viewBoxWidth || width}
-              height={viewBoxHeight || height}
-            />
-          </g>
-        ) : null}
-        <g transform={transform} fill={useRect ? '#FFFFFF' : `url(#lg-${uid})`}>
+        <g fill={`url(#lg-${uid})`}>
+          <rect
+            x="0"
+            y="0"
+            width={viewBoxWidth || width}
+            height={viewBoxHeight || height}
+          />
+        </g>
+        <g transform={transform} fill="#FFFFFF">
           <path d={d} />
         </g>
       </g>
@@ -46,8 +43,7 @@ const CustomIcon = (props: CustomIconProps) => {
   );
 };
 
-interface CustomIconProps {
-  useRect?: boolean; // backgrund에 rect 요소를 사용할 지 여부
+interface CustomArchitectureIconProps {
   width?: number;
   height?: number;
   viewBoxWidth?: number;
@@ -59,12 +55,11 @@ interface CustomIconProps {
   d: string;
 }
 
-CustomIcon.defaultProps = {
-  useRect: true,
+CustomArchitectureIcon.defaultProps = {
   width: 24,
   height: 24,
   viewBoxWidth: 24,
   viewBoxHeight: 24,
 };
 
-export default CustomIcon;
+export default CustomArchitectureIcon;

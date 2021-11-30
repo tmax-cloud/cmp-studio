@@ -1,5 +1,6 @@
 import * as React from 'react';
-import CustomIcon from './CustomIcon';
+import CustomArchitectureIcon from './CustomArchitectureIcon';
+import CustomResourceIcon from './CustomResourceIcon';
 
 export const getAWSResourceIcon = (name: string, size?: number) => {
   if (name.startsWith('aws_accessanalyzer')) {
@@ -10,12 +11,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#BD0816"
           endColor="#FF5252"
           d={info.path}
@@ -32,12 +30,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#BD0816"
           endColor="#FF5252"
           d={info.path}
@@ -56,7 +51,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -77,7 +72,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -96,12 +91,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -120,7 +112,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -141,7 +133,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -162,7 +154,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -181,7 +173,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -203,7 +195,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -222,7 +214,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -242,12 +234,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -264,12 +253,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -286,12 +272,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -308,12 +291,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -330,12 +310,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -354,7 +331,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -373,7 +350,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -395,7 +372,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#055F4E"
@@ -414,7 +391,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -436,7 +413,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -457,7 +434,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -476,12 +453,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -498,12 +472,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -522,7 +493,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#1B660F"
@@ -543,7 +514,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -564,7 +535,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#1B660F"
@@ -585,7 +556,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -606,7 +577,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -625,12 +596,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -649,7 +617,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -668,12 +636,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -692,7 +657,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -713,7 +678,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -734,7 +699,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -755,7 +720,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -774,12 +739,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -798,7 +760,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -817,7 +779,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -839,7 +801,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -860,7 +822,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -881,7 +843,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -902,7 +864,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -923,7 +885,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -944,7 +906,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -965,7 +927,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -986,7 +948,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -1007,7 +969,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#1B660F"
@@ -1026,12 +988,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -1050,7 +1009,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -1069,12 +1028,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#055F4E"
           endColor="#56C0A7"
           d={info.path}
@@ -1093,7 +1049,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#055F4E"
@@ -1112,12 +1068,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#2E27AD"
           endColor="#527FFF"
           d={info.path}
@@ -1136,7 +1089,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1157,7 +1110,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1178,7 +1131,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1197,12 +1150,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -1221,7 +1171,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1242,7 +1192,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1263,7 +1213,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1284,7 +1234,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1305,7 +1255,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1326,7 +1276,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1347,7 +1297,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1368,7 +1318,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1389,7 +1339,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -1410,7 +1360,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -1429,12 +1379,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -1453,7 +1400,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1474,7 +1421,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1495,7 +1442,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -1514,12 +1461,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#2E27AD"
           endColor="#527FFF"
           d={info.path}
@@ -1538,7 +1482,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1557,12 +1501,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -1579,12 +1520,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -1603,7 +1541,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#1B660F"
@@ -1624,7 +1562,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -1643,12 +1581,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -1667,7 +1602,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -1686,12 +1621,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -1708,12 +1640,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -1730,12 +1659,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -1754,7 +1680,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -1773,12 +1699,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -1797,7 +1720,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#1B660F"
@@ -1816,12 +1739,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -1840,7 +1760,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -1859,12 +1779,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -1883,7 +1800,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -1904,7 +1821,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -1925,7 +1842,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -1946,7 +1863,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -1965,12 +1882,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -1989,7 +1903,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2010,7 +1924,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -2029,7 +1943,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2049,12 +1963,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -2073,7 +1984,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -2094,7 +2005,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#1B660F"
@@ -2115,7 +2026,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#1B660F"
@@ -2134,7 +2045,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#1B660F"
@@ -2156,7 +2067,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2175,12 +2086,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -2199,7 +2107,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2218,12 +2126,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -2242,7 +2147,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2263,7 +2168,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -2282,12 +2187,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#BD0816"
           endColor="#FF5252"
           d={info.path}
@@ -2306,7 +2208,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -2327,7 +2229,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -2348,7 +2250,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -2367,12 +2269,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -2389,12 +2288,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -2411,12 +2307,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -2433,12 +2326,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -2455,12 +2345,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -2477,12 +2364,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -2499,7 +2383,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2519,7 +2403,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2539,7 +2423,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2559,7 +2443,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2581,7 +2465,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2602,7 +2486,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -2623,7 +2507,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2642,12 +2526,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -2666,7 +2547,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -2687,7 +2568,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2708,7 +2589,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#055F4E"
@@ -2729,7 +2610,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -2750,7 +2631,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -2771,7 +2652,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -2792,7 +2673,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -2813,7 +2694,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -2834,7 +2715,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -2853,12 +2734,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -2877,7 +2755,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -2898,7 +2776,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -2919,7 +2797,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -2938,12 +2816,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -2962,7 +2837,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -2981,12 +2856,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -3003,7 +2875,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -3023,12 +2895,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -3045,12 +2914,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -3067,12 +2933,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -3089,12 +2952,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -3113,7 +2973,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -3132,12 +2992,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -3154,12 +3011,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -3178,7 +3032,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -3199,7 +3053,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -3218,7 +3072,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -3238,7 +3092,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -3260,7 +3114,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -3281,7 +3135,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -3302,7 +3156,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -3323,7 +3177,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
@@ -3344,7 +3198,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -3363,12 +3217,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -3385,12 +3236,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -3407,12 +3255,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -3429,12 +3274,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -3453,7 +3295,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -3472,12 +3314,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -3494,12 +3333,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -3516,12 +3352,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -3538,12 +3371,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -3560,12 +3390,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -3582,12 +3409,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#1B660F"
           endColor="#6CAE3E"
           d={info.path}
@@ -3604,7 +3428,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#1B660F"
@@ -3624,12 +3448,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#055F4E"
           endColor="#56C0A7"
           d={info.path}
@@ -3646,12 +3467,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#055F4E"
           endColor="#56C0A7"
           d={info.path}
@@ -3670,7 +3488,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#055F4E"
@@ -3689,12 +3507,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -3711,12 +3526,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -3735,7 +3547,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -3754,12 +3566,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#BD0816"
           endColor="#FF5252"
           d={info.path}
@@ -3778,7 +3587,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -3799,7 +3608,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -3820,7 +3629,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#C8511B"
@@ -3841,7 +3650,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -3862,7 +3671,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -3883,7 +3692,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -3902,7 +3711,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -3922,12 +3731,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -3946,7 +3752,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -3965,12 +3771,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#C8511B"
           endColor="#FF9900"
           d={info.path}
@@ -3987,12 +3790,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -4011,7 +3811,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -4030,12 +3830,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -4054,7 +3851,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#B0084D"
@@ -4075,7 +3872,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -4096,7 +3893,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#1B660F"
@@ -4115,12 +3912,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#B0084D"
           endColor="#FF4F8B"
           d={info.path}
@@ -4137,12 +3931,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -4159,12 +3950,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -4183,7 +3971,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#4D27A8"
@@ -4202,12 +3990,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -4224,12 +4009,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#4D27A8"
           endColor="#A166FF"
           d={info.path}
@@ -4246,12 +4028,9 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
-          useRect={false}
+        <CustomResourceIcon
           width={size}
           height={size}
-          viewBoxWidth={info.width}
-          viewBoxHeight={info.height}
           startColor="#BD0816"
           endColor="#FF5252"
           d={info.path}
@@ -4268,7 +4047,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#BD0816"
@@ -4290,7 +4069,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#055F4E"
@@ -4311,7 +4090,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#055F4E"
@@ -4332,7 +4111,7 @@ export const getAWSResourceIcon = (name: string, size?: number) => {
     };
     return {
       icon: (
-        <CustomIcon
+        <CustomArchitectureIcon
           width={size}
           height={size}
           startColor="#2E27AD"
