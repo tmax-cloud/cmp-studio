@@ -18,7 +18,7 @@ const FormHeader = (props: FormHeaderProps) => {
       }}
     >
       <Box sx={{ margin: '16px', display: 'flex' }}>
-        {getIcon(resourceName, 32)}
+        {getIcon(resourceName || title, 32)}
         <Typography variant="h3" sx={{ ml: 1.5 }}>
           {title}
         </Typography>

@@ -100,7 +100,9 @@ const TopologyObject = (props: TopologyObjectProps) => {
     const content = objResult.filter((cur: any) => {
       const { type, resourceName, ...obj } = cur;
       const { instanceName } = getObjectNameInfo(obj, type);
-      return item.instanceName === instanceName;
+      return (
+        item.instanceName === instanceName && item.resourceName === resourceName
+      );
     })[0];
 
     const { type, resourceName, ...obj } = content;
