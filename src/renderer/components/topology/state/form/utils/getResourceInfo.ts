@@ -5,11 +5,16 @@ export const noResourceNameTypeList = [
   'provider',
   'variable',
   'output',
+  'terraform',
+  'locals',
 ];
+
+export const hasNotResourceName = (type: string) =>
+  !!noResourceNameTypeList.find((currType) => type === currType);
 
 export const getObjectNameInfo = (object: any, type: string) => {
   const resourceName = Object.keys(object)[0];
-  if (noResourceNameTypeList.find((currType) => type === currType)) {
+  if (hasNotResourceName(type)) {
     return { resourceName: '', instanceName: Object.keys(object)[0] };
   }
   return { resourceName, instanceName: Object.keys(object[resourceName])[0] };
