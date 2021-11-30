@@ -5,7 +5,6 @@ import {
   List,
   styled,
   Box,
-  Button,
   MenuItem,
   InputLabel,
   Select,
@@ -141,7 +140,8 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
   const folderUri = useWorkspaceUri(workspaceUid);
-  const addedObjectJSON = { key1: 'value1' }; //temp
+  //const addedObjectJSON = { key1: 'value1' }; //temp
+  const addedObjectJSON = {}; //temp
   const graphData = useAppSelector(selectGraphData);
   const accordions = [
     {
