@@ -7,8 +7,7 @@ import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { exportProject } from '@renderer/utils/ipc/workspaceIpcUtils';
 import {
   selectCodeFileObjects,
-  selectCodeSelectedObjectInfoInstanceName,
-  selectCodeSelectedObjectInfoId,
+  selectCodeSelectedObjectInfo,
   selectMapObjectTypeCollection,
 } from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
@@ -48,26 +47,23 @@ const SaveSection = (props: SaveSectionProps) => {
   const classes = useStyles();
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const mapObjectCollection = useAppSelector(selectMapObjectTypeCollection);
-  const objectId = useAppSelector(selectCodeSelectedObjectInfoId);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
-  const selectedObjectInstanceName = useAppSelector(
-    selectCodeSelectedObjectInfoInstanceName
+  const { type, resourceName, instanceName } = useAppSelector(
+    selectCodeSelectedObjectInfo
   );
-  const dispatch = useAppDispatch();
 
+  const path = resourceName
+    ? `${type}.${resourceName}.${instanceName}`
+    : `${type}.${instanceName}`;
+  const dispatch = useAppDispatch();
   const onDeleteObject = () => {
     const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
-      if (_.get(cur.fileJson, objectId.split('/').join('.'))) {
+      if (_.get(cur.fileJson, path)) {
         return true;
       } else {
         return false;
       }
     });
-    const [type] = objectId.split('/');
-    const { resourceName, instanceName } = getObjectNameInfo(
-      fileObjects[fileIdx].fileJson[type],
-      type
-    );
     const newFileObjects = fileObjects.map((cur: any, idx: number) => {
       if (idx === fileIdx) {
         if (_.size(cur.fileJson) > 1) {
@@ -145,17 +141,12 @@ const SaveSection = (props: SaveSectionProps) => {
           onClick={async () => {
             // redux fileObjects에 변경된 부분 저장하기
             const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
-              if (_.get(cur.fileJson, objectId.split('/').join('.'))) {
+              if (_.get(cur.fileJson, path)) {
                 return true;
               } else {
                 return false;
               }
             });
-            const [type] = objectId.split('/');
-            const { resourceName, instanceName } = getObjectNameInfo(
-              fileObjects[fileIdx].fileJson[type],
-              type
-            );
             const newFileObjects = fileObjects.map((cur: any, idx: number) => {
               if (idx === fileIdx) {
                 if (resourceName) {
@@ -192,21 +183,11 @@ const SaveSection = (props: SaveSectionProps) => {
             });
             dispatch(setFileObjects(newFileObjects));
             dispatch(
-              setSelectedField(
-                resourceName
-                  ? {
-                      [resourceName]: {
-                        [instanceName]: {
-                          ...formState,
-                        },
-                      },
-                    }
-                  : {
-                      [instanceName]: {
-                        ...formState,
-                      },
-                    }
-              )
+              setSelectedField({
+                [instanceName]: {
+                  ...formState,
+                },
+              })
             );
 
             // TemporaryDataPath에 변경사항 저장 (terraform plan 용도)

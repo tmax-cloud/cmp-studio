@@ -20,7 +20,10 @@ import { setSelectedNode } from '@renderer/features/graphSlice';
 import { selectSelectedData } from '@renderer/features/graphSliceInputSelectors';
 import { getIcon } from '@renderer/components/topology/icon/IconFactory';
 import { NodeData } from '@renderer/types/graph';
-import { getObjectNameInfo } from '../state/form/utils/getResourceInfo';
+import {
+  getObjectNameInfo,
+  hasNotResourceName,
+} from '../state/form/utils/getResourceInfo';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
   backgroundColor: theme.palette.object.accordion,
@@ -95,16 +98,19 @@ const TopologyObject = (props: TopologyObjectProps) => {
     item: Item
   ) => {
     const content = objResult.filter((cur: any) => {
-      const { type, ...obj } = cur;
-      const { resourceName, instanceName } = getObjectNameInfo(obj, type);
-      const title = `${type}/${!!resourceName ? resourceName : instanceName}`;
-      return item.title === title;
-    });
+      const { type, resourceName, ...obj } = cur;
+      const { instanceName } = getObjectNameInfo(obj, type);
+      return item.instanceName === instanceName;
+    })[0];
+
+    const { type, resourceName, ...obj } = content;
+    const { instanceName } = getObjectNameInfo(obj, type);
 
     const object = {
-      id: item.title,
-      instanceName: item.instanceName,
-      content: content[0],
+      type,
+      resourceName,
+      instanceName,
+      content,
     };
 
     const nodeType =
@@ -137,16 +143,28 @@ const TopologyObject = (props: TopologyObjectProps) => {
           <AccordionDetails sx={{ backgroundColor: 'white', padding: 0 }}>
             <List>
               {accordion.content.map((item, index) => {
-                const name = item.resourceName || item.instanceName;
+                const getItemInfo = (type: string) => {
+                  if (hasNotResourceName(type)) {
+                    return {
+                      title: `${item.instanceName} (${item.type})`,
+                      iconName: item.instanceName,
+                    };
+                  }
+                  return {
+                    title: `${item.instanceName} (${item.resourceName})`,
+                    iconName: item.resourceName,
+                  };
+                };
+                const { title, iconName } = getItemInfo(item.type);
                 return (
                   <ListItem disablePadding key={`item-${index}`}>
                     <ListItemButton
                       onClick={(event) => handleClick(event, objResult, item)}
                     >
                       <ListItemIcon sx={{ minWidth: 36 }}>
-                        {getIcon(name, 24)}
+                        {getIcon(iconName, 24)}
                       </ListItemIcon>
-                      <ListItemName>{name}</ListItemName>
+                      <ListItemName>{title}</ListItemName>
                     </ListItemButton>
                   </ListItem>
                 );
@@ -164,8 +182,6 @@ export interface AccordionContentProps {
 }
 
 export interface Item {
-  provider?: string;
-  title: string;
   resourceName: string;
   instanceName: string;
   type: string;

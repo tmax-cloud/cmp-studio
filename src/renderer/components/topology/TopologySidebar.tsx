@@ -21,7 +21,10 @@ import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
 import parseToCustomizeKey from './state/form/utils/parseToCustomizeKey';
-import { getObjectNameInfo } from './state/form/utils/getResourceInfo';
+import {
+  getObjectNameInfo,
+  hasNotResourceName,
+} from './state/form/utils/getResourceInfo';
 import {
   openExistFolder,
   getProjectJson,
@@ -144,12 +147,25 @@ const TopologySidebar = () => {
     fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
       // eslint-disable-next-line guard-for-in
       for (const currKey in file.fileJson) {
-        objResult.push(
-          ..._.entries(file.fileJson[currKey]).map((object) => ({
-            [object[0]]: object[1],
-            type: currKey,
-          }))
-        );
+        if (hasNotResourceName(currKey)) {
+          objResult.push(
+            ..._.entries(file.fileJson[currKey]).map((object) => ({
+              [object[0]]: object[1],
+              type: currKey,
+              resourceName: '',
+            }))
+          );
+        } else {
+          Object.keys(file.fileJson[currKey]).forEach((key) => {
+            objResult.push(
+              ..._.entries(file.fileJson[currKey][key]).map((object) => ({
+                [object[0]]: object[1],
+                type: currKey,
+                resourceName: key,
+              }))
+            );
+          });
+        }
       }
     });
 
@@ -157,22 +173,17 @@ const TopologySidebar = () => {
     const itemsList: Item[] = [];
     objResult
       .filter((result) => {
-        const { type, ...object } = result;
+        const { type, resourceName, ...object } = result;
         const { instanceName } = getObjectNameInfo(object, type);
         return !!instanceName;
       })
       .map((result) => {
-        const { type, ...object } = result;
-        const { resourceName, instanceName } = getObjectNameInfo(object, type);
-        const title = !!resourceName
-          ? type + '/' + resourceName
-          : type + '/' + instanceName;
-        return { type, resourceName, title, instanceName };
+        const { type, resourceName, ...object } = result;
+        const instanceName = Object.keys(object)[0];
+        return { type, resourceName, instanceName };
       })
       .forEach((i: Item) => {
         itemsList.push({
-          provider: i.resourceName.split('_')[0],
-          title: i.title,
           instanceName: i.instanceName,
           resourceName: i.resourceName,
           type: i.type,

@@ -20,8 +20,9 @@ import {
 import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { ArrowDropDown } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
-import { selectCode } from '@renderer/features/codeSliceInputSelectors';
+import { selectCodeSelectedObjectInfo } from '@renderer/features/codeSliceInputSelectors';
 import { addSchemaBasedField, addCustomField } from './utils/addInputField';
+import { hasNotResourceName } from './utils/getResourceInfo';
 
 const useStyles: any = makeStyles((theme) =>
   createStyles({
@@ -57,9 +58,8 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
     []
   );
 
-  const {
-    selectedObjectInfo: { id, content, sourceSchema },
-  } = useAppSelector(selectCode);
+  const { type, resourceName, instanceName, content, sourceSchema } =
+    useAppSelector(selectCodeSelectedObjectInfo);
 
   const initSchemaList = (schema: JSONSchema7) => {
     const selectedSchema =
@@ -76,14 +76,20 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
     );
   };
 
+  const getTerraformMapId = (type: string) => {
+    if (hasNotResourceName(type)) {
+      return type + '-' + instanceName;
+    }
+    return type + '-' + resourceName;
+  };
   React.useEffect(() => {
     const schema: JSONSchema7 = terraformSchemaMap.get(
-      id.replace('/', '-')
+      getTerraformMapId(type)
     ) as JSONSchema7;
     schema
       ? setCurrentSchemaList(initSchemaList(schema) as string[])
       : setCurrentSchemaList([]);
-  }, [id, sourceSchema]);
+  }, [instanceName, sourceSchema]);
 
   React.useLayoutEffect(() => {
     setAdditionalSchema('');
@@ -107,7 +113,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               <InputLabel id="schema-label">스키마</InputLabel>
               <Select
                 labelId="schema-label"
-                id={id}
+                id={type + '-' + instanceName}
                 className={classes.wideSelect}
                 label="Schema"
                 value={additionalSchema}
@@ -126,11 +132,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 
             <Button
               onClick={() => {
-                const result = addSchemaBasedField(
-                  content,
-                  formData,
-                  additionalSchema
-                );
+                const result = addSchemaBasedField(content, additionalSchema);
                 setCurrentSchemaList((schemaList) =>
                   schemaList.filter((cur) => cur !== additionalSchema)
                 );
@@ -151,7 +153,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
             <FormControl fullWidth>
               <InputLabel id="schema-label">타입</InputLabel>
               <Select
-                id={id}
+                id={type + '-' + instanceName}
                 sx={{ width: '220px' }}
                 className={classes.narrowSelect}
                 label="타입"
@@ -169,7 +171,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               </Select>
             </FormControl>
             <TextField
-              id={id}
+              id={type + '-' + instanceName}
               className={classes.text}
               label="키"
               value={customFieldKey}

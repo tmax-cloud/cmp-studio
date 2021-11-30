@@ -3,7 +3,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 
 interface ObjcectInfo {
-  id: string;
+  type: string;
+  resourceName: string;
   instanceName: string;
   content: any;
   sourceSchema: JSONSchema7;
@@ -18,7 +19,8 @@ const initialState: CodeSlice = {
   fileObjects: [],
   mapObjectTypeCollection: {},
   selectedObjectInfo: {
-    id: '',
+    type: '',
+    resourceName: '',
     instanceName: '',
     content: {},
     sourceSchema: {},
