@@ -15,7 +15,6 @@ import { setFileObjects, setSelectedField } from '@renderer/features/codeSlice';
 import { setSidePanel } from '@renderer/features/uiSlice';
 import { setTerraformState } from '@renderer/features/commonSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
-import { getObjectNameInfo } from './utils/getResourceInfo';
 
 const useStyles = makeStyles({
   root: {

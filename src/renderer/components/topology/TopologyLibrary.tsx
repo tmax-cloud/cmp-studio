@@ -168,7 +168,6 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
           <AccordionDetails sx={{ backgroundColor: 'white', padding: 0 }}>
             <List>
               {items.map((item, index) => {
-                const isDatasource = item.type === 'data';
                 return (
                   <ListItem disablePadding key={`item-${index}`}>
                     <ListItemButton

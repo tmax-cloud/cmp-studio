@@ -10,8 +10,7 @@ const EditorTab = (props: EditorTabProps) => {
   const { schema, formData, uiSchema } = props;
 
   const [formState, setFormState] = React.useState(formData);
-  const { type, resourceName, instanceName, sourceSchema, content } =
-    useAppSelector(selectCodeSelectedObjectInfo);
+  const { instanceName } = useAppSelector(selectCodeSelectedObjectInfo);
 
   React.useEffect(() => {
     setFormState(formData);
