@@ -9,7 +9,7 @@ export interface NodeData extends NodeObject {
   fullName: string; // 'terraform graph' 커맨드를 통해 나온 raw string
   simpleName: string;
   type: NodeKind;
-  icon: string;
+  icon: IconData;
   modules: string[];
   state?: string;
   dataSource?: boolean; // 데이터소스 여부. true면 데이터소스
@@ -26,4 +26,12 @@ export interface ModuleData {
   name: string;
   path: string;
   size: number;
+}
+
+export interface IconData {
+  width: number;
+  height: number;
+  path: string;
+  translateX?: number;
+  translateY?: number;
 }

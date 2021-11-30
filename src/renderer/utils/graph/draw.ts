@@ -1,4 +1,4 @@
-import { NodeKind } from '@renderer/types/graph';
+import { IconData, NodeKind } from '@renderer/types/graph';
 
 export const drawShadow = (ctx: CanvasRenderingContext2D) => {
   ctx.shadowColor = '#C9CFDB';
@@ -67,16 +67,23 @@ export const drawCircle = (
   ctx.fill();
 };
 
-export const drawImage = (
+export const drawIcon = (
   ctx: CanvasRenderingContext2D,
-  src: string,
   x: number,
   y: number,
-  size: number
+  size: number,
+  icon: IconData
 ) => {
-  const img = document.createElement('img');
-  img.src = src;
-  ctx.drawImage(img, x, y, size, size);
+  ctx.save();
+  const horizontalScale = size / icon.width;
+  const verticalScale = size / icon.height;
+  const translateX = icon.translateX ? x + icon.translateX : x;
+  const translateY = icon.translateY ? y + icon.translateY : y;
+  ctx.transform(horizontalScale, 0, 0, verticalScale, translateX, translateY);
+  ctx.fillStyle = '#fff';
+  const path = new Path2D(icon.path);
+  ctx.fill(path, 'evenodd');
+  ctx.restore();
 };
 
 export const fitText = (
