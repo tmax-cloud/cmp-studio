@@ -168,7 +168,6 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
           <AccordionDetails sx={{ backgroundColor: 'white', padding: 0 }}>
             <List>
               {items.map((item, index) => {
-                const isDatasource = item.type === 'data';
                 return (
                   <ListItem disablePadding key={`item-${index}`}>
                     <ListItemButton
@@ -210,7 +209,8 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                             setFileObjects(fileObjects.concat(newFileObjects))
                           );
                           const object = {
-                            id: item.title,
+                            type: item.type,
+                            resourceName: item.resourceName,
                             instanceName: newInstanceName,
                             content: newFileObjects[0].fileJson,
                           };
@@ -263,7 +263,8 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                             setFileObjects(fileObjects.concat(newFileObjects))
                           );
                           const object = {
-                            id: item.title,
+                            type: item.type,
+                            resourceName: item.resourceName,
                             instanceName: newInstanceName,
                             content: newFileObjects[0].fileJson,
                           };

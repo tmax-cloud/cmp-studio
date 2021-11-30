@@ -61,7 +61,12 @@ export const ObjectFieldTemplate = ({
           element.hidden ? (
             element.content
           ) : (
-            <Grid item xs={12} key={index} style={{ marginBottom: '10px' }}>
+            <Grid
+              item
+              xs={12}
+              key={index}
+              style={{ marginBottom: '10px', marginRight: '36px' }}
+            >
               {element.content}
             </Grid>
           )

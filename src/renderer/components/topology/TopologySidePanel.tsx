@@ -12,12 +12,19 @@ import FormTabs from './state/StateTabs';
 import preDefinedData from './state/form/utils/preDefinedData';
 import { setSelectedSourceSchema } from '../../features/codeSlice';
 import { TOPOLOGY_TOOLBAR_HEIGHT } from './toolbar/TopologyToolbar';
+import { hasNotResourceName } from './state/form/utils/getResourceInfo';
 
 export const SIDEPANEL_WIDTH = 500;
 // 저장 버튼 누르면 redux objects에 content 덮어씌우기나이ㅓㄻ
 const TopologySidePanel = () => {
   const {
-    selectedObjectInfo: { id, content, sourceSchema, instanceName },
+    selectedObjectInfo: {
+      type,
+      resourceName,
+      content,
+      sourceSchema,
+      instanceName,
+    },
   } = useSelector(selectCode);
 
   const dispatch = useAppDispatch();
@@ -27,16 +34,16 @@ const TopologySidePanel = () => {
     []
   );
   const currentSchema = _.isEmpty(sourceSchema)
-    ? terraformSchemaMap.get(id.replace('/', '-'))
+    ? terraformSchemaMap.get(type + '-' + instanceName)
     : sourceSchema;
   const {
     customUISchema = {},
     formData = {},
     fixedSchema = {},
-  } = id && preDefinedData(currentSchema, content);
+  } = instanceName && preDefinedData(currentSchema, content);
   React.useEffect(() => {
     dispatch(setSelectedSourceSchema(fixedSchema));
-  }, [id]);
+  }, [instanceName]);
   return (
     <>
       <Drawer
@@ -53,7 +60,7 @@ const TopologySidePanel = () => {
         anchor="right"
         variant="persistent"
       >
-        <FormHeader title={instanceName} resourceName={id.split('/')[1]} />
+        <FormHeader title={instanceName} resourceName={resourceName} />
         <FormTabs
           schema={fixedSchema}
           formData={formData}

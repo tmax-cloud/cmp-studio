@@ -7,12 +7,11 @@ import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { exportProject } from '@renderer/utils/ipc/workspaceIpcUtils';
 import {
   selectCodeFileObjects,
-  selectCodeSelectedObjectInfoInstanceName,
-  selectCodeSelectedObjectInfoId,
+  selectCodeSelectedObjectInfo,
   selectMapObjectTypeCollection,
 } from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
-import { setFileObjects } from '@renderer/features/codeSlice';
+import { setFileObjects, setSelectedField } from '@renderer/features/codeSlice';
 import { setSidePanel } from '@renderer/features/uiSlice';
 import { setTerraformState } from '@renderer/features/commonSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
@@ -47,37 +46,65 @@ const SaveSection = (props: SaveSectionProps) => {
   const classes = useStyles();
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const mapObjectCollection = useAppSelector(selectMapObjectTypeCollection);
-  const objectId = useAppSelector(selectCodeSelectedObjectInfoId);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
-  const selectedObjectInstanceName = useAppSelector(
-    selectCodeSelectedObjectInfoInstanceName
+  const { type, resourceName, instanceName } = useAppSelector(
+    selectCodeSelectedObjectInfo
   );
-  const dispatch = useAppDispatch();
 
+  const path = resourceName
+    ? `${type}.${resourceName}.${instanceName}`
+    : `${type}.${instanceName}`;
+  const dispatch = useAppDispatch();
   const onDeleteObject = () => {
     const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
-      if (_.get(cur.fileJson, objectId.split('/').join('.'))) {
+      if (_.get(cur.fileJson, path)) {
         return true;
       } else {
         return false;
       }
     });
-    const [type, resourceName] = objectId.split('/');
     const newFileObjects = fileObjects.map((cur: any, idx: number) => {
       if (idx === fileIdx) {
         if (_.size(cur.fileJson) > 1) {
-          // 타입이 여러개인 경우 (상관 안해도 됨.)
+          // 동일한 파일에 데이터가 여러개인 경우
           if (_.size(cur.fileJson[type]) > 1) {
-            return _.omit(cur, [`fileJson.${type}.${resourceName}`]);
+            // 동일한 타입의 데이터가 여러개인 경우
+            if (resourceName) {
+              // resourceName이 있는 경우
+              if (_.size(cur.fileJsonp[type][resourceName]) > 1) {
+                // 동일한 리소스이름의 인스턴스가 여러개인 경우
+                return _.omit(cur, [
+                  `fileJson.${type}.${resourceName}/${instanceName}`,
+                ]);
+              }
+              // 동일한 리소스이름의 인스턴스가 하나인 경우
+              return _.omit(cur, [`fileJson.${type}.${resourceName}`]);
+            } else {
+              // resourceName이 없는 경우
+              return _.omit(cur, [`fileJson.${type}.${instanceName}`]);
+            }
           }
+          // 동일한 타입의 데이터가 하나인 경우
           return _.omit(cur, [`fileJson.${type}`]);
         } else {
-          // 타입이 하나인 경우 (해당 타입의 리소스가 없을 경우에 대해 분기 처리 해줘야함.)
+          // 동일한 파일에 데이터가 하나인 경우
           if (_.size(cur.fileJson[type]) > 1) {
-            // 리소스가 여러개인 경우 (상관 없음
-            return _.omit(cur, [`fileJson.${type}.${resourceName}`]);
+            // 동일한 타입의 데이터가 여러개인 경우
+            if (resourceName) {
+              // resourceName이 있는 경우
+              if (_.size(cur.fileJsonp[type][resourceName]) > 1) {
+                // 동일한 리소스이름의 인스턴스가 여러개인 경우
+                return _.omit(cur, [
+                  `fileJson.${type}.${resourceName}/${instanceName}`,
+                ]);
+              }
+              // 동일한 리소스이름의 인스턴스가 하나인 경우
+              return _.omit(cur, [`fileJson.${type}.${resourceName}`]);
+            } else {
+              // resourceName이 없는 경우
+              return _.omit(cur, [`fileJson.${type}.${instanceName}`]);
+            }
           }
-          //리소스가 하나인 경우
           return null;
         }
       }
@@ -113,33 +140,54 @@ const SaveSection = (props: SaveSectionProps) => {
           onClick={async () => {
             // redux fileObjects에 변경된 부분 저장하기
             const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
-              if (_.get(cur.fileJson, objectId.split('/').join('.'))) {
+              if (_.get(cur.fileJson, path)) {
                 return true;
               } else {
                 return false;
               }
             });
-            const [type, resourceName] = objectId.split('/');
             const newFileObjects = fileObjects.map((cur: any, idx: number) => {
               if (idx === fileIdx) {
-                return {
-                  ...cur,
-                  fileJson: {
-                    ...cur.fileJson,
-                    [type]: {
-                      ...cur.fileJson[type],
-                      [resourceName]: {
-                        [selectedObjectInstanceName]: {
+                if (resourceName) {
+                  return {
+                    ...cur,
+                    fileJson: {
+                      ...cur.fileJson,
+                      [type]: {
+                        ...cur.fileJson[type],
+                        [resourceName]: {
+                          [instanceName]: {
+                            ...formState,
+                          },
+                        },
+                      },
+                    },
+                  };
+                } else {
+                  return {
+                    ...cur,
+                    fileJson: {
+                      ...cur.fileJson,
+                      [type]: {
+                        ...cur.fileJson[type],
+                        [instanceName]: {
                           ...formState,
                         },
                       },
                     },
-                  },
-                };
+                  };
+                }
               }
               return cur;
             });
             dispatch(setFileObjects(newFileObjects));
+            dispatch(
+              setSelectedField({
+                [instanceName]: {
+                  ...formState,
+                },
+              })
+            );
 
             // TemporaryDataPath에 변경사항 저장 (terraform plan 용도)
             const result = await exportProject({

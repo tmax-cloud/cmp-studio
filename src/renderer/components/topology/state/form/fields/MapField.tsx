@@ -23,7 +23,7 @@ const MapField = (props: FieldProps) => {
     required,
     name,
     onChange,
-    formData,
+    formData = [],
   } = props;
   const id = idSchema.$id;
   const additional = true;
@@ -34,7 +34,11 @@ const MapField = (props: FieldProps) => {
     fontWeight: 'bold',
   };
 
-  const [mapData, setMapData] = React.useState(_.cloneDeep(formData) || {});
+  const [mapData, setMapData] = React.useState(formData);
+
+  React.useEffect(() => {
+    setMapData(formData);
+  }, [formData]);
 
   if (!additional) {
     return <>{children}</>;
@@ -47,7 +51,9 @@ const MapField = (props: FieldProps) => {
         <Divider />
       </Box>
 
-      {_.toPairs(mapData).map(([key, value], idx) => {
+      {mapData.map((currObj: Map<string, string>, idx: number) => {
+        const key = Object.keys(currObj)[0];
+        const value = Object.values(currObj)[0];
         return (
           <Grid
             container
@@ -63,17 +69,15 @@ const MapField = (props: FieldProps) => {
                   onChange={(e) => {
                     onChange(
                       (() => {
-                        const result = {};
-                        _.toPairs(mapData).forEach(
-                          ([curKey, curValue], i: number) => {
-                            if (i === idx) {
-                              _.assign(result, { [e.target.value]: curValue });
-                            } else {
-                              _.assign(result, { [curKey]: curValue });
-                            }
+                        const resultObj = {};
+                        _.assign(resultObj, { [e.target.value]: value });
+                        const result = mapData.map(
+                          (cur: Map<string, string>, index: number) => {
+                            if (index === idx) return resultObj;
+                            return cur;
                           }
                         );
-                        setMapData(_.cloneDeep(result));
+                        setMapData(result);
                         return result;
                       })()
                     );
@@ -92,17 +96,15 @@ const MapField = (props: FieldProps) => {
                   onChange={(e) => {
                     onChange(
                       (() => {
-                        const result = {};
-                        _.toPairs(mapData).forEach(
-                          ([curKey, curValue]: any, i: number) => {
-                            if (i === idx) {
-                              _.assign(result, { [curKey]: e.target.value });
-                            } else {
-                              _.assign(result, { [curKey]: curValue });
-                            }
+                        const resultObj = {};
+                        _.assign(resultObj, { [key]: e.target.value });
+                        const result = mapData.map(
+                          (cur: Map<string, string>, index: number) => {
+                            if (index === idx) return resultObj;
+                            return cur;
                           }
                         );
-                        setMapData(_.defaultsDeep(result));
+                        setMapData(result);
                         return result;
                       })()
                     );
@@ -123,15 +125,22 @@ const MapField = (props: FieldProps) => {
                 onClick={() => {
                   return onChange(
                     (() => {
-                      _.toPairs(mapData).forEach(
-                        ([curKey, curValue], i: number) => {
-                          if (idx === i) {
-                            delete mapData[curKey];
-                          }
+                      const result = mapData.filter(
+                        (cur: Map<string, string>) => {
+                          const matchingKey = Object.keys(cur)[0];
+                          if (matchingKey === key) return false;
+                          return true;
                         }
                       );
-                      setMapData(_.defaultsDeep(mapData));
-                      return mapData;
+                      // _.toPairs(mapData).forEach(
+                      //   ([curKey, curValue], i: number) => {
+                      //     if (idx === i) {
+                      //       delete mapData[curKey];
+                      //     }
+                      //   }
+                      // );
+                      setMapData(result);
+                      return result;
                     })()
                   );
                 }}
@@ -147,8 +156,11 @@ const MapField = (props: FieldProps) => {
             onChange(
               (() => {
                 // const result = mapData.concat({ '': '' });
-                setMapData(_.cloneDeep(_.assign(mapData, { '': '' })));
-                return _.assign(mapData, { '': '' });
+                setMapData((currMapData: Map<string, string>[]) => [
+                  ...currMapData,
+                  { '': '' },
+                ]);
+                return mapData;
               })()
             );
           }}
