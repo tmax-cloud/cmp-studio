@@ -123,7 +123,6 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
             return { [key]: value };
           }
         );
-        console.log(result);
         setFormData(result);
         setSchema({
           type: 'map',
@@ -145,6 +144,7 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
             makeSchemaPath + '.items',
             makeObjPath + '[0]'
           );
+          _.set(formData, makeObjPath, [_.get(formData, makeObjPath)]);
         } else {
           for (let idx = 0; idx < obj[currKey].length; idx++) {
             makeFixedSchema(
@@ -155,6 +155,12 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
           }
         }
       } else {
+        // if (
+        //   prevSchemaPath.split('.').pop() === 'items' &&
+        //   !_.get(formData, prevObjPath)
+        // ) {
+        //   _.set(formData, prevObjPath, );
+        // }
         _.set(fixedSchema, makeSchemaPath, _.get(jsonSchema, makeSchemaPath));
       }
     });
