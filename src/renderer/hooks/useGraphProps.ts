@@ -12,6 +12,7 @@ import {
   hasLink,
   hasNode,
   getPrunedGraph,
+  getCodeInfo,
 } from '@renderer/utils/graph';
 import { DrawingKind } from '@renderer/utils/graph/draw';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
@@ -25,6 +26,9 @@ import {
   setSelectedModule,
   setSelectedNode,
 } from '@renderer/features/graphSlice';
+import { setSidePanel } from '@renderer/features/uiSlice';
+import { setSelectedObjectInfo } from '@renderer/features/codeSlice';
+import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
 
 const initialConfig: GraphConfig = {
   isMounted: false,
@@ -42,6 +46,7 @@ export const useGraphProps = () => {
   const graphRef = React.useRef<ForceGraphMethods>();
   const configRef = React.useRef<GraphConfig>(initialConfig);
 
+  const fileObjects = useAppSelector(selectCodeFileObjects);
   const graphData = useAppSelector(selectSelectedData);
   const selectedNode = useAppSelector(selectSelectedNode);
   const selectedModule = useAppSelector(selectSelectedModule);
@@ -138,6 +143,13 @@ export const useGraphProps = () => {
 
     // handle click
     if (selectedNode?.id !== node.id) {
+      const codeInfo: any = getCodeInfo(fileObjects, node);
+      if (codeInfo) {
+        dispatch(setSelectedObjectInfo(codeInfo));
+        dispatch(setSidePanel(true));
+      } else {
+        dispatch(setSidePanel(false));
+      }
       dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
     } else {
       dispatch(setSelectedNode(null));
