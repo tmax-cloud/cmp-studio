@@ -22,6 +22,7 @@ import { selectSelectedData } from '@renderer/features/graphSliceInputSelectors'
 import { getIcon } from '@renderer/components/topology/icon/IconFactory';
 import { NodeData } from '@renderer/types/graph';
 import { getIconColor } from '@renderer/utils/graph/draw';
+import { TerraformType } from '@renderer/types/terraform';
 import {
   getObjectNameInfo,
   hasNotResourceName,
@@ -89,7 +90,7 @@ const ListItemColorLabel = (props: ItemColorLabelProps) => {
       sx={{
         marginRight: 2,
         borderWidth: 2,
-        borderColor: `${getIconColor(1, type, type === 'data')}`,
+        borderColor: getIconColor(type, 1),
       }}
     />
   ) : (
@@ -190,7 +191,7 @@ const TopologyObject = (props: TopologyObjectProps) => {
                       onClick={(event) => handleClick(event, objResult, item)}
                       sx={{ paddingLeft: isVar(item.type) ? '16px' : 0 }}
                     >
-                      <ListItemColorLabel type={item.type} />
+                      <ListItemColorLabel type={item.type as TerraformType} />
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         {getIcon(itemIcon, 24)}
                       </ListItemIcon>
@@ -217,7 +218,7 @@ export interface AccordionContentProps {
 }
 
 export interface ItemColorLabelProps {
-  type: string;
+  type: TerraformType;
 }
 
 export interface Item {
