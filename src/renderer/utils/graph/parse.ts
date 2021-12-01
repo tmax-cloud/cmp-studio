@@ -3,21 +3,23 @@ import * as _ from 'lodash';
 import { GraphData, NodeObject } from 'react-force-graph-2d';
 import { LinkData, NodeData } from '@renderer/types/graph';
 import { getIconInfo } from '@renderer/components/topology/icon/IconFactory';
+import { isTerraformType } from '@renderer/types/terraform';
 
 export const nodesById = (nodes: NodeObject[]) =>
   Object.fromEntries(nodes.map((node) => [node.id, node]));
 
-const parseNodeSimpleName = (str: string, state?: string) =>
+const parseNodeInstanceName = (str: string, state?: string) =>
   state ? str.replace(`(${state})`, '').trim() : str;
 
 const parseNodeState = (str: string) => str.match(/\((.*)\)/)?.pop();
 
 const parseNodeFullName = (str: string) => {
-  let simpleName = '';
   let type = '';
+  let resourceName;
+  let instanceName = '';
   let state;
-  let dataSource;
   const modules = [];
+  let isData = false;
 
   let newStr = str;
   if (str.includes('provider[')) {
@@ -35,35 +37,45 @@ const parseNodeFullName = (str: string) => {
       continue;
     }
 
-    // 데이터소스 일 경우
-    if (part === 'data') {
-      if (parts.length === 2) {
-        dataSource = true;
-      }
+    // 데이터소스일 경우
+    if (part === 'data' && parts.length === 2) {
+      isData = true;
       continue;
     }
 
-    const isModule = part === 'module';
-    type = isModule ? 'module' : part;
+    // set type
+    type = part;
+    if (!isTerraformType(part)) {
+      if (part === 'var') {
+        type = 'variable';
+      } else {
+        resourceName = part;
+        type = 'resource';
+      }
+    }
+    if (isData) {
+      type = 'data';
+      isData = false;
+    }
 
+    // set instance name
     const part2 = parts.shift();
     if (part2) {
       state = parseNodeState(part2);
-      simpleName = parseNodeSimpleName(part2, state);
-      isModule && simpleName && modules.push(simpleName);
+      instanceName = parseNodeInstanceName(part2, state);
+      part === 'module' && instanceName && modules.push(instanceName);
     }
   }
 
-  const name = type === 'module' || type === 'provider' ? simpleName : type;
-  const icon = getIconInfo(name);
+  const icon = getIconInfo(resourceName || instanceName);
 
   return {
-    simpleName,
     type,
+    instanceName,
+    resourceName,
     state,
     modules,
     icon,
-    dataSource,
   };
 };
 
@@ -87,7 +99,7 @@ const removeNodeList = (node: NodeData) => {
   // 유틸성 노드 제거
   const fullNames = ['root', 'meta.count-boundary (EachMode fixup)'];
   // output & variable 노드 제거
-  const types = ['output', 'var'];
+  const types = ['output', 'variable'];
   // close 상태인 노드 제거
   const states = ['close'];
   return (

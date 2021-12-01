@@ -115,13 +115,13 @@ const TopologyObject = (props: TopologyObjectProps) => {
       content,
     };
 
-    const nodeType =
-      item.type !== 'resource' && item.type !== 'data'
-        ? item.type
-        : item.resourceName;
-    const node = (graphData.nodes as NodeData[]).find(
-      (node) => node.type === nodeType && node.simpleName === item.instanceName
-    );
+    const node = (graphData.nodes as NodeData[]).find((node) => {
+      const { type, resourceName, instanceName } = node;
+      const isEqual = resourceName ? resourceName === item.resourceName : true;
+      return (
+        type === item.type && instanceName === item.instanceName && isEqual
+      );
+    });
     node ? dispatch(setSelectedNode(node)) : dispatch(setSelectedNode(null));
 
     dispatch(setSelectedObjectInfo(object));
