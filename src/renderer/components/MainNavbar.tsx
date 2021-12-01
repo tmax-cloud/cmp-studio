@@ -8,6 +8,7 @@ const useStyles = makeStyles({
   root: {
     height: TOP_NAVBAR_HEIGHT,
     minHeight: TOP_NAVBAR_HEIGHT,
+    backgroundColor: '#31475E',
   },
 });
 const MainNavbar: React.FC = (props) => {
