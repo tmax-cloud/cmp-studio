@@ -200,11 +200,14 @@ const SaveSection = (props: SaveSectionProps) => {
             await getTerraformPlan({ workspaceUid })
               .then((res: TerraformTypes.TerraformResponse) => {
                 const { status, data } = res;
+                const { planData } =
+                  data as TerraformTypes.TerraformPlanSuccessData;
+                const { message } = data as TerraformTypes.TerraformErrorData;
                 dispatch(
                   setTerraformState({
                     status,
-                    data: data?.planData,
-                    message: data?.message,
+                    data: planData,
+                    message,
                   })
                 );
                 return res;

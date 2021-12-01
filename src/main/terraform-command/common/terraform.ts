@@ -41,10 +41,11 @@ export type TerraformVersionSuccessData = { versionData: string };
 export type TerraformGraphSuccessData = { graphData: string };
 export type TerraformErrorData = { message: string };
 
-type TerraformData = TerraformGraphSuccessData &
-  TerraformErrorData &
-  TerraformVersionSuccessData &
-  TerraformPlanSuccessData &
-  string;
+type TerraformData =
+  | TerraformGraphSuccessData
+  | TerraformErrorData
+  | TerraformVersionSuccessData
+  | TerraformPlanSuccessData
+  | string;
 
 export type TerraformResponse = IPCResponse<TerraformStatus, TerraformData>;
