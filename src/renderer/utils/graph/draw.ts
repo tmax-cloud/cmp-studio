@@ -1,4 +1,5 @@
-import { IconData, NodeKind } from '@renderer/types/graph';
+import { IconData } from '@renderer/types/graph';
+import { TerraformType } from '@renderer/types/terraform';
 
 export const drawShadow = (ctx: CanvasRenderingContext2D) => {
   ctx.shadowColor = '#C9CFDB';
@@ -122,21 +123,18 @@ export const drawTexts = (
   ctx.fillText(newText, x, y);
 };
 
-export const getIconColor = (
-  opacity: number,
-  type: NodeKind,
-  dataSource?: boolean
-) => {
+export const getIconColor = (type: TerraformType, opacity: number) => {
   switch (type) {
+    case 'data':
+      return `rgba(144, 157, 255, ${opacity})`; // datasource
     case 'module':
       return `rgba(255, 173, 48, ${opacity})`;
     case 'provider':
       return `rgba(255, 87, 134, ${opacity})`;
+    case 'resource':
+      return `rgba(0, 183, 189, ${opacity})`;
     default:
-      if (dataSource) {
-        return `rgba(144, 157, 255, ${opacity})`; // datasource
-      }
-      return `rgba(0, 183, 189, ${opacity})`; // resource
+      return `rgba(211, 211, 211, ${opacity})`;
   }
 };
 

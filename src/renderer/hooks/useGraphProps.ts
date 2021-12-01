@@ -51,8 +51,8 @@ export const useGraphProps = () => {
   const nodeLabel = (obj: NodeObject) => {
     const node = obj as NodeData;
     return `<div class='tooltip-container'>
-      <div class='node-type'>${node.type}</div>
-      <div class='node-name'>${node.simpleName}</div>
+      <div class='node-type'>${node.resourceName || node.type}</div>
+      <div class='node-name'>${node.instanceName}</div>
     </div>`;
   };
 
@@ -127,6 +127,7 @@ export const useGraphProps = () => {
   const handleNodeClick = (obj: NodeObject, event: MouseEvent) => {
     const node = obj as NodeData;
 
+    // handle double click
     configRef.current.clickCount += 1;
     setTimeout(() => {
       if (configRef.current.clickCount === 2) {
@@ -135,6 +136,7 @@ export const useGraphProps = () => {
       configRef.current.clickCount = 0;
     }, 300);
 
+    // handle click
     if (selectedNode?.id !== node.id) {
       dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
     } else {
