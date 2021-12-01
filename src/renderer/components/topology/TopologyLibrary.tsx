@@ -80,6 +80,7 @@ const AccordionHeaderDesc = styled(Typography)(({ theme }) => ({
 const ListItemName = styled(Typography)(({ theme }) => ({
   color: theme.palette.object.accordionHeader.primary,
   fontSize: '0.75rem',
+  wordBreak: 'break-word',
 }));
 
 const defaultList = [
