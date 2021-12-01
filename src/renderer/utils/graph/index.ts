@@ -75,7 +75,7 @@ export const getModuleNodeByName = (
   name: string
 ): NodeData | undefined =>
   (nodes as NodeData[]).find(
-    (node) => node.type === 'module' && node.simpleName === name
+    (node) => node.type === 'module' && node.instanceName === name
   ) as NodeData;
 
 export const getModuleData = (nodes: NodeObject[]): ModuleData[] => {
@@ -94,7 +94,7 @@ export const getModuleData = (nodes: NodeObject[]): ModuleData[] => {
     // 부모 노드가 없는 노드, 즉 루트 노드만 foreach 문 수행
     if (_.isEmpty((node as NodeData).parentNodes) && node.id) {
       (function traverse(n = nodesById(nodes)[node.id]) {
-        const { id, simpleName, type, modules, childNodes } = n;
+        const { id, instanceName, type, modules, childNodes } = n;
         if (type !== 'module') {
           return;
         }
@@ -103,7 +103,7 @@ export const getModuleData = (nodes: NodeObject[]): ModuleData[] => {
         if (!paths.has(path)) {
           paths.add(path);
           const size = getPrunedGraph(nodes, id).nodes.length;
-          data.push({ root: false, id, name: simpleName, path, size });
+          data.push({ root: false, id, name: instanceName, path, size });
         }
 
         if (childNodes) {
@@ -149,10 +149,11 @@ export const drawNode = (
   );
 
   const cirlceSize = 16;
-  const iconColor = getIconColor(opacity, node.type, node.dataSource);
+  const iconColor = getIconColor(node.type, opacity);
   drawCircle(ctx, x, y - cirlceSize / 2, cirlceSize, iconColor);
   drawIcon(ctx, x - cirlceSize / 2, y - cirlceSize, cirlceSize, node.icon);
 
   const padding = 4;
-  drawTexts(ctx, node.simpleName, x, y + cirlceSize + padding, w - padding * 2);
+  const newY = y + cirlceSize + padding;
+  drawTexts(ctx, node.instanceName, x, newY, w - padding * 2);
 };
