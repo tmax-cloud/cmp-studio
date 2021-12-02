@@ -213,8 +213,11 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                             type: item.resourceName,
                             resourceName: '',
                             instanceName: newInstanceName,
-                            content:
-                              newFileObjects[0].fileJson[item.resourceName],
+                            content: {
+                              [newInstanceName]: addedObjectJSON,
+                              type: item.resourceName,
+                              resourceName: '',
+                            },
                           };
                           dispatch(setSelectedObjectInfo(object));
                           dispatch(setSidePanel(true));
@@ -243,24 +246,6 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                               },
                             },
                           ];
-                          /*
-                        const content = objResult.filter((cur: any) => {
-                          const { type, ...obj } = cur;
-                          const { resourceName, instanceName } = getObjectNameInfo(
-                            obj,
-                            type
-                          );
-                          const title = !!resourceName
-                            ? type + '/' + resourceName
-                            : type + '/' + instanceName;
-                          return item.title === title;
-                        });
-                        const object = {
-                          id: item.title,
-                          instanceName: item.instanceName,
-                          content: content[0],
-                        };
-                        */
                           dispatch(
                             setFileObjects(fileObjects.concat(newFileObjects))
                           );
@@ -268,7 +253,11 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                             type: item.type,
                             resourceName: item.resourceName,
                             instanceName: newInstanceName,
-                            content: newFileObjects[0].fileJson,
+                            content: {
+                              [newInstanceName]: addedObjectJSON,
+                              type: item.type,
+                              resourceName: item.resourceName,
+                            },
                           };
                           dispatch(setSelectedObjectInfo(object));
                           dispatch(setSidePanel(true));
