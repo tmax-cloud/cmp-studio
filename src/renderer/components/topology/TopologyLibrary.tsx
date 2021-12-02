@@ -210,10 +210,11 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                             setFileObjects(fileObjects.concat(newFileObjects))
                           );
                           const object = {
-                            type: item.type,
-                            resourceName: item.resourceName,
+                            type: item.resourceName,
+                            resourceName: '',
                             instanceName: newInstanceName,
-                            content: newFileObjects[0].fileJson,
+                            content:
+                              newFileObjects[0].fileJson[item.resourceName],
                           };
                           dispatch(setSelectedObjectInfo(object));
                           dispatch(setSidePanel(true));
