@@ -11,6 +11,7 @@ import {
   ListItemButton,
   ListItemIcon,
   Typography,
+  Divider,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
@@ -20,6 +21,8 @@ import { setSelectedNode } from '@renderer/features/graphSlice';
 import { selectSelectedData } from '@renderer/features/graphSliceInputSelectors';
 import { getIcon } from '@renderer/components/topology/icon/IconFactory';
 import { NodeData } from '@renderer/types/graph';
+import { getIconColor } from '@renderer/utils/graph/draw';
+import { TerraformType } from '@renderer/types/terraform';
 import {
   getObjectNameInfo,
   hasNotResourceName,
@@ -64,10 +67,46 @@ const AccordionHeaderDesc = styled(Typography)(({ theme }) => ({
   alignItems: 'center',
 }));
 
-const ListItemName = styled(Typography)(({ theme }) => ({
-  color: theme.palette.object.accordionHeader.primary,
-  fontSize: '0.75rem',
+const ListItemTypeText = styled(Typography)(({ theme }) => ({
+  color: theme.palette.object.accordionHeader.secondary,
+  fontSize: '0.625rem',
+  wordBreak: 'break-word',
 }));
+
+const ListItemNameText = styled(Typography)(({ theme }) => ({
+  color: theme.palette.object.accordionHeader.primary,
+  fontSize: '0.875rem',
+  wordBreak: 'break-word',
+}));
+
+const isVar = (type: string) => type === 'output' || type === 'variable';
+
+const ListItemColorLabel = (props: ItemColorLabelProps) => {
+  const { type } = props;
+  return !isVar(type) ? (
+    <Divider
+      orientation="vertical"
+      flexItem
+      sx={{
+        marginRight: 2,
+        borderWidth: 2,
+        borderColor: getIconColor(type, 1),
+      }}
+    />
+  ) : (
+    <></>
+  );
+};
+
+const getItemInfo = (item: Item) => {
+  const { type, resourceName, instanceName } = item;
+  const itemType = hasNotResourceName(type) ? type : resourceName;
+  const itemIcon = hasNotResourceName(type) ? instanceName : resourceName;
+  return {
+    itemType,
+    itemIcon,
+  };
+};
 
 const TopologyObject = (props: TopologyObjectProps) => {
   const { items, objResult } = props;
@@ -145,28 +184,23 @@ const TopologyObject = (props: TopologyObjectProps) => {
           <AccordionDetails sx={{ backgroundColor: 'white', padding: 0 }}>
             <List>
               {accordion.content.map((item, index) => {
-                const getItemInfo = (type: string) => {
-                  if (hasNotResourceName(type)) {
-                    return {
-                      title: `${item.instanceName} (${item.type})`,
-                      iconName: item.instanceName,
-                    };
-                  }
-                  return {
-                    title: `${item.instanceName} (${item.resourceName})`,
-                    iconName: item.resourceName,
-                  };
-                };
-                const { title, iconName } = getItemInfo(item.type);
+                const { itemType, itemIcon } = getItemInfo(item);
                 return (
                   <ListItem disablePadding key={`item-${index}`}>
                     <ListItemButton
                       onClick={(event) => handleClick(event, objResult, item)}
+                      sx={{ paddingLeft: isVar(item.type) ? '16px' : 0 }}
                     >
+                      <ListItemColorLabel type={item.type as TerraformType} />
                       <ListItemIcon sx={{ minWidth: 36 }}>
-                        {getIcon(iconName, 24)}
+                        {getIcon(itemIcon, 24)}
                       </ListItemIcon>
-                      <ListItemName>{title}</ListItemName>
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <ListItemTypeText>
+                          {itemType.toUpperCase()}
+                        </ListItemTypeText>
+                        <ListItemNameText>{item.instanceName}</ListItemNameText>
+                      </Box>
                     </ListItemButton>
                   </ListItem>
                 );
@@ -181,6 +215,10 @@ const TopologyObject = (props: TopologyObjectProps) => {
 
 export interface AccordionContentProps {
   children: React.ReactElement;
+}
+
+export interface ItemColorLabelProps {
+  type: TerraformType;
 }
 
 export interface Item {

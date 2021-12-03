@@ -13,7 +13,6 @@ import {
   MenuItem,
   ThemeProvider,
 } from '@mui/material';
-import { AcUnit, FilterVintage, Storage, Circle } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useHistory } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
@@ -33,11 +32,9 @@ import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import TopologyLibrary from './TopologyLibrary';
 import {
-  setSelectedObjectInfo,
   setFileObjects,
   setMapObjectTypeCollection,
 } from '../../features/codeSlice';
-import { setSidePanel } from '../../features/uiSlice';
 
 import { setWorkspaceUid } from '../../features/commonSlice';
 import CreateWorkspaceModal from '../workspace/CreateWorkspaceModal';
@@ -73,15 +70,16 @@ const TabPanel: React.FC<TabPanelProps> = (props) => {
   const { children, value, index, ...other } = props;
 
   return (
-    <div
+    <Box
       role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      sx={{ height: 'inherit', overflow: 'auto', p: 2 }}
       {...other}
     >
-      {value === index && <Box sx={{ p: 2 }}>{children}</Box>}
-    </div>
+      {value === index && <Box>{children}</Box>}
+    </Box>
   );
 };
 
@@ -214,7 +212,7 @@ const TopologySidebar = () => {
   };
 
   const content = (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', height: 'inherit' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={tabIndex}
@@ -329,6 +327,7 @@ const TopologySidebar = () => {
             width: SIDEBAR_WIDTH,
             top: TOP_NAVBAR_HEIGHT,
             height: `calc(100% - ${TOP_NAVBAR_HEIGHT}px)`,
+            overflow: 'hidden',
           },
         }}
       >
