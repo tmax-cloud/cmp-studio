@@ -1,15 +1,6 @@
+import { current } from 'immer';
 import { JSONSchema7 } from 'json-schema';
 import * as _ from 'lodash';
-
-const supportedSchemaList = [
-  'resource',
-  'provider',
-  'output',
-  'variable',
-  'data',
-];
-
-const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
 
 const specialKey = (props: {
   resourceType: string;
@@ -28,116 +19,22 @@ const preDefinedFileObjects = (
   resourceName: string,
   instanceName: string
 ) => {
-  if (
-    _.isEmpty(jsonSchema) &&
-    _.findIndex(supportedSchemaList, resourceType) >= 0
-  ) {
-    return { mapObjectTypeList: {}, customizedObject: {} };
-  }
-  const customizedSchema = {};
-  const customizedObject = {};
   const mapObjectTypeList: any[] = [];
 
-  const makeCustomizedSchema = (obj: any, prevPath: string) => {
+  const makeMapObjectTypeList = (
+    obj: any,
+    prevSchemaPath: string,
+    prevObjPath: string
+  ) => {
     Object.keys(obj).forEach((currKey) => {
-      const makePath = prevPath
-        ? `${prevPath}.properties.${currKey}`
+      const makeSchemaPath = prevSchemaPath
+        ? `${prevSchemaPath}.properties.${currKey}`
         : `properties.${currKey}`;
-      const changedProperty = _.last(makePath.split('.')) as string;
-      const prefix = makePath.replace(changedProperty, '');
-      const customPath =
-        prefix +
-        specialKey({
-          resourceType,
-          resourceName,
-          instanceName,
-          propertyName: currKey,
-        });
-
-      const setSchema = (fixedValue: SchemaField, propertyType: string) => {
-        if (propertyType === 'object' || propertyType === 'map') {
-          _.set(jsonSchema, customPath, _.get(jsonSchema, makePath));
-          _.omit(jsonSchema, [`${makePath}`]);
-          _.set(customizedSchema, customPath, fixedValue || {});
-        } else {
-          _.set(customizedSchema, makePath, fixedValue);
-        }
-      };
-
-      const fillSchemaByFormData = (obj: any) => {
-        const currentKey = makePath.split('properties.');
-        const currentValue = obj[currentKey[1]];
-        if (currentKey.length > 1) {
-          switch (typeof obj[currentKey[1]]) {
-            case 'string': {
-              setSchema({ type: 'string' }, 'string');
-              break;
-            }
-            case 'boolean': {
-              setSchema({ type: 'boolean' }, 'boolean');
-              break;
-            }
-            case 'object': {
-              if (isArray(currentValue)) {
-                setSchema(_.get(jsonSchema, makePath), 'object');
-              } else {
-                setSchema(
-                  {
-                    type: 'map',
-                    items: {
-                      type: 'string',
-                    },
-                  },
-                  'map'
-                );
-              }
-              break;
-            }
-            case 'number': {
-              setSchema({ type: 'string' }, 'string');
-              break;
-            }
-            default:
-          }
-        }
-      };
-      if (
-        // !!_.get(customizedSchema, makePath) &&
-        !_.get(jsonSchema, makePath) ||
-        _.findIndex(supportedSchemaList, (cur) => cur === resourceType) < 0
-      ) {
-        fillSchemaByFormData(obj);
-        return;
-      }
-      if (
-        _.get(jsonSchema, makePath) &&
-        !_.get(jsonSchema, makePath + '.type') &&
-        'properties' in _.get(jsonSchema, makePath)
-      ) {
-        setSchema(_.get(jsonSchema, makePath), 'object');
-        makeCustomizedSchema(obj[currKey], customPath);
-      } else if (_.get(jsonSchema, makePath + '.type') === 'map') {
-        setSchema(
-          {
-            type: 'map',
-            items: {
-              type: 'string',
-            },
-          },
-          'map'
-        );
-      } else {
-        _.set(customizedSchema, makePath, _.get(jsonSchema, makePath));
-      }
-    });
-  };
-  const makeMapObjectTypeList = (obj: any, prevPath: string) => {
-    Object.keys(obj).forEach((currKey) => {
-      const makeSchemaPath = prevPath
-        ? `${prevPath}.properties.${currKey}`
+      const makeObjPath = prevObjPath
+        ? `${prevObjPath}.properties.${currKey}`
         : `properties.${currKey}`;
-      const makeSpecialSchemaPath = prevPath
-        ? `${prevPath}.properties.${specialKey({
+      const makeSpecialSchemaPath = prevSchemaPath
+        ? `${prevSchemaPath}.properties.${specialKey({
             resourceType,
             resourceName,
             instanceName,
@@ -149,66 +46,77 @@ const preDefinedFileObjects = (
             instanceName,
             propertyName: currKey,
           })}`;
+      const fillSchemaByFormData = (obj: any) => {
+        const currentKey = makeObjPath;
+        const currentValue = obj[currentKey];
 
-      const makePath = _.get(customizedSchema, makeSpecialSchemaPath)
-        ? makeSpecialSchemaPath
-        : makeSchemaPath;
-      if (
-        !_.get(customizedSchema, makePath + '.type') &&
-        'properties' in _.get(customizedSchema, makePath)
+        if (currentKey && typeof obj[currentKey] === 'object') {
+          if (!Array.isArray(currentValue)) {
+            mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'object' });
+          }
+        }
+      };
+
+      if (!_.get(jsonSchema, makeSchemaPath)) {
+        // tf_schema에 정의되지 않은 프로퍼티
+        fillSchemaByFormData(obj);
+      } else if (
+        _.get(jsonSchema, makeSchemaPath) &&
+        !_.get(jsonSchema, makeSchemaPath + '.type') &&
+        'properties' in _.get(jsonSchema, makeSchemaPath)
       ) {
-        _.set(
-          customizedObject,
-          makePath.replace('properties.', ''),
-          _.get(obj, makeSchemaPath.replace('properties.', ''))
-        );
         if (Array.isArray(obj[currKey])) {
+          // type이 object 프로퍼티가 중복 정의 되었을 때 -> array
           for (let idx = 0; idx < obj[currKey].length; idx++) {
-            makeMapObjectTypeList(obj[currKey][idx], makePath);
+            makeMapObjectTypeList(
+              obj[currKey][idx],
+              makeSchemaPath + '.items',
+              makeObjPath + `[${idx}]`
+            );
           }
         } else {
-          makeMapObjectTypeList(obj[currKey], makePath);
+          makeMapObjectTypeList(obj[currKey], makeSchemaPath, makeObjPath);
+          // if (prevObjPath) {
+          //   mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'block' });
+          // }
         }
-        mapObjectTypeList.push({ [makePath]: 'object' });
-      } else if (_.get(customizedSchema, makePath + '.type') === 'map') {
-        _.set(
-          customizedObject,
-          makePath.replace('properties.', ''),
-          _.get(obj, makeSchemaPath.replace('properties.', ''))
-        );
-        mapObjectTypeList.push({ [makePath]: 'map' });
+        mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'object' });
+      } else if (_.get(jsonSchema, makeSchemaPath + '.type') === 'map') {
+        // type이 map일 때
+        mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'map' });
       } else if (
-        _.get(customizedSchema, makePath + '.type') === 'object' &&
-        !_.get(jsonSchema, makePath + '.type')
+        _.get(jsonSchema, makeSchemaPath + '.type') === 'array' ||
+        _.get(jsonSchema, makeSchemaPath + '.items.properties')
       ) {
-        _.set(
-          customizedObject,
-          makePath.replace('properties.', ''),
-          _.get(obj, makeSchemaPath.replace('properties.', ''))
-        );
-        mapObjectTypeList.push({ [makePath]: 'object' });
-      } else {
-        _.set(
-          customizedObject,
-          makePath.replace('properties.', ''),
-          _.get(obj, makePath.replace('properties.', ''))
-        );
+        if (!Array.isArray(obj[currKey])) {
+          makeMapObjectTypeList(
+            obj[currKey],
+            makeSchemaPath + '.items',
+            makeObjPath + '[0]'
+          );
+          if (typeof obj[currKey] === 'object') {
+            mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'block' });
+          }
+        } else {
+          for (let idx = 0; idx < obj[currKey].length; idx++) {
+            makeMapObjectTypeList(
+              obj[currKey][idx],
+              makeSchemaPath + '.items',
+              makeObjPath + `[${idx}]`
+            );
+          }
+          if (typeof obj[currKey][0] === 'object') {
+            mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'block' });
+          }
+        }
       }
     });
   };
 
   if (!_.isEmpty(object)) {
-    makeCustomizedSchema(object, '');
-    makeMapObjectTypeList(object, '');
+    makeMapObjectTypeList(object, '', '');
   }
-  return { mapObjectTypeList, customizedObject };
+  return mapObjectTypeList;
 };
 
-type SchemaField = {
-  type: string;
-  items?: SchemaType;
-};
-type SchemaType = {
-  type: string;
-};
 export default preDefinedFileObjects;
