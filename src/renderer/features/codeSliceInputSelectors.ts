@@ -14,9 +14,6 @@ export const selectCodeSelectedObjectInfoInstanceName = (state: RootState) =>
 
 export const selectCode = (state: RootState) => state.code;
 
-export const selectCodeSelectedObjectInfoContent = (state: RootState) =>
-  state.code.selectedObjectInfo.content;
-
 export const selectCodeSelectedObjectInfoSourceSchema = (state: RootState) =>
   state.code.selectedObjectInfo.sourceSchema;
 

@@ -3,7 +3,7 @@ import * as _ from 'lodash-es';
 import { useSelector } from 'react-redux';
 import { Drawer } from '@mui/material';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
-import { selectCode } from '@renderer/features/codeSliceInputSelectors';
+import { selectCodeSelectedObjectInfo } from '@renderer/features/codeSliceInputSelectors';
 import { selectUiToggleSidePanel } from '@renderer/features/uiSliceInputSelectors';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
@@ -17,15 +17,8 @@ import { hasNotResourceName } from './state/form/utils/getResourceInfo';
 export const SIDEPANEL_WIDTH = 500;
 // 저장 버튼 누르면 redux objects에 content 덮어씌우기나이ㅓㄻ
 const TopologySidePanel = () => {
-  const {
-    selectedObjectInfo: {
-      type,
-      resourceName,
-      content,
-      sourceSchema,
-      instanceName,
-    },
-  } = useSelector(selectCode);
+  const { type, resourceName, content, sourceSchema, instanceName } =
+    useSelector(selectCodeSelectedObjectInfo);
   const name = hasNotResourceName(type) ? instanceName : resourceName;
 
   const dispatch = useAppDispatch();
@@ -41,7 +34,7 @@ const TopologySidePanel = () => {
     customUISchema = {},
     formData = {},
     fixedSchema = {},
-  } = instanceName && preDefinedData(currentSchema, content);
+  } = instanceName && preDefinedData(currentSchema, content, type);
   React.useEffect(() => {
     dispatch(setSelectedSourceSchema(fixedSchema));
   }, [instanceName]);

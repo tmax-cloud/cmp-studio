@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import {
-  setSelectedField,
+  setSelectedContent,
   setSelectedSourceSchema,
 } from '@renderer/features/codeSlice';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
@@ -136,7 +136,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                 setCurrentSchemaList((schemaList) =>
                   schemaList.filter((cur) => cur !== additionalSchema)
                 );
-                dispatch(setSelectedField(result));
+                dispatch(setSelectedContent(result));
                 setAdditionalSchema('');
               }}
             >
@@ -189,7 +189,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                   },
                   sourceSchema
                 );
-                dispatch(setSelectedField(object));
+                dispatch(setSelectedContent(object));
                 dispatch(setSelectedSourceSchema(schema));
                 setCustomFieldType('');
                 setCustomFieldKey('');
