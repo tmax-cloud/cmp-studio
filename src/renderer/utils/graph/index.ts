@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { GraphData, LinkObject, NodeObject } from 'react-force-graph-2d';
 import { LinkData, ModuleData, NodeData } from '@renderer/types/graph';
+import { TerraformFileJsonMeta } from '@main/workspaces/common/workspace';
 import { getRawGraph } from './dot';
 import { getRefinedGraph, nodesById } from './parse';
 import { getTerraformGraphData } from './terraform';
@@ -156,4 +157,53 @@ export const drawNode = (
   const padding = 4;
   const newY = y + cirlceSize + padding;
   drawTexts(ctx, node.instanceName, x, newY, w - padding * 2);
+};
+
+const getCodeInfoValue = (data: any, keyName: string) => {
+  for (const [key, value] of Object.entries(data)) {
+    if (key === keyName) {
+      return { [key]: value };
+    }
+  }
+  return null;
+};
+
+export const getCodeInfo = (
+  fileObjects: TerraformFileJsonMeta[],
+  node: NodeData
+) => {
+  if (!Array.isArray(fileObjects)) {
+    return null;
+  }
+  let codeInfo: any = null;
+  fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
+    for (const currKey in file.fileJson) {
+      if (node.type === currKey) {
+        const data = file.fileJson[currKey];
+        if (node.resourceName) {
+          for (const [key] of Object.entries(data)) {
+            if (key === node.resourceName) {
+              codeInfo = getCodeInfoValue(data[key], node.instanceName);
+            }
+          }
+        } else {
+          codeInfo = getCodeInfoValue(data, node.instanceName);
+        }
+      }
+    }
+  });
+
+  if (codeInfo) {
+    return {
+      type: node.type,
+      resourceName: node.resourceName || '',
+      instanceName: node.instanceName,
+      content: {
+        ...codeInfo,
+        type: node.type,
+        resouceName: node.resourceName || '',
+      },
+    };
+  }
+  return codeInfo;
 };
