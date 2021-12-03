@@ -22,7 +22,7 @@ import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelector
 import parseToCustomizeKey from './state/form/utils/parseToCustomizeKey';
 import {
   getObjectNameInfo,
-  hasNotResourceName,
+  getObjectType,
 } from './state/form/utils/getResourceInfo';
 import {
   openExistFolder,
@@ -141,28 +141,52 @@ const TopologySidebar = () => {
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
   const fileObjects = useAppSelector(selectCodeFileObjects);
   // [TODO] Error나서 string으로 들어올 때 Error 표시 기획 필요할듯
+
   Array.isArray(fileObjects) &&
     fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
       // eslint-disable-next-line guard-for-in
       for (const currKey in file.fileJson) {
-        if (hasNotResourceName(currKey)) {
-          objResult.push(
-            ..._.entries(file.fileJson[currKey]).map((object) => ({
-              [object[0]]: object[1],
-              type: currKey,
-              resourceName: '',
-            }))
-          );
-        } else {
-          Object.keys(file.fileJson[currKey]).forEach((key) => {
+        switch (getObjectType(currKey)) {
+          case 2: {
+            Object.keys(file.fileJson[currKey]).forEach((key) => {
+              objResult.push(
+                ..._.entries(file.fileJson[currKey][key]).map((object) => {
+                  return {
+                    [object[0]]: object[1],
+                    type: currKey,
+                    resourceName: key,
+                    instanceName: object[0],
+                  };
+                })
+              );
+            });
+            break;
+          }
+          case 1: {
             objResult.push(
-              ..._.entries(file.fileJson[currKey][key]).map((object) => ({
-                [object[0]]: object[1],
+              ..._.entries(file.fileJson[currKey]).map((object) => {
+                return {
+                  [object[0]]: object[1],
+                  type: currKey,
+                  resourceName: '',
+                  instanceName: object[0],
+                };
+              })
+            );
+            break;
+          }
+          case 0: {
+            objResult.push(
+              ..._.entries(file.fileJson[currKey]).map((object) => ({
+                [currKey]: { [object[0]]: object[1] },
                 type: currKey,
-                resourceName: key,
+                resourceName: '',
+                instanceName: '',
               }))
             );
-          });
+            break;
+          }
+          default:
         }
       }
     });

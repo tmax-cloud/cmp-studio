@@ -23,10 +23,7 @@ import { getIcon } from '@renderer/components/topology/icon/IconFactory';
 import { NodeData } from '@renderer/types/graph';
 import { getIconColor } from '@renderer/utils/graph/draw';
 import { TerraformType } from '@renderer/types/terraform';
-import {
-  getObjectNameInfo,
-  hasNotResourceName,
-} from '../state/form/utils/getResourceInfo';
+import { getObjectType } from '../state/form/utils/getResourceInfo';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
   backgroundColor: theme.palette.object.accordion,
@@ -100,8 +97,8 @@ const ListItemColorLabel = (props: ItemColorLabelProps) => {
 
 const getItemInfo = (item: Item) => {
   const { type, resourceName, instanceName } = item;
-  const itemType = hasNotResourceName(type) ? type : resourceName;
-  const itemIcon = hasNotResourceName(type) ? instanceName : resourceName;
+  const itemType = getObjectType(type) === 2 ? resourceName : type;
+  const itemIcon = getObjectType(type) === 2 ? resourceName : instanceName;
   return {
     itemType,
     itemIcon,
@@ -137,21 +134,45 @@ const TopologyObject = (props: TopologyObjectProps) => {
     item: Item
   ) => {
     const selectedObj = objResult.filter((cur: any) => {
-      const { type, resourceName, ...obj } = cur;
-      const { instanceName } = getObjectNameInfo(obj, type);
-      return (
-        item.instanceName === instanceName && item.resourceName === resourceName
-      );
+      const { type, resourceName, instanceName, ...obj } = cur;
+      switch (getObjectType(type)) {
+        case 2: {
+          return (
+            item.instanceName === instanceName &&
+            item.resourceName === resourceName
+          );
+        }
+        case 1: {
+          return item.instanceName === instanceName;
+        }
+        case 0: {
+          return item.type === type;
+        }
+        default:
+      }
     })[0];
 
-    const { type, resourceName, ...content } = selectedObj;
-    const { instanceName } = getObjectNameInfo(content, type);
+    const { type, resourceName, instanceName, ...obj } = selectedObj;
+    const content = (type: string) => {
+      switch (getObjectType(type)) {
+        case 2: {
+          return obj[instanceName];
+        }
+        case 1: {
+          return obj[instanceName];
+        }
+        case 0: {
+          return obj[type];
+        }
+        default:
+      }
+    };
 
     const object = {
       type,
       resourceName,
       instanceName,
-      content: content[instanceName],
+      content: content(type),
     };
 
     const node = (graphData.nodes as NodeData[]).find((node) => {

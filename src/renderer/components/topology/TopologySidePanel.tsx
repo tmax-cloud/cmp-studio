@@ -12,14 +12,14 @@ import FormTabs from './state/StateTabs';
 import preDefinedData from './state/form/utils/preDefinedData';
 import { setSelectedSourceSchema } from '../../features/codeSlice';
 import { TOPOLOGY_TOOLBAR_HEIGHT } from './toolbar/TopologyToolbar';
-import { hasNotResourceName } from './state/form/utils/getResourceInfo';
+import { getObjectType } from './state/form/utils/getResourceInfo';
 
 export const SIDEPANEL_WIDTH = 500;
 // 저장 버튼 누르면 redux objects에 content 덮어씌우기나이ㅓㄻ
 const TopologySidePanel = () => {
   const { type, resourceName, content, sourceSchema, instanceName } =
     useSelector(selectCodeSelectedObjectInfo);
-  const name = hasNotResourceName(type) ? instanceName : resourceName;
+  const name = getObjectType(type) === 1 ? instanceName : resourceName;
 
   const dispatch = useAppDispatch();
   const isSidePanelOpen = useAppSelector(selectUiToggleSidePanel);
@@ -34,7 +34,17 @@ const TopologySidePanel = () => {
     customUISchema = {},
     formData = {},
     fixedSchema = {},
-  } = instanceName && preDefinedData(currentSchema, content, type);
+  } = React.useMemo(
+    () => preDefinedData(currentSchema, content, type),
+    [currentSchema, content, type]
+  );
+  const title = React.useMemo(() => {
+    if (getObjectType(type) === 0) {
+      return type;
+    } else {
+      return instanceName;
+    }
+  }, [type, instanceName]);
   React.useEffect(() => {
     dispatch(setSelectedSourceSchema(fixedSchema));
   }, [instanceName]);
@@ -54,7 +64,7 @@ const TopologySidePanel = () => {
         anchor="right"
         variant="persistent"
       >
-        <FormHeader title={instanceName} resourceName={resourceName} />
+        <FormHeader title={title} resourceName={resourceName} />
         <FormTabs
           schema={fixedSchema}
           formData={formData}

@@ -22,7 +22,7 @@ import { ArrowDropDown } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectCodeSelectedObjectInfo } from '@renderer/features/codeSliceInputSelectors';
 import { addSchemaBasedField, addCustomField } from './utils/addInputField';
-import { hasNotResourceName } from './utils/getResourceInfo';
+import { getObjectType } from './utils/getResourceInfo';
 
 const useStyles: any = makeStyles((theme) =>
   createStyles({
@@ -76,15 +76,10 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
     );
   };
 
-  const getTerraformMapId = (type: string) => {
-    if (hasNotResourceName(type)) {
-      return type + '-' + instanceName;
-    }
-    return type + '-' + resourceName;
-  };
+  const name = getObjectType(type) === 1 ? instanceName : resourceName;
   React.useEffect(() => {
     const schema: JSONSchema7 = terraformSchemaMap.get(
-      getTerraformMapId(type)
+      type + '-' + name
     ) as JSONSchema7;
     schema
       ? setCurrentSchemaList(initSchemaList(schema) as string[])
