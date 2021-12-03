@@ -136,7 +136,7 @@ const TopologyObject = (props: TopologyObjectProps) => {
     objResult: any[],
     item: Item
   ) => {
-    const content = objResult.filter((cur: any) => {
+    const selectedObj = objResult.filter((cur: any) => {
       const { type, resourceName, ...obj } = cur;
       const { instanceName } = getObjectNameInfo(obj, type);
       return (
@@ -144,14 +144,14 @@ const TopologyObject = (props: TopologyObjectProps) => {
       );
     })[0];
 
-    const { type, resourceName, ...obj } = content;
-    const { instanceName } = getObjectNameInfo(obj, type);
+    const { type, resourceName, ...content } = selectedObj;
+    const { instanceName } = getObjectNameInfo(content, type);
 
     const object = {
       type,
       resourceName,
       instanceName,
-      content,
+      content: content[instanceName],
     };
 
     const node = (graphData.nodes as NodeData[]).find((node) => {

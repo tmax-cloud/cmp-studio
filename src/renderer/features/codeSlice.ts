@@ -40,7 +40,7 @@ const codeSlice = createSlice({
     setSelectedObjectInfo: (state, action: PayloadAction<any>) => {
       state.selectedObjectInfo = action.payload;
     },
-    setSelectedField: (state, action: PayloadAction<any>) => {
+    setSelectedContent: (state, action: PayloadAction<any>) => {
       state.selectedObjectInfo.content = action.payload;
     },
     setSelectedSourceSchema: (state, action: PayloadAction<any>) => {
@@ -53,7 +53,7 @@ export const {
   setFileObjects,
   setMapObjectTypeCollection,
   setSelectedObjectInfo,
-  setSelectedField,
+  setSelectedContent,
   setSelectedSourceSchema,
 } = codeSlice.actions;
 
