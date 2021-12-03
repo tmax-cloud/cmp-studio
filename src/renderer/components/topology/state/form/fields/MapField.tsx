@@ -53,7 +53,7 @@ const MapField = (props: FieldProps) => {
 
       {mapData.map((currObj: Map<string, string>, idx: number) => {
         const key = Object.keys(currObj)[0];
-        const value = Object.values(currObj)[0];
+        const value = String(Object.values(currObj)[0]);
         return (
           <Grid
             container
@@ -132,13 +132,6 @@ const MapField = (props: FieldProps) => {
                           return true;
                         }
                       );
-                      // _.toPairs(mapData).forEach(
-                      //   ([curKey, curValue], i: number) => {
-                      //     if (idx === i) {
-                      //       delete mapData[curKey];
-                      //     }
-                      //   }
-                      // );
                       setMapData(result);
                       return result;
                     })()

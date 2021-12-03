@@ -26,6 +26,7 @@ const TopologySidePanel = () => {
       instanceName,
     },
   } = useSelector(selectCode);
+  const name = hasNotResourceName(type) ? instanceName : resourceName;
 
   const dispatch = useAppDispatch();
   const isSidePanelOpen = useAppSelector(selectUiToggleSidePanel);
@@ -34,7 +35,7 @@ const TopologySidePanel = () => {
     []
   );
   const currentSchema = _.isEmpty(sourceSchema)
-    ? terraformSchemaMap.get(type + '-' + instanceName)
+    ? terraformSchemaMap.get(type + '-' + name)
     : sourceSchema;
   const {
     customUISchema = {},
