@@ -213,11 +213,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                             type: item.resourceName,
                             resourceName: '',
                             instanceName: newInstanceName,
-                            content: {
-                              [newInstanceName]: addedObjectJSON,
-                              type: item.resourceName,
-                              resourceName: '',
-                            },
+                            content: addedObjectJSON,
                           };
                           dispatch(setSelectedObjectInfo(object));
                           dispatch(setSidePanel(true));
@@ -253,11 +249,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                             type: item.type,
                             resourceName: item.resourceName,
                             instanceName: newInstanceName,
-                            content: {
-                              [newInstanceName]: addedObjectJSON,
-                              type: item.type,
-                              resourceName: item.resourceName,
-                            },
+                            content: addedObjectJSON,
                           };
                           dispatch(setSelectedObjectInfo(object));
                           dispatch(setSidePanel(true));

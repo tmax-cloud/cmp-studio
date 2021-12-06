@@ -1,24 +1,12 @@
 import { JSONSchema7 } from 'json-schema';
 import * as _ from 'lodash';
-import { getObjectNameInfo } from './getResourceInfo';
 
 const supportedSchemaList = ['resource', 'provider', 'data'];
 
 const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
 
-const createFormData = (object: any) => {
-  if (_.isEmpty(object)) {
-    return { type: {}, formData: {} };
-  }
-  const { type, resourceName, ...targetObject } = object;
-  const { instanceName } = getObjectNameInfo(object, type);
-
-  const formData = _.cloneDeep(targetObject[instanceName]);
-  return { type, formData };
-};
-
-const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
-  const { type, formData } = createFormData(object);
+const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
+  const formData = _.cloneDeep(object);
   if (!jsonSchema && _.findIndex(supportedSchemaList, type) >= 0) {
     return { customUISchema: {}, formData: {}, fixedSchema: {} };
   }
@@ -72,7 +60,6 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
                     return { [key]: value };
                   }
                 );
-                console.log(result);
                 setFormData(result);
                 setSchema({
                   type: 'map',
@@ -123,6 +110,7 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any) => {
             return { [key]: value };
           }
         );
+        // _.set(formData, makeObjPath, [result]);
         setFormData(result);
         setSchema({
           type: 'map',

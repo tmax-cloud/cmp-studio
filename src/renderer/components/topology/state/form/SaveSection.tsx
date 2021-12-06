@@ -11,7 +11,10 @@ import {
   selectMapObjectTypeCollection,
 } from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
-import { setFileObjects, setSelectedField } from '@renderer/features/codeSlice';
+import {
+  setFileObjects,
+  setSelectedContent,
+} from '@renderer/features/codeSlice';
 import { setSidePanel } from '@renderer/features/uiSlice';
 import { setTerraformState } from '@renderer/features/commonSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
@@ -182,10 +185,8 @@ const SaveSection = (props: SaveSectionProps) => {
             });
             dispatch(setFileObjects(newFileObjects));
             dispatch(
-              setSelectedField({
-                [instanceName]: {
-                  ...formState,
-                },
+              setSelectedContent({
+                ...formState,
               })
             );
 

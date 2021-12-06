@@ -1,4 +1,3 @@
-import { current } from 'immer';
 import { JSONSchema7 } from 'json-schema';
 import * as _ from 'lodash';
 

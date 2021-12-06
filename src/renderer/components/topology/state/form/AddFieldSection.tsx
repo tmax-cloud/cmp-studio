@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import {
-  setSelectedField,
+  setSelectedContent,
   setSelectedSourceSchema,
 } from '@renderer/features/codeSlice';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
@@ -22,7 +22,7 @@ import { ArrowDropDown } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectCodeSelectedObjectInfo } from '@renderer/features/codeSliceInputSelectors';
 import { addSchemaBasedField, addCustomField } from './utils/addInputField';
-import { hasNotResourceName } from './utils/getResourceInfo';
+import { getId } from './utils/getResourceInfo';
 
 const useStyles: any = makeStyles((theme) =>
   createStyles({
@@ -76,16 +76,9 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
     );
   };
 
-  const getTerraformMapId = (type: string) => {
-    if (hasNotResourceName(type)) {
-      return type + '-' + instanceName;
-    }
-    return type + '-' + resourceName;
-  };
+  const id = getId(type, resourceName, instanceName);
   React.useEffect(() => {
-    const schema: JSONSchema7 = terraformSchemaMap.get(
-      getTerraformMapId(type)
-    ) as JSONSchema7;
+    const schema: JSONSchema7 = terraformSchemaMap.get(id) as JSONSchema7;
     schema
       ? setCurrentSchemaList(initSchemaList(schema) as string[])
       : setCurrentSchemaList([]);
@@ -136,7 +129,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                 setCurrentSchemaList((schemaList) =>
                   schemaList.filter((cur) => cur !== additionalSchema)
                 );
-                dispatch(setSelectedField(result));
+                dispatch(setSelectedContent(result));
                 setAdditionalSchema('');
               }}
             >
@@ -189,7 +182,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                   },
                   sourceSchema
                 );
-                dispatch(setSelectedField(object));
+                dispatch(setSelectedContent(object));
                 dispatch(setSelectedSourceSchema(schema));
                 setCustomFieldType('');
                 setCustomFieldKey('');
