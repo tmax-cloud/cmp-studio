@@ -1,0 +1,76 @@
+# Complete VPC
+
+Configuration in this directory creates set of VPC resources which may be sufficient for staging or production environment (look into [simple-vpc](../simple-vpc) for more simplified setup).
+
+There are public, private, database, ElastiCache, intra (private w/o Internet access) subnets, and NAT Gateways created in each availability zone.
+
+## Usage
+
+To run this example you need to execute:
+
+```bash
+$ terraform init
+$ terraform plan
+$ terraform apply
+```
+
+Note that this example may create resources which can cost money (AWS Elastic IP, for example). Run `terraform destroy` when you don't need these resources.
+
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+## Requirements
+
+| Name                                                                     | Version   |
+| ------------------------------------------------------------------------ | --------- |
+| <a name="requirement_terraform"></a> [terraform](#requirement_terraform) | >= 0.13.1 |
+| <a name="requirement_aws"></a> [aws](#requirement_aws)                   | >= 3.63   |
+
+## Providers
+
+| Name                                             | Version |
+| ------------------------------------------------ | ------- |
+| <a name="provider_aws"></a> [aws](#provider_aws) | >= 3.63 |
+
+## Modules
+
+| Name                                                                                                  | Source                      | Version |
+| ----------------------------------------------------------------------------------------------------- | --------------------------- | ------- |
+| <a name="module_vpc"></a> [vpc](#module_vpc)                                                          | ../../                      | n/a     |
+| <a name="module_vpc_endpoints"></a> [vpc_endpoints](#module_vpc_endpoints)                            | ../../modules/vpc-endpoints | n/a     |
+| <a name="module_vpc_endpoints_nocreate"></a> [vpc_endpoints_nocreate](#module_vpc_endpoints_nocreate) | ../../modules/vpc-endpoints | n/a     |
+
+## Resources
+
+| Name                                                                                                                                                   | Type        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| [aws_iam_policy_document.dynamodb_endpoint_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.generic_endpoint_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)  | data source |
+| [aws_security_group.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/security_group)                            | data source |
+| [aws_vpc_endpoint_service.dynamodb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc_endpoint_service)               | data source |
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+| Name                                                                                                                                                           | Description                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| <a name="output_cgw_ids"></a> [cgw_ids](#output_cgw_ids)                                                                                                       | List of IDs of Customer Gateway                                 |
+| <a name="output_database_subnets"></a> [database_subnets](#output_database_subnets)                                                                            | List of IDs of database subnets                                 |
+| <a name="output_elasticache_subnets"></a> [elasticache_subnets](#output_elasticache_subnets)                                                                   | List of IDs of elasticache subnets                              |
+| <a name="output_intra_subnets"></a> [intra_subnets](#output_intra_subnets)                                                                                     | List of IDs of intra subnets                                    |
+| <a name="output_nat_public_ips"></a> [nat_public_ips](#output_nat_public_ips)                                                                                  | List of public Elastic IPs created for AWS NAT Gateway          |
+| <a name="output_private_subnets"></a> [private_subnets](#output_private_subnets)                                                                               | List of IDs of private subnets                                  |
+| <a name="output_public_subnets"></a> [public_subnets](#output_public_subnets)                                                                                  | List of IDs of public subnets                                   |
+| <a name="output_redshift_subnets"></a> [redshift_subnets](#output_redshift_subnets)                                                                            | List of IDs of redshift subnets                                 |
+| <a name="output_this_customer_gateway"></a> [this_customer_gateway](#output_this_customer_gateway)                                                             | Map of Customer Gateway attributes                              |
+| <a name="output_vpc_endpoint_lambda_dns_entry"></a> [vpc_endpoint_lambda_dns_entry](#output_vpc_endpoint_lambda_dns_entry)                                     | The DNS entries for the VPC Endpoint for Lambda.                |
+| <a name="output_vpc_endpoint_lambda_id"></a> [vpc_endpoint_lambda_id](#output_vpc_endpoint_lambda_id)                                                          | The ID of VPC endpoint for Lambda                               |
+| <a name="output_vpc_endpoint_lambda_network_interface_ids"></a> [vpc_endpoint_lambda_network_interface_ids](#output_vpc_endpoint_lambda_network_interface_ids) | One or more network interfaces for the VPC Endpoint for Lambda. |
+| <a name="output_vpc_endpoint_ssm_dns_entry"></a> [vpc_endpoint_ssm_dns_entry](#output_vpc_endpoint_ssm_dns_entry)                                              | The DNS entries for the VPC Endpoint for SSM.                   |
+| <a name="output_vpc_endpoint_ssm_id"></a> [vpc_endpoint_ssm_id](#output_vpc_endpoint_ssm_id)                                                                   | The ID of VPC endpoint for SSM                                  |
+| <a name="output_vpc_endpoint_ssm_network_interface_ids"></a> [vpc_endpoint_ssm_network_interface_ids](#output_vpc_endpoint_ssm_network_interface_ids)          | One or more network interfaces for the VPC Endpoint for SSM.    |
+| <a name="output_vpc_id"></a> [vpc_id](#output_vpc_id)                                                                                                          | The ID of the VPC                                               |
+
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
