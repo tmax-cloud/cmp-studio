@@ -39,9 +39,9 @@ export const getId = (
   instanceName: string
 ) => {
   if (getObjectType(type) === 1) {
-    return instanceName;
+    return type + '-' + instanceName;
   }
-  return resourceName;
+  return type + '-' + resourceName;
 };
 
 export const getObjectNameInfo = (object: any, type: string) => {
