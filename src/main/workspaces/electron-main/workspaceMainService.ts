@@ -156,6 +156,7 @@ export class WorkspaceMainService
           ) {
             const uid = await this.getWorkspaceMetaOfExistFolder(folderUri);
             this.workspacesHistoryService.addWorkspaceToStorage(folderUri);
+            this.workspaceManagementService.copyRealToTempFolder(uid);
             return {
               status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
               data: { uid },

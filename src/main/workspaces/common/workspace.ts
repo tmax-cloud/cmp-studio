@@ -106,6 +106,9 @@ export interface WorkspaceManagementServiceInterface {
   getWorkspaceConfig(uid: string): any;
   generateDefaultNewWorkspaceName(): string;
   setWorkspaceConfigItem(uid: string, key: string, data: any): void;
+  getWorkspaceTemporaryFolderPath(workspaceId: string): string;
+  getRealOrTempFolderPath(workspaceId: string): string;
+  copyRealToTempFolder(workspaceId: string): void;
 }
 export interface WorkspacesHistoryServiceInterface {
   addWorkspaceToStorage(folderUri: string): void;

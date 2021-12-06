@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  copyDir,
   createFile,
   readFileJson,
   writeFileJson,
@@ -24,14 +25,6 @@ export const workspaceMapPath = path.join(
 );
 export const getWorkspaceConfigPath = (uid: string) => {
   return path.join(getWorkspaceMetaFolderPath(), uid, WORKSPACE_CONFIG_PATH);
-};
-
-export const getWorkspaceTemporaryFolderPath = (uid: string) => {
-  return path.join(
-    getWorkspaceMetaFolderPath(),
-    uid,
-    TEMPORARYDATA_FOLDER_PATH
-  );
 };
 
 export class WorkspaceManagementService
@@ -206,5 +199,26 @@ export class WorkspaceManagementService
       }
     }
     return newWorkspaceName;
+  }
+
+  getWorkspaceTemporaryFolderPath(workspaceId: string): string {
+    return path.join(
+      getWorkspaceMetaFolderPath(),
+      workspaceId,
+      TEMPORARYDATA_FOLDER_PATH
+    );
+  }
+
+  getRealOrTempFolderPath(workspaceId: string): string {
+    const folderPath = this.getWorkspaceConfig(workspaceId).workspaceRealPath;
+    const tempFolderPath = this.getWorkspaceTemporaryFolderPath(workspaceId);
+    const path = fs.existsSync(tempFolderPath) ? tempFolderPath : folderPath;
+    return path;
+  }
+
+  copyRealToTempFolder(workspaceId: string): void {
+    const folderPath = this.getWorkspaceConfig(workspaceId).workspaceRealPath;
+    const tempFolderPath = this.getWorkspaceTemporaryFolderPath(workspaceId);
+    copyDir(folderPath, tempFolderPath);
   }
 }
