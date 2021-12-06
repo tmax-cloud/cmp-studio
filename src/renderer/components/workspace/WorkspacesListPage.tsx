@@ -15,7 +15,11 @@ import {
   getRecentlyOpenedWorkspaces,
   getProjectJson,
 } from '../../utils/ipc/workspaceIpcUtils';
-import { setFileObjects } from '../../features/codeSlice';
+import parseToCustomizeKey from '../topology/state/form/utils/parseToCustomizeKey';
+import {
+  setFileObjects,
+  setMapObjectTypeCollection,
+} from '../../features/codeSlice';
 import { setWorkspaceUid } from '../../features/commonSlice';
 import { maximizeWindowSize } from '../../utils/ipc/windowIpcUtils';
 import { getAppConfigItem } from '../../utils/ipc/configIpcUtils';
@@ -59,6 +63,11 @@ const WorkspacesListPage: React.FC = (props) => {
       folderUri,
     };
     const projectJsonRes = await getProjectJson(args);
+    const { data, mapObjectTypeCollection } = parseToCustomizeKey(
+      projectJsonRes.data
+    );
+    dispatch(setMapObjectTypeCollection(mapObjectTypeCollection));
+    dispatch(setFileObjects(data));
     dispatch(setFileObjects(projectJsonRes.data));
     openExistFolder(args)
       .then((response: WorkspaceTypes.WorkspaceResponse) => {
