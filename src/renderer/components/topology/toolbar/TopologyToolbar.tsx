@@ -4,7 +4,10 @@ import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import { exportProject } from '@renderer/utils/ipc/workspaceIpcUtils';
-import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import {
+  selectCodeFileObjects,
+  selectMapObjectTypeCollection,
+} from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import { useAppSelector } from '@renderer/app/store';
 import { useWorkspaceName } from '@renderer/hooks/useWorkspaceName';
@@ -29,6 +32,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
 
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
+  const mapObjectCollection = useAppSelector(selectMapObjectTypeCollection);
   const workspaceName = useWorkspaceName(workspaceUid);
 
   return (
@@ -58,6 +62,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
               objects: fileObjects,
               workspaceUid,
               isAllSave: true,
+              typeMap: mapObjectCollection,
             });
             console.log('[INFO] File export result : ', result);
           }}
