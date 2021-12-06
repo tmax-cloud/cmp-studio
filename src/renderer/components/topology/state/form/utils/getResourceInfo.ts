@@ -33,6 +33,16 @@ export const getObjectType = (type: string) => {
   }
   return -1; // 해당 사항 없을 때 (error)
 };
+export const getId = (
+  type: string,
+  resourceName: string,
+  instanceName: string
+) => {
+  if (getObjectType(type) === 1) {
+    return instanceName;
+  }
+  return resourceName;
+};
 
 export const getObjectNameInfo = (object: any, type: string) => {
   return { instanceName: Object.keys(object)[0] };

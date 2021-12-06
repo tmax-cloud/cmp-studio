@@ -12,14 +12,15 @@ import FormTabs from './state/StateTabs';
 import preDefinedData from './state/form/utils/preDefinedData';
 import { setSelectedSourceSchema } from '../../features/codeSlice';
 import { TOPOLOGY_TOOLBAR_HEIGHT } from './toolbar/TopologyToolbar';
-import { getObjectType } from './state/form/utils/getResourceInfo';
+import { getObjectType, getId } from './state/form/utils/getResourceInfo';
 
 export const SIDEPANEL_WIDTH = 500;
 // 저장 버튼 누르면 redux objects에 content 덮어씌우기나이ㅓㄻ
 const TopologySidePanel = () => {
   const { type, resourceName, content, sourceSchema, instanceName } =
     useSelector(selectCodeSelectedObjectInfo);
-  const name = getObjectType(type) === 1 ? instanceName : resourceName;
+
+  const id = getId(type, resourceName, instanceName);
 
   const dispatch = useAppDispatch();
   const isSidePanelOpen = useAppSelector(selectUiToggleSidePanel);
@@ -28,7 +29,7 @@ const TopologySidePanel = () => {
     []
   );
   const currentSchema = _.isEmpty(sourceSchema)
-    ? terraformSchemaMap.get(type + '-' + name)
+    ? terraformSchemaMap.get(id)
     : sourceSchema;
   const {
     customUISchema = {},
