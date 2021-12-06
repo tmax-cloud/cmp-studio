@@ -142,52 +142,56 @@ const TopologySidebar = () => {
   const fileObjects = useAppSelector(selectCodeFileObjects);
   // [TODO] Error나서 string으로 들어올 때 Error 표시 기획 필요할듯
 
+  const setObjResult = (file: any, type: string) => {
+    switch (getObjectType(type)) {
+      case 2: {
+        Object.keys(file.fileJson[type]).forEach((resourceName) => {
+          objResult.push(
+            ..._.entries(file.fileJson[type][resourceName]).map((object) => {
+              return {
+                [object[0]]: object[1],
+                type,
+                resourceName,
+                instanceName: object[0],
+              };
+            })
+          );
+        });
+        break;
+      }
+      case 1: {
+        objResult.push(
+          ..._.entries(file.fileJson[type]).map((object) => {
+            return {
+              [object[0]]: object[1],
+              type,
+              resourceName: '',
+              instanceName: object[0],
+            };
+          })
+        );
+        break;
+      }
+      case 0: {
+        objResult.push(
+          ..._.entries(file.fileJson[type]).map((object) => ({
+            [type]: { [object[0]]: object[1] },
+            type,
+            resourceName: '',
+            instanceName: '',
+          }))
+        );
+        break;
+      }
+      default:
+    }
+  };
+
   Array.isArray(fileObjects) &&
     fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
       // eslint-disable-next-line guard-for-in
-      for (const currKey in file.fileJson) {
-        switch (getObjectType(currKey)) {
-          case 2: {
-            Object.keys(file.fileJson[currKey]).forEach((key) => {
-              objResult.push(
-                ..._.entries(file.fileJson[currKey][key]).map((object) => {
-                  return {
-                    [object[0]]: object[1],
-                    type: currKey,
-                    resourceName: key,
-                    instanceName: object[0],
-                  };
-                })
-              );
-            });
-            break;
-          }
-          case 1: {
-            objResult.push(
-              ..._.entries(file.fileJson[currKey]).map((object) => {
-                return {
-                  [object[0]]: object[1],
-                  type: currKey,
-                  resourceName: '',
-                  instanceName: object[0],
-                };
-              })
-            );
-            break;
-          }
-          case 0: {
-            objResult.push(
-              ..._.entries(file.fileJson[currKey]).map((object) => ({
-                [currKey]: { [object[0]]: object[1] },
-                type: currKey,
-                resourceName: '',
-                instanceName: '',
-              }))
-            );
-            break;
-          }
-          default:
-        }
+      for (const type in file.fileJson) {
+        setObjResult(file, type);
       }
     });
 

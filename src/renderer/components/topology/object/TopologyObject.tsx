@@ -127,6 +127,44 @@ const TopologyObject = (props: TopologyObjectProps) => {
       ),
     },
   ];
+  const filterObjList = (
+    type: string,
+    item: Item,
+    resourceName: string,
+    instanceName: string
+  ) => {
+    switch (getObjectType(type)) {
+      case 2: {
+        return (
+          item.instanceName === instanceName &&
+          item.resourceName === resourceName
+        );
+      }
+      case 1: {
+        return item.instanceName === instanceName;
+      }
+      case 0: {
+        return item.type === type;
+      }
+      default:
+        return false;
+    }
+  };
+
+  const getObject = (type: string, obj: any, instanceName: string) => {
+    switch (getObjectType(type)) {
+      case 2: {
+        return obj[instanceName];
+      }
+      case 1: {
+        return obj[instanceName];
+      }
+      case 0: {
+        return obj[type];
+      }
+      default:
+    }
+  };
 
   const handleClick = (
     event: React.MouseEvent<any>,
@@ -134,38 +172,13 @@ const TopologyObject = (props: TopologyObjectProps) => {
     item: Item
   ) => {
     const selectedObj = objResult.filter((cur: any) => {
-      const { type, resourceName, instanceName, ...obj } = cur;
-      switch (getObjectType(type)) {
-        case 2: {
-          return (
-            item.instanceName === instanceName &&
-            item.resourceName === resourceName
-          );
-        }
-        case 1: {
-          return item.instanceName === instanceName;
-        }
-        case 0: {
-          return item.type === type;
-        }
-        default:
-      }
+      const { type, resourceName, instanceName } = cur;
+      return filterObjList(type, item, resourceName, instanceName);
     })[0];
 
     const { type, resourceName, instanceName, ...obj } = selectedObj;
     const content = (type: string) => {
-      switch (getObjectType(type)) {
-        case 2: {
-          return obj[instanceName];
-        }
-        case 1: {
-          return obj[instanceName];
-        }
-        case 0: {
-          return obj[type];
-        }
-        default:
-      }
+      return getObject(type, obj, instanceName);
     };
 
     const object = {
