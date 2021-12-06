@@ -1,8 +1,23 @@
 import * as _ from 'lodash-es';
 import { JSONSchema7 } from 'json-schema';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
-import { hasNotResourceName, getObjectNameInfo } from './getResourceInfo';
+import { getObjectNameInfo, getObjectType, getId } from './getResourceInfo';
 import preDefinedFileObjects from './preDefinedFileObjects';
+
+const getContent = (type: string, object: any) => {
+  switch (getObjectType(type)) {
+    case 2: {
+      return Object.values(Object.values(object as any)[0] as any)[0];
+    }
+    case 1: {
+      return Object.values(object as any)[0];
+    }
+    case 0: {
+      return object;
+    }
+    default:
+  }
+};
 
 const parseToCustomizeKey = (fileObjects: any[]) => {
   const terraformSchemaMap = getSchemaMap();
@@ -16,18 +31,16 @@ const parseToCustomizeKey = (fileObjects: any[]) => {
             resourceValue,
             resourceType
           );
-          const id = hasNotResourceName(resourceType)
-            ? resourceType + '-' + instanceName
-            : resourceType + '-' + resourceName;
+          const id = getId(resourceType, resourceName, instanceName);
           const currentSchema = terraformSchemaMap.get(id);
-          const content = hasNotResourceName(resourceType)
-            ? resourceValue
-            : Object.values(resourceValue as any)[0];
+          const content = (type: string) => {
+            getContent(type, resource);
+          };
           const mapObjectTypeList = currentSchema
             ? preDefinedFileObjects(
                 resourceType,
                 currentSchema as JSONSchema7,
-                content,
+                content(resourceType),
                 resourceName,
                 Object.keys(resourceValue as any)[0]
               )
