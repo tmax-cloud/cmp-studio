@@ -105,6 +105,45 @@ const getItemInfo = (item: Item) => {
   };
 };
 
+const filterObjList = (
+  type: string,
+  item: Item,
+  resourceName: string,
+  instanceName: string
+) => {
+  switch (getObjectType(type)) {
+    case 0: {
+      return item.type === type;
+    }
+    case 1: {
+      return item.instanceName === instanceName;
+    }
+    case 2: {
+      return (
+        item.instanceName === instanceName && item.resourceName === resourceName
+      );
+    }
+    default:
+      return false;
+  }
+};
+
+const getObject = (type: string, obj: any, instanceName: string) => {
+  switch (getObjectType(type)) {
+    case 0: {
+      return obj[type];
+    }
+    case 1: {
+      return obj[instanceName];
+    }
+    case 2: {
+      return obj[instanceName];
+    }
+    default:
+      return {};
+  }
+};
+
 const TopologyObject = (props: TopologyObjectProps) => {
   const { items, objResult } = props;
 
@@ -127,44 +166,6 @@ const TopologyObject = (props: TopologyObjectProps) => {
       ),
     },
   ];
-  const filterObjList = (
-    type: string,
-    item: Item,
-    resourceName: string,
-    instanceName: string
-  ) => {
-    switch (getObjectType(type)) {
-      case 2: {
-        return (
-          item.instanceName === instanceName &&
-          item.resourceName === resourceName
-        );
-      }
-      case 1: {
-        return item.instanceName === instanceName;
-      }
-      case 0: {
-        return item.type === type;
-      }
-      default:
-        return false;
-    }
-  };
-
-  const getObject = (type: string, obj: any, instanceName: string) => {
-    switch (getObjectType(type)) {
-      case 2: {
-        return obj[instanceName];
-      }
-      case 1: {
-        return obj[instanceName];
-      }
-      case 0: {
-        return obj[type];
-      }
-      default:
-    }
-  };
 
   const handleClick = (
     event: React.MouseEvent<any>,
@@ -177,17 +178,8 @@ const TopologyObject = (props: TopologyObjectProps) => {
     })[0];
 
     const { type, resourceName, instanceName, ...obj } = selectedObj;
-    const content = (type: string) => {
-      return getObject(type, obj, instanceName);
-    };
 
-    const object = {
-      type,
-      resourceName,
-      instanceName,
-      content: content(type),
-    };
-
+    // 그래프 연동
     const node = (graphData.nodes as NodeData[]).find((node) => {
       const { type, resourceName, instanceName } = node;
       const isEqual = resourceName ? resourceName === item.resourceName : true;
@@ -197,6 +189,13 @@ const TopologyObject = (props: TopologyObjectProps) => {
     });
     node ? dispatch(setSelectedNode(node)) : dispatch(setSelectedNode(null));
 
+    // 폼 에디터 연동
+    const object = {
+      type,
+      resourceName,
+      instanceName,
+      content: getObject(type, obj, instanceName),
+    };
     dispatch(setSelectedObjectInfo(object));
     dispatch(setSidePanel(true));
   };

@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import { setSidePanel } from '@renderer/features/uiSlice';
 import parseToCustomizeKey from './state/form/utils/parseToCustomizeKey';
 import {
   getObjectNameInfo,
@@ -120,6 +121,7 @@ const TopologySidebar = () => {
           const { data, mapObjectTypeCollection } = parseToCustomizeKey(
             projectJsonRes.data
           );
+          dispatch(setSidePanel(false));
           dispatch(setMapObjectTypeCollection(mapObjectTypeCollection));
           dispatch(setFileObjects(data));
           history.push(`/main/${uid}`);
