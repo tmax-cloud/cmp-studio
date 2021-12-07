@@ -68,7 +68,6 @@ const WorkspacesListPage: React.FC = (props) => {
     );
     dispatch(setMapObjectTypeCollection(mapObjectTypeCollection));
     dispatch(setFileObjects(data));
-    dispatch(setFileObjects(projectJsonRes.data));
     openExistFolder(args)
       .then((response: WorkspaceTypes.WorkspaceResponse) => {
         const { status, data } = response;
