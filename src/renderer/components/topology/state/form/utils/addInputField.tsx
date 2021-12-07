@@ -40,6 +40,22 @@ const setAdditionalSchemaByType = (key: string, type: string) => {
   return { properties: { [key]: newSchema } };
 };
 const makeObject = ({ input }: makeObjectType) => {
+  switch (input.type) {
+    case 'string': {
+      return { [input.key]: '' };
+    }
+    case 'object': {
+      return { [input.key]: {} };
+      break;
+    }
+    case 'array': {
+      return { [input.key]: [] };
+    }
+    case 'boolean': {
+      return { [input.key]: '' };
+    }
+    default:
+  }
   return { [input.key]: '' };
 };
 

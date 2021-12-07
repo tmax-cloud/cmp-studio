@@ -34,8 +34,8 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
 
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
-  const workspaceName = useWorkspaceName(workspaceUid);
   const mapObjectCollection = useAppSelector(selectMapObjectTypeCollection);
+  const workspaceName = useWorkspaceName(workspaceUid);
 
   const dispatch = useAppDispatch();
 

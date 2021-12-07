@@ -44,7 +44,7 @@ const useStyles: any = makeStyles((theme) =>
 );
 
 const AddFieldSection = (props: AddFieldSectionProps) => {
-  const { formData } = props;
+  const { formData, sourceSchema } = props;
   const classes = useStyles();
 
   const inputTypeList = ['string', 'object', 'array', 'boolean'];
@@ -57,14 +57,17 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   const [currentSchemaList, setCurrentSchemaList] = React.useState<string[]>(
     []
   );
-
-  const { type, resourceName, instanceName, content, sourceSchema } =
-    useAppSelector(selectCodeSelectedObjectInfo);
+  const { type, resourceName, instanceName, content } = useAppSelector(
+    selectCodeSelectedObjectInfo
+  );
 
   const initSchemaList = (schema: JSONSchema7) => {
+    if (_.isEmpty(sourceSchema)) {
+      return [];
+    }
     const selectedSchema =
       sourceSchema && !_.isEmpty(sourceSchema)
-        ? Object.keys(sourceSchema.properties)
+        ? Object.keys(sourceSchema.properties as JSONSchema7Definition)
         : [];
 
     return _.xor(
@@ -106,7 +109,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               <InputLabel id="schema-label">스키마</InputLabel>
               <Select
                 labelId="schema-label"
-                id={type + '-' + instanceName}
+                id={getId(type, resourceName, instanceName)}
                 className={classes.wideSelect}
                 label="Schema"
                 value={additionalSchema}
@@ -146,7 +149,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
             <FormControl fullWidth>
               <InputLabel id="schema-label">타입</InputLabel>
               <Select
-                id={type + '-' + instanceName}
+                id={getId(type, resourceName, instanceName)}
                 sx={{ width: '220px' }}
                 className={classes.narrowSelect}
                 label="타입"
@@ -164,7 +167,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               </Select>
             </FormControl>
             <TextField
-              id={type + '-' + instanceName}
+              id={getId(type, resourceName, instanceName)}
               className={classes.text}
               label="키"
               value={customFieldKey}
@@ -199,6 +202,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 
 type AddFieldSectionProps = {
   formData: any;
+  sourceSchema: JSONSchema7;
 };
 
 export default AddFieldSection;

@@ -105,11 +105,12 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
         }
       } else if (_.get(jsonSchema, makeSchemaPath + '.type') === 'map') {
         // type이 map일 때
-        const result = _.entries(_.get(formData, makeObjPath)).map(
-          ([key, value]) => {
-            return { [key]: value };
-          }
-        );
+        console.log(_.get(formData, makeObjPath));
+        const result = !Array.isArray(_.get(formData, makeObjPath))
+          ? _.entries(_.get(formData, makeObjPath)).map(([key, value]) => {
+              return { [key]: value };
+            })
+          : _.get(formData, makeObjPath);
         // _.set(formData, makeObjPath, [result]);
         setFormData(result);
         setSchema({
@@ -153,48 +154,67 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
       }
     });
   };
-  const makeCustomUISchema = (obj: any, prevPath: string) => {
+  const makeCustomUISchema = (
+    obj: any,
+    prevSchemaPath: string,
+    prevUISchemaPath: string
+  ) => {
     Object.keys(obj).forEach((currKey) => {
-      const makeSchemaPath = prevPath
-        ? `${prevPath}.properties.${currKey}`
+      const makeSchemaPath = prevSchemaPath
+        ? `${prevSchemaPath}.properties.${currKey}`
         : `properties.${currKey}`;
-      const makeUIPath = prevPath ? `${prevPath}.${currKey}` : currKey;
+      const makeUIPath = prevUISchemaPath
+        ? `${prevUISchemaPath}.${currKey}`
+        : currKey;
 
       if (
-        !_.get(fixedSchema, makeSchemaPath + '.type') &&
-        'properties' in _.get(fixedSchema, makeSchemaPath)
+        (_.get(fixedSchema, makeSchemaPath) &&
+          !_.get(fixedSchema, makeSchemaPath + '.type') &&
+          'properties' in _.get(fixedSchema, makeSchemaPath)) ||
+        (_.get(jsonSchema, makeSchemaPath + '.type') === 'array' &&
+          _.get(jsonSchema, makeSchemaPath + '.items.properties'))
       ) {
+        _.set(customUISchema, makeUIPath, {
+          [`ui:dependency`]: { path: makeUIPath, type: 'parent' },
+        });
         if (Array.isArray(obj[currKey])) {
+          Object.keys(
+            _.get(fixedSchema, makeSchemaPath + '.items.properties')
+          ).forEach((cur) => {
+            _.set(customUISchema, makeUIPath + `.items.${cur}`, {
+              [`ui:dependency`]: { path: makeUIPath, type: 'child' },
+            });
+          });
           for (let idx = 0; idx < obj[currKey].length; idx++) {
-            makeCustomUISchema(obj[currKey][idx], makeSchemaPath);
+            makeCustomUISchema(
+              obj[currKey][idx],
+              makeSchemaPath + '.items',
+              makeUIPath + '.items'
+            );
           }
         } else {
-          makeCustomUISchema(obj[currKey], makeSchemaPath);
+          makeCustomUISchema(obj[currKey], makeSchemaPath, makeUIPath);
         }
-      } else if (_.get(fixedSchema, makeSchemaPath + '.type') === 'map') {
+      } else if (
+        _.get(fixedSchema, makeSchemaPath) &&
+        _.get(fixedSchema, makeSchemaPath + '.type') === 'map'
+      ) {
         _.set(customUISchema, makeUIPath, {
           [`ui:field`]: 'MapField',
         });
       }
+
+      // if (!!prevUISchemaPath) {
+      //   _.set(customUISchema, makeUIPath, {
+      //     [`ui:dependency`]: { path: makeUIPath, type: 'child' },
+      //   });
+      // }
     });
   };
 
-  //   const makeCustomFormData (obj: any, prevPath: string, prevObjPath: string) => {
-  //     Object.keys(obj).forEach((currKey) => {
-
-  //       const makeSchemaPath = prevPath
-  //         ? `${prevPath}.properties.${currKey}`
-  //         : `properties.${currKey}`;
-  //         const makeObjPath = prevObjPath
-  //           ? `${prevObjPath}.properties.${currKey}`
-  //           : `properties.${currKey}`;
-  //     })
-  //   }
-
   if (!_.isEmpty(formData)) {
     makeFixedSchema(formData, '', '');
-    makeCustomUISchema(formData, '');
-    // makeCustomFormData(formData, '');
+    makeCustomUISchema(formData, '', '');
   }
   return { customUISchema, formData, fixedSchema };
 };

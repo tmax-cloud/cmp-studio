@@ -4,13 +4,13 @@ import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { getObjectNameInfo, getObjectType, getId } from './getResourceInfo';
 import preDefinedFileObjects from './preDefinedFileObjects';
 
-const getContent = (type: string, object: any) => {
+const getContent = (type: string, object: any, resourceValue: any) => {
   switch (getObjectType(type)) {
     case 2: {
-      return Object.values(Object.values(object as any)[0] as any)[0];
+      return Object.values(resourceValue)[0];
     }
     case 1: {
-      return Object.values(object as any)[0];
+      return resourceValue;
     }
     case 0: {
       return object;
@@ -34,7 +34,7 @@ const parseToCustomizeKey = (fileObjects: any[]) => {
           const id = getId(resourceType, resourceName, instanceName);
           const currentSchema = terraformSchemaMap.get(id);
           const content = (type: string) => {
-            getContent(type, resource);
+            return getContent(type, resource, resourceValue);
           };
           const mapObjectTypeList = currentSchema
             ? preDefinedFileObjects(
