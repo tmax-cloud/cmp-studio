@@ -160,12 +160,13 @@ export const drawNode = (
 };
 
 const getCodeInfoValue = (data: any, keyName: string) => {
+  let codeValue = null;
   for (const [key, value] of Object.entries(data)) {
     if (key === keyName) {
-      return { [key]: value };
+      codeValue = value;
     }
   }
-  return null;
+  return codeValue;
 };
 
 export const getCodeInfo = (
@@ -181,28 +182,28 @@ export const getCodeInfo = (
       if (node.type === currKey) {
         const data = file.fileJson[currKey];
         if (node.resourceName) {
-          for (const [key] of Object.entries(data)) {
-            if (key === node.resourceName) {
-              codeInfo = getCodeInfoValue(data[key], node.instanceName);
+          const resourceData = getCodeInfoValue(data, node.resourceName);
+          if (resourceData) {
+            const content = getCodeInfoValue(resourceData, node.instanceName);
+            if (content) {
+              codeInfo = content;
             }
           }
         } else {
-          codeInfo = getCodeInfoValue(data, node.instanceName);
+          const content = getCodeInfoValue(data, node.instanceName);
+          if (content) {
+            codeInfo = content;
+          }
         }
       }
     }
   });
-
   if (codeInfo) {
     return {
       type: node.type,
       resourceName: node.resourceName || '',
       instanceName: node.instanceName,
-      content: {
-        ...codeInfo,
-        type: node.type,
-        resouceName: node.resourceName || '',
-      },
+      content: codeInfo,
     };
   }
   return codeInfo;
