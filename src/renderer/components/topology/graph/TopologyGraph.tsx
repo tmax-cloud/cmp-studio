@@ -6,13 +6,14 @@ import ForceGraph2D, {
 } from 'react-force-graph-2d';
 import { withResizeDetector } from 'react-resize-detector';
 import { useAppSelector } from '@renderer/app/store';
-import { useGraphData, useGraphInitOutput } from '@renderer/hooks/useGraphData';
+import { useGraphData } from '@renderer/hooks/useGraphData';
+import { useGraphInitOutput } from '@renderer/hooks/useGraphInitOutput';
 import {
   selectErrorMsg,
   selectLoadingMsg,
   selectSelectedData,
 } from '@renderer/features/graphSliceInputSelectors';
-import { INIT_FINISHED } from '@renderer/utils/graph/terraform';
+import { INIT_FINISHED } from '@renderer/utils/graph';
 import Box from '@mui/material/Box';
 import Error from './Error';
 import { GraphLoadingModal } from '../modal';
