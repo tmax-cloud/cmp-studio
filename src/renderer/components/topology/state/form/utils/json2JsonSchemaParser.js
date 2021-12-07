@@ -5,8 +5,8 @@ function parseJson(clouds) {
   function renameKey(obj, oldKey, newKey) {
     if (oldKey in obj) {
       obj[newKey] = obj[oldKey];
+      delete obj[oldKey];
     }
-    delete obj[oldKey];
   }
   function mergeKey(obj, oldKey, newKey) {
     if (newKey in obj) {
@@ -36,6 +36,17 @@ function parseJson(clouds) {
             typeof schemaData.properties[k].type[1][1] === 'object' &&
               Object.keys(schemaData.properties[k].type[1][1]).forEach(
                 function (l) {
+                  // if (k === 'egress' && l === 'cidr_blocks') {
+                  //   console.log(schemaData.properties[k].type[1][1][l]);
+                  // }
+                  // if (Array.isArray(schemaData.properties[k].type[1][1][l])) {
+                  //   return buildSchema({
+                  //     properties: {
+                  //       ...schemaData.properties[k].type[1][1],
+                  //       [l]: { type: schemaData.properties[k].type[1][1][l] },
+                  //     },
+                  //   });
+                  // }
                   schemaData.properties[k].type[1][1][l] = {
                     type: schemaData.properties[k].type[1][1][l],
                   };
@@ -143,7 +154,9 @@ function parseJson(clouds) {
           renameKey(schemaData, 'attributes', 'properties');
           mergeKey(schemaData, 'block_types', 'properties');
         }
-
+        if (key === 'aws_security_group') {
+          console.log(key);
+        }
         schemaData.properties &&
           Object.keys(schemaData.properties).length > 0 &&
           buildSchema(schemaData);
