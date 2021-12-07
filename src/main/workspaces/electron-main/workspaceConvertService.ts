@@ -2,10 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import * as FileUtils from '../../base/common/fileUtils';
 import * as WorkspaceTypes from '../common/workspace';
-import {
-  WorkspaceManagementService,
-  getWorkspaceTemporaryFolderPath,
-} from './workspaceManagementService';
+import { WorkspaceManagementService } from './workspaceManagementService';
 const Converter = require('../../utils/hcljsonconverter');
 
 export class WorkspaceConvertService
@@ -47,7 +44,8 @@ export class WorkspaceConvertService
       workspaceUid
     ) as string;
     const temporaryDataFolderUri =
-      getWorkspaceTemporaryFolderPath(workspaceUid);
+      workspaceManagementService.getWorkspaceTemporaryFolderPath(workspaceUid);
+
     objList.forEach((obj) => {
       const { fileJson, filePath } = obj;
 

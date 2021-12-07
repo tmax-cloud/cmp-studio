@@ -163,7 +163,7 @@ export class TerraformMainService {
         graphData += chunk;
         // graphData += iconv.decode(chunk, 'euc-kr');
       }
-      console.log('graphData: ', graphData);
+      // console.log('graphData: ', graphData);
 
       let graphError = '';
       for await (const chunk of graphCmd.stderr) {
@@ -220,10 +220,6 @@ export class TerraformMainService {
       'studio:doTerraformInit',
       async (event, arg: TerraformInitArgs): Promise<TerraformResponse> => {
         const { workspaceUid } = arg;
-        const workspaceConfig: WorkspaceIdentifier =
-          this.workspaceMainService.workspaceManagementService.getWorkspaceConfig(
-            workspaceUid
-          );
         // MEMO : 워크스페이스별로 테라폼 exe경로 다르게 설정하는 기능 추가되면 아래 주석처리 풀어서 path 유효성도 체크하기
         /*
         const tfExePath = workspaceConfig.terraformExePath || 'EMPTY';
@@ -234,7 +230,10 @@ export class TerraformMainService {
           };
         }
         */
-        const folderUri = workspaceConfig.workspaceRealPath;
+        const folderUri =
+          this.workspaceMainService.workspaceManagementService.getWorkspaceTemporaryFolderPath(
+            workspaceUid
+          );
         try {
           // MEMO : 현재는 tfExePath 값은 사용안하고있어서 그냥 공백으로 넘겨줌.
           await this.doTerraformInit(folderUri, '', event);
@@ -256,10 +255,6 @@ export class TerraformMainService {
       'studio:getTerraformGraph',
       async (event, arg: TerraformGraphArgs): Promise<TerraformResponse> => {
         const { workspaceUid } = arg;
-        const workspaceConfig: WorkspaceIdentifier =
-          this.workspaceMainService.workspaceManagementService.getWorkspaceConfig(
-            workspaceUid
-          );
         // MEMO : 워크스페이스별로 테라폼 exe경로 다르게 설정하는 기능 추가되면 아래 주석처리 풀어서 path 유효성도 체크하기
         /*
         const tfExePath = workspaceConfig.terraformExePath || 'EMPTY';
@@ -271,7 +266,11 @@ export class TerraformMainService {
         }
         */
 
-        const folderUri = workspaceConfig.workspaceRealPath;
+        const folderUri =
+          this.workspaceMainService.workspaceManagementService.getWorkspaceTemporaryFolderPath(
+            workspaceUid
+          );
+
         // MEMO : 시스템 환경변수로 Path에 설정돼있는 terraform.exe만 실행시키도록 임시 처리.
         // MEMO : 현재는 tfExePath 값은 사용안하고있어서 그냥 공백으로 넘겨줌.
         // MEMO : 워크스페이스 설정마다 다른 terraform.exe 실행시켜주려면 위와 아래부분 주석처리부분 사용하기

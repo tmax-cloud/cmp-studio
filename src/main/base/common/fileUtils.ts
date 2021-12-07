@@ -18,6 +18,19 @@ export function makeDir(dirPath: string) {
   }
 }
 
+export function copyDir(source: string, destination: string) {
+  fs.mkdirSync(destination, { recursive: true });
+
+  fs.readdirSync(source, { withFileTypes: true }).forEach((entry) => {
+    const sourcePath = path.join(source, entry.name);
+    const destinationPath = path.join(destination, entry.name);
+
+    entry.isDirectory()
+      ? copyDir(sourcePath, destinationPath)
+      : fs.copyFileSync(sourcePath, destinationPath);
+  });
+}
+
 export function createFile(resourcePath: string) {
   const dirname = path.dirname(resourcePath);
   if (!fs.existsSync(dirname)) {
