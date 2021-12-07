@@ -18,6 +18,7 @@ import {
 import { setSidePanel } from '@renderer/features/uiSlice';
 import { setTerraformState } from '@renderer/features/commonSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
+import { getObjectType } from './utils/getResourceInfo';
 
 const useStyles = makeStyles({
   root: {
@@ -54,13 +55,28 @@ const SaveSection = (props: SaveSectionProps) => {
     selectCodeSelectedObjectInfo
   );
 
-  const path = resourceName
-    ? `${type}.${resourceName}.${instanceName}`
-    : `${type}.${instanceName}`;
+  const getPath = (type: string) => {
+    switch (getObjectType(type)) {
+      case 2: {
+        return `${type}.${resourceName}.${instanceName}`;
+      }
+      case 1: {
+        return `${type}.${instanceName}`;
+      }
+      case 0: {
+        return `${type}`;
+      }
+      default:
+        return '';
+    }
+  };
+
+  const path = getPath(type);
+
   const dispatch = useAppDispatch();
   const onDeleteObject = () => {
     const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
-      if (_.get(cur.fileJson, path)) {
+      if (_.get(cur.fileJson, path as string)) {
         return true;
       } else {
         return false;
@@ -74,17 +90,20 @@ const SaveSection = (props: SaveSectionProps) => {
             // 동일한 타입의 데이터가 여러개인 경우
             if (resourceName) {
               // resourceName이 있는 경우
-              if (_.size(cur.fileJsonp[type][resourceName]) > 1) {
+              if (_.size(cur.fileJson[type][resourceName]) > 1) {
                 // 동일한 리소스이름의 인스턴스가 여러개인 경우
                 return _.omit(cur, [
-                  `fileJson.${type}.${resourceName}/${instanceName}`,
+                  `fileJson.${type}.${resourceName}.${instanceName}`,
                 ]);
               }
               // 동일한 리소스이름의 인스턴스가 하나인 경우
               return _.omit(cur, [`fileJson.${type}.${resourceName}`]);
             } else {
               // resourceName이 없는 경우
-              return _.omit(cur, [`fileJson.${type}.${instanceName}`]);
+              if (instanceName) {
+                return _.omit(cur, [`fileJson.${type}.${instanceName}`]);
+              }
+              return _.omit(cur, [`fileJson.${type}`]);
             }
           }
           // 동일한 타입의 데이터가 하나인 경우
@@ -95,17 +114,20 @@ const SaveSection = (props: SaveSectionProps) => {
             // 동일한 타입의 데이터가 여러개인 경우
             if (resourceName) {
               // resourceName이 있는 경우
-              if (_.size(cur.fileJsonp[type][resourceName]) > 1) {
+              if (_.size(cur.fileJson[type][resourceName]) > 1) {
                 // 동일한 리소스이름의 인스턴스가 여러개인 경우
                 return _.omit(cur, [
-                  `fileJson.${type}.${resourceName}/${instanceName}`,
+                  `fileJson.${type}.${resourceName}.${instanceName}`,
                 ]);
               }
               // 동일한 리소스이름의 인스턴스가 하나인 경우
               return _.omit(cur, [`fileJson.${type}.${resourceName}`]);
             } else {
               // resourceName이 없는 경우
-              return _.omit(cur, [`fileJson.${type}.${instanceName}`]);
+              if (instanceName) {
+                return _.omit(cur, [`fileJson.${type}.${instanceName}`]);
+              }
+              return _.omit(cur, [`fileJson.${type}`]);
             }
           }
           return null;
@@ -122,6 +144,47 @@ const SaveSection = (props: SaveSectionProps) => {
       )
     );
     dispatch(setSidePanel(false));
+  };
+
+  const setFileObject = (type: string, fileObject: any) => {
+    switch (getObjectType(type)) {
+      case 2: {
+        return {
+          ...fileObject,
+          fileJson: {
+            ...fileObject.fileJson,
+            [type]: {
+              ...fileObject.fileJson[type],
+              [resourceName]: {
+                [instanceName]: formState,
+              },
+            },
+          },
+        };
+      }
+      case 1: {
+        return {
+          ...fileObject,
+          fileJson: {
+            ...fileObject.fileJson,
+            [type]: {
+              ...fileObject.fileJson[type],
+              [instanceName]: formState,
+            },
+          },
+        };
+      }
+      case 0: {
+        return {
+          ...fileObject,
+          fileJson: {
+            ...fileObject.fileJson,
+            [type]: formState,
+          },
+        };
+      }
+      default:
+    }
   };
 
   return (
@@ -143,46 +206,20 @@ const SaveSection = (props: SaveSectionProps) => {
           onClick={async () => {
             // redux fileObjects에 변경된 부분 저장하기
             const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
-              if (_.get(cur.fileJson, path)) {
+              if (_.get(cur.fileJson, path as string)) {
                 return true;
               } else {
                 return false;
               }
             });
-            const newFileObjects = fileObjects.map((cur: any, idx: number) => {
-              if (idx === fileIdx) {
-                if (resourceName) {
-                  return {
-                    ...cur,
-                    fileJson: {
-                      ...cur.fileJson,
-                      [type]: {
-                        ...cur.fileJson[type],
-                        [resourceName]: {
-                          [instanceName]: {
-                            ...formState,
-                          },
-                        },
-                      },
-                    },
-                  };
-                } else {
-                  return {
-                    ...cur,
-                    fileJson: {
-                      ...cur.fileJson,
-                      [type]: {
-                        ...cur.fileJson[type],
-                        [instanceName]: {
-                          ...formState,
-                        },
-                      },
-                    },
-                  };
+            const newFileObjects = fileObjects.map(
+              (fileObject: any, idx: number) => {
+                if (idx === fileIdx) {
+                  return setFileObject(type, fileObject);
                 }
+                return fileObject;
               }
-              return cur;
-            });
+            );
             dispatch(setFileObjects(newFileObjects));
             dispatch(
               setSelectedContent({
