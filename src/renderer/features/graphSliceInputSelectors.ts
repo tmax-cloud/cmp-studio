@@ -2,6 +2,8 @@ import { RootState } from '@renderer/app/store';
 import { NodeData } from '@renderer/types/graph';
 import { GraphData } from 'react-force-graph-2d';
 
+export const selectTerraformData = (state: RootState): string =>
+  state.graph.terraformData;
 export const selectGraphData = (state: RootState): GraphData =>
   state.graph.graphData;
 export const selectSelectedData = (state: RootState): GraphData =>

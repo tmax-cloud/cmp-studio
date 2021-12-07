@@ -9,8 +9,10 @@ import {
   selectMapObjectTypeCollection,
 } from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
-import { useAppSelector } from '@renderer/app/store';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { useWorkspaceName } from '@renderer/hooks/useWorkspaceName';
+import { watchGraphData } from '@renderer/features/graphSlice';
+import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
 import {
   FitScreenButton,
   SaveButton,
@@ -35,6 +37,21 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
   const mapObjectCollection = useAppSelector(selectMapObjectTypeCollection);
   const workspaceName = useWorkspaceName(workspaceUid);
 
+  const dispatch = useAppDispatch();
+
+  const handleSaveButtonClick = async () => {
+    const result = await exportProject({
+      objects: fileObjects,
+      workspaceUid,
+      isAllSave: true,
+      typeMap: mapObjectCollection,
+    });
+    if (result.status === WorkspaceStatusType.SUCCESS) {
+      dispatch(watchGraphData(workspaceUid));
+    }
+    // console.log('[INFO] File export result : ', result);
+  };
+
   return (
     <Toolbar
       style={{ minHeight: 48, paddingLeft: 20, paddingRight: 20 }}
@@ -56,17 +73,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
           ml: 5,
         }}
       >
-        <SaveButton
-          onClick={async () => {
-            const result = await exportProject({
-              objects: fileObjects,
-              workspaceUid,
-              isAllSave: true,
-              typeMap: mapObjectCollection,
-            });
-            console.log('[INFO] File export result : ', result);
-          }}
-        />
+        <SaveButton onClick={handleSaveButtonClick} />
         <SelectModuleButton onClick={handleModuleListModalOpen} />
         <ModuleListModal
           isOpen={openModuleListModal}

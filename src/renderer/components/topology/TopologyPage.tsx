@@ -3,7 +3,7 @@ import { Box, styled, Theme } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import { setSchemaMap } from '@renderer/utils/storageAPI';
 import { useGraphProps } from '@renderer/hooks/useGraphProps';
-import { fetchGraphData } from '@renderer/features/graphSlice';
+import { fetchGraphDataByWorkspaceId } from '@renderer/features/graphSlice';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import { selectUiToggleSidePanel } from '@renderer/features/uiSliceInputSelectors';
@@ -41,7 +41,7 @@ export const TopologyPage = () => {
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
-    dispatch(fetchGraphData(workspaceUid));
+    dispatch(fetchGraphDataByWorkspaceId(workspaceUid));
   }, [dispatch, workspaceUid]);
 
   if (!localStorage.getItem('schemaJson')) {

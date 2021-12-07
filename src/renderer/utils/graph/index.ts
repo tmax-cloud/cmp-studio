@@ -2,9 +2,14 @@ import * as _ from 'lodash';
 import { GraphData, LinkObject, NodeObject } from 'react-force-graph-2d';
 import { LinkData, ModuleData, NodeData } from '@renderer/types/graph';
 import { TerraformFileJsonMeta } from '@main/workspaces/common/workspace';
+import {
+  TerraformErrorData,
+  TerraformGraphSuccessData,
+  TerraformStatusType,
+} from '@main/terraform-command/common/terraform';
+import { doTerraformInit, getTerraformGraph } from '../ipc/terraformIpcUtils';
 import { getRawGraph } from './dot';
 import { getRefinedGraph, nodesById } from './parse';
-import { getTerraformGraphData } from './terraform';
 import {
   drawTexts,
   drawRoundRect,
@@ -17,13 +22,41 @@ import {
 } from './draw';
 
 export const QUICK_START = 'CMP Studio 시작하기';
+export const INIT_FINISHED = '테라폼 초기화가 완료되었습니다.';
+
+export const getTerraformData = async (workspaceUid: string) => {
+  let graphData;
+  const response = await getTerraformGraph({ workspaceUid });
+  if (response.status === TerraformStatusType.ERROR_GRAPH) {
+    const response2 = await doTerraformInit({ workspaceUid });
+    if (response2.status === TerraformStatusType.ERROR_INIT) {
+      const { message } = response2.data as TerraformErrorData;
+      throw new Error(`테라폼 초기화에 실패했습니다.\n\n${message}`);
+    } else if (response2.status === TerraformStatusType.SUCCESS) {
+      const response3 = await getTerraformGraph({ workspaceUid });
+      if (response3.status === TerraformStatusType.ERROR_GRAPH) {
+        const { message } = response3.data as TerraformErrorData;
+        throw new Error(
+          `테라폼 그래프 명령어 실행에 문제가 있습니다.\n\n${message}`
+        );
+      } else if (response3.status === TerraformStatusType.SUCCESS) {
+        graphData = (response3.data as TerraformGraphSuccessData).graphData;
+      }
+    }
+  } else if (response.status === TerraformStatusType.SUCCESS) {
+    graphData = (response.data as TerraformGraphSuccessData).graphData;
+  }
+  if (!graphData) {
+    throw new Error('테라폼 그래프 명령어 실행 오류');
+  }
+  // console.log('## terraform dot data: ', graphData);
+  return graphData;
+};
 
 export const getGraphData = async (
-  workspaceUid: string
+  terraformData: string
 ): Promise<GraphData> => {
-  const tfGraph = await getTerraformGraphData(workspaceUid);
-  // console.log('## raw dot data: ', tfGraph);
-  const rawGraph = await getRawGraph(tfGraph);
+  const rawGraph = await getRawGraph(terraformData);
   // console.log('## raw json data: ', rawGraph);
   const graph = getRefinedGraph(rawGraph);
   // console.log('## graph data: ', graph);
