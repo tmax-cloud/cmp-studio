@@ -15,7 +15,7 @@ import {
   setFileObjects,
   setSelectedContent,
 } from '@renderer/features/codeSlice';
-import { setSidePanel } from '@renderer/features/uiSlice';
+import { setFileDirty, setSidePanel } from '@renderer/features/uiSlice';
 import { setTerraformState } from '@renderer/features/commonSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
 import {
@@ -155,6 +155,7 @@ const SaveSection = (props: SaveSectionProps) => {
       typeMap: mapObjectCollection,
     });
     if (result.status === WorkspaceStatusType.SUCCESS) {
+      dispatch(setFileDirty(true));
       dispatch(fetchGraphDataByWorkspaceId(workspaceUid));
     }
     dispatch(setSidePanel(false));
@@ -249,6 +250,7 @@ const SaveSection = (props: SaveSectionProps) => {
               typeMap: mapObjectCollection,
             });
             if (result.status === WorkspaceStatusType.SUCCESS) {
+              dispatch(setFileDirty(true));
               dispatch(watchGraphData(workspaceUid));
             }
 
