@@ -230,13 +230,13 @@ export class TerraformMainService {
           };
         }
         */
-        const uri =
-          this.workspaceMainService.workspaceManagementService.getRealOrTempFolderPath(
+        const folderUri =
+          this.workspaceMainService.workspaceManagementService.getWorkspaceTemporaryFolderPath(
             workspaceUid
           );
         try {
           // MEMO : 현재는 tfExePath 값은 사용안하고있어서 그냥 공백으로 넘겨줌.
-          await this.doTerraformInit(uri, '', event);
+          await this.doTerraformInit(folderUri, '', event);
           return {
             status: TerraformStatusType.SUCCESS,
             data: TerraformStatusType.SUCCESS,
@@ -266,8 +266,8 @@ export class TerraformMainService {
         }
         */
 
-        const uri =
-          this.workspaceMainService.workspaceManagementService.getRealOrTempFolderPath(
+        const folderUri =
+          this.workspaceMainService.workspaceManagementService.getWorkspaceTemporaryFolderPath(
             workspaceUid
           );
 
@@ -275,7 +275,7 @@ export class TerraformMainService {
         // MEMO : 현재는 tfExePath 값은 사용안하고있어서 그냥 공백으로 넘겨줌.
         // MEMO : 워크스페이스 설정마다 다른 terraform.exe 실행시켜주려면 위와 아래부분 주석처리부분 사용하기
         try {
-          const graphData: string = await this.doTerraformGraph(uri, '');
+          const graphData: string = await this.doTerraformGraph(folderUri, '');
           return {
             status: TerraformStatusType.SUCCESS,
             data: { graphData },

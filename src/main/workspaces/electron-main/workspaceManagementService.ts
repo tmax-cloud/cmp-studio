@@ -209,13 +209,6 @@ export class WorkspaceManagementService
     );
   }
 
-  getRealOrTempFolderPath(workspaceId: string): string {
-    const folderPath = this.getWorkspaceConfig(workspaceId).workspaceRealPath;
-    const tempFolderPath = this.getWorkspaceTemporaryFolderPath(workspaceId);
-    const path = fs.existsSync(tempFolderPath) ? tempFolderPath : folderPath;
-    return path;
-  }
-
   copyRealToTempFolder(workspaceId: string): void {
     const folderPath = this.getWorkspaceConfig(workspaceId).workspaceRealPath;
     const tempFolderPath = this.getWorkspaceTemporaryFolderPath(workspaceId);
