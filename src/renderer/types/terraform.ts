@@ -25,9 +25,9 @@ export const twoDepthDataTypes = ['module', 'provider', 'variable', 'output'];
 export const threeDepthDataTypes = ['resource', 'data'];
 
 export enum DataDepthType {
-  ONE_DEPTH_DATA_TYPE = 1,
-  TWO_DEPTH_DATA_TYPE = 2,
-  THREE_DEPTH_DATA_TYPE = 3,
+  ONE_DEPTH_DATA_TYPE = 'ONE_DEPTH_DATA_TYPE',
+  TWO_DEPTH_DATA_TYPE = 'TWO_DEPTH_DATA_TYPE',
+  THREE_DEPTH_DATA_TYPE = 'THREE_DEPTH_DATA_TYPE',
 }
 export const getObjectDataType = {
   terraform: DataDepthType.ONE_DEPTH_DATA_TYPE,
@@ -48,7 +48,7 @@ export const getId = (
   resourceName: string,
   instanceName: string
 ) => {
-  if (getObjectDataType[type] === 2) {
+  if (getObjectDataType[type] === 'TWO_DEPTH_DATA_TYPE') {
     return type + '-' + instanceName;
   }
   return type + '-' + resourceName;

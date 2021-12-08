@@ -62,13 +62,13 @@ const SaveSection = (props: SaveSectionProps) => {
 
   const getPath = (type: TerraformType) => {
     switch (getObjectDataType[type]) {
-      case 3: {
+      case 'THREE_DEPTH_DATA_TYPE': {
         return `${type}.${resourceName}.${instanceName}`;
       }
-      case 2: {
+      case 'TWO_DEPTH_DATA_TYPE': {
         return `${type}.${instanceName}`;
       }
-      case 1: {
+      case 'ONE_DEPTH_DATA_TYPE': {
         return `${type}`;
       }
       default:
@@ -163,7 +163,7 @@ const SaveSection = (props: SaveSectionProps) => {
 
   const setFileObject = (type: TerraformType, fileObject: any) => {
     switch (getObjectDataType[type]) {
-      case 3: {
+      case 'THREE_DEPTH_DATA_TYPE': {
         return {
           ...fileObject,
           fileJson: {
@@ -177,7 +177,7 @@ const SaveSection = (props: SaveSectionProps) => {
           },
         };
       }
-      case 2: {
+      case 'TWO_DEPTH_DATA_TYPE': {
         return {
           ...fileObject,
           fileJson: {
@@ -189,7 +189,7 @@ const SaveSection = (props: SaveSectionProps) => {
           },
         };
       }
-      case 1: {
+      case 'ONE_DEPTH_DATA_TYPE': {
         return {
           ...fileObject,
           fileJson: {

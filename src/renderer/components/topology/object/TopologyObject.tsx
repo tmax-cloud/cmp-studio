@@ -96,8 +96,12 @@ const ListItemColorLabel = (props: ItemColorLabelProps) => {
 
 const getItemInfo = (item: Item) => {
   const { type, resourceName, instanceName } = item;
-  const itemType = getObjectDataType[type] === 3 ? resourceName : type;
-  const itemIcon = getObjectDataType[type] === 3 ? resourceName : instanceName;
+  const itemType =
+    getObjectDataType[type] === 'THREE_DEPTH_DATA_TYPE' ? resourceName : type;
+  const itemIcon =
+    getObjectDataType[type] === 'THREE_DEPTH_DATA_TYPE'
+      ? resourceName
+      : instanceName;
   return {
     itemType,
     itemIcon,
@@ -111,13 +115,13 @@ const filterObjList = (
   instanceName: string
 ) => {
   switch (getObjectDataType[type]) {
-    case 1: {
+    case 'ONE_DEPTH_DATA_TYPE': {
       return item.type === type;
     }
-    case 2: {
+    case 'TWO_DEPTH_DATA_TYPE': {
       return item.instanceName === instanceName;
     }
-    case 3: {
+    case 'THREE_DEPTH_DATA_TYPE': {
       return (
         item.instanceName === instanceName && item.resourceName === resourceName
       );
@@ -129,13 +133,13 @@ const filterObjList = (
 
 const getObject = (type: TerraformType, obj: any, instanceName: string) => {
   switch (getObjectDataType[type]) {
-    case 1: {
+    case 'ONE_DEPTH_DATA_TYPE': {
       return obj[type];
     }
-    case 2: {
+    case 'TWO_DEPTH_DATA_TYPE': {
       return obj[instanceName];
     }
-    case 3: {
+    case 'THREE_DEPTH_DATA_TYPE': {
       return obj[instanceName];
     }
     default:

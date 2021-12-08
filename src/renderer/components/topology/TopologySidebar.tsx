@@ -144,7 +144,7 @@ const TopologySidebar = () => {
 
   const setObjResult = (file: any, type: TerraformType) => {
     switch (getObjectDataType[type]) {
-      case 3: {
+      case 'THREE_DEPTH_DATA_TYPE': {
         Object.keys(file.fileJson[type]).forEach((resourceName) => {
           objResult.push(
             ..._.entries(file.fileJson[type][resourceName]).map((object) => {
@@ -159,7 +159,7 @@ const TopologySidebar = () => {
         });
         break;
       }
-      case 2: {
+      case 'TWO_DEPTH_DATA_TYPE': {
         objResult.push(
           ..._.entries(file.fileJson[type]).map((object) => {
             return {
@@ -172,7 +172,7 @@ const TopologySidebar = () => {
         );
         break;
       }
-      case 1: {
+      case 'ONE_DEPTH_DATA_TYPE': {
         objResult.push(
           ..._.entries(file.fileJson[type]).map((object) => ({
             [type]: { [object[0]]: object[1] },

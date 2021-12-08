@@ -44,7 +44,7 @@ const TopologySidePanel = () => {
     [currentSchema, content, type]
   );
   const title = React.useMemo(() => {
-    if (getObjectDataType[type] === 1) {
+    if (getObjectDataType[type] === 'ONE_DEPTH_DATA_TYPE') {
       return type;
     } else {
       return instanceName;

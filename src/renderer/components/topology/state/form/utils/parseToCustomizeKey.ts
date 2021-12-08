@@ -10,13 +10,13 @@ import preDefinedFileObjects from './preDefinedFileObjects';
 
 const getContent = (type: TerraformType, object: any, resourceValue: any) => {
   switch (getObjectDataType[type]) {
-    case 3: {
+    case 'THREE_DEPTH_DATA_TYPE': {
       return Object.values(resourceValue)[0];
     }
-    case 2: {
+    case 'TWO_DEPTH_DATA_TYPE': {
       return resourceValue;
     }
-    case 1: {
+    case 'ONE_DEPTH_DATA_TYPE': {
       return object;
     }
     default:
