@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ReactElement } from 'react';
-import { styled, Tooltip } from '@mui/material';
+import { Badge, styled, Tooltip } from '@mui/material';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 
@@ -12,6 +12,7 @@ const SaveButton = (props: SaveButtonProps) => {
   const {
     label = '저장',
     icon = <SaveButtonIcon fontSize="small" />,
+    visibleBadge,
     onClick,
     className,
     ...rest
@@ -32,7 +33,9 @@ const SaveButton = (props: SaveButtonProps) => {
           onClick={handleClick}
           {...rest}
         >
-          {icon}
+          <Badge variant="dot" color="primary" invisible={!visibleBadge}>
+            {icon}
+          </Badge>
         </IconButton>
       </span>
     </Tooltip>
@@ -43,6 +46,7 @@ interface Props {
   className?: string;
   icon?: ReactElement;
   label?: string;
+  visibleBadge: boolean;
   onClick?: (e: MouseEvent) => void;
 }
 

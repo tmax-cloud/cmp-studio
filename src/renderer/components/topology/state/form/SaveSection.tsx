@@ -15,9 +15,14 @@ import {
   setFileObjects,
   setSelectedContent,
 } from '@renderer/features/codeSlice';
-import { setSidePanel } from '@renderer/features/uiSlice';
+import { setFileDirty, setSidePanel } from '@renderer/features/uiSlice';
 import { setTerraformState } from '@renderer/features/commonSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
+import {
+  fetchGraphDataByWorkspaceId,
+  watchGraphData,
+} from '@renderer/features/graphSlice';
+import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
 import { getObjectType } from './utils/getResourceInfo';
 
 const useStyles = makeStyles({
@@ -74,7 +79,7 @@ const SaveSection = (props: SaveSectionProps) => {
   const path = getPath(type);
 
   const dispatch = useAppDispatch();
-  const onDeleteObject = () => {
+  const onDeleteObject = async () => {
     const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
       if (_.get(cur.fileJson, path as string)) {
         return true;
@@ -143,6 +148,16 @@ const SaveSection = (props: SaveSectionProps) => {
           : newFileObjects
       )
     );
+    const result = await exportProject({
+      objects: newFileObjects,
+      workspaceUid,
+      isAllSave: false,
+      typeMap: mapObjectCollection,
+    });
+    if (result.status === WorkspaceStatusType.SUCCESS) {
+      dispatch(setFileDirty(true));
+      dispatch(fetchGraphDataByWorkspaceId(workspaceUid));
+    }
     dispatch(setSidePanel(false));
   };
 
@@ -234,6 +249,10 @@ const SaveSection = (props: SaveSectionProps) => {
               isAllSave: false,
               typeMap: mapObjectCollection,
             });
+            if (result.status === WorkspaceStatusType.SUCCESS) {
+              dispatch(setFileDirty(true));
+              dispatch(watchGraphData(workspaceUid));
+            }
 
             await getTerraformPlan({ workspaceUid })
               .then((res: TerraformTypes.TerraformResponse) => {
