@@ -11,6 +11,7 @@ import {
   selectMapObjectTypeCollection,
 } from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
+import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
 import {
   setFileObjects,
   setSelectedContent,
@@ -23,7 +24,6 @@ import {
   watchGraphData,
 } from '@renderer/features/graphSlice';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
-import { getObjectType } from './utils/getResourceInfo';
 
 const useStyles = makeStyles({
   root: {
@@ -60,15 +60,15 @@ const SaveSection = (props: SaveSectionProps) => {
     selectCodeSelectedObjectInfo
   );
 
-  const getPath = (type: string) => {
-    switch (getObjectType(type)) {
-      case 2: {
+  const getPath = (type: TerraformType) => {
+    switch (getObjectDataType[type]) {
+      case 3: {
         return `${type}.${resourceName}.${instanceName}`;
       }
-      case 1: {
+      case 2: {
         return `${type}.${instanceName}`;
       }
-      case 0: {
+      case 1: {
         return `${type}`;
       }
       default:
@@ -161,9 +161,9 @@ const SaveSection = (props: SaveSectionProps) => {
     dispatch(setSidePanel(false));
   };
 
-  const setFileObject = (type: string, fileObject: any) => {
-    switch (getObjectType(type)) {
-      case 2: {
+  const setFileObject = (type: TerraformType, fileObject: any) => {
+    switch (getObjectDataType[type]) {
+      case 3: {
         return {
           ...fileObject,
           fileJson: {
@@ -177,7 +177,7 @@ const SaveSection = (props: SaveSectionProps) => {
           },
         };
       }
-      case 1: {
+      case 2: {
         return {
           ...fileObject,
           fileJson: {
@@ -189,7 +189,7 @@ const SaveSection = (props: SaveSectionProps) => {
           },
         };
       }
-      case 0: {
+      case 1: {
         return {
           ...fileObject,
           fileJson: {

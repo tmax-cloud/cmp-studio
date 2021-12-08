@@ -20,11 +20,10 @@ import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
 import { setSidePanel } from '@renderer/features/uiSlice';
+import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
 import parseToCustomizeKey from './state/form/utils/parseToCustomizeKey';
-import {
-  getObjectNameInfo,
-  getObjectType,
-} from './state/form/utils/getResourceInfo';
+import { getObjectNameInfo } from './state/form/utils/getResourceInfo';
+
 import {
   openExistFolder,
   getProjectJson,
@@ -144,9 +143,9 @@ const TopologySidebar = () => {
   const fileObjects = useAppSelector(selectCodeFileObjects);
   // [TODO] Error나서 string으로 들어올 때 Error 표시 기획 필요할듯
 
-  const setObjResult = (file: any, type: string) => {
-    switch (getObjectType(type)) {
-      case 2: {
+  const setObjResult = (file: any, type: TerraformType) => {
+    switch (getObjectDataType[type]) {
+      case 3: {
         Object.keys(file.fileJson[type]).forEach((resourceName) => {
           objResult.push(
             ..._.entries(file.fileJson[type][resourceName]).map((object) => {
@@ -161,7 +160,7 @@ const TopologySidebar = () => {
         });
         break;
       }
-      case 1: {
+      case 2: {
         objResult.push(
           ..._.entries(file.fileJson[type]).map((object) => {
             return {
@@ -174,7 +173,7 @@ const TopologySidebar = () => {
         );
         break;
       }
-      case 0: {
+      case 1: {
         objResult.push(
           ..._.entries(file.fileJson[type]).map((object) => ({
             [type]: { [object[0]]: object[1] },
@@ -193,7 +192,7 @@ const TopologySidebar = () => {
     fileObjects.forEach((file: { filePath: string; fileJson: any }) => {
       // eslint-disable-next-line guard-for-in
       for (const type in file.fileJson) {
-        setObjResult(file, type);
+        setObjResult(file, type as TerraformType);
       }
     });
 
