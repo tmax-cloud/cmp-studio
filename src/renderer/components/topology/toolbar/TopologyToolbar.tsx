@@ -13,6 +13,8 @@ import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { useWorkspaceName } from '@renderer/hooks/useWorkspaceName';
 import { watchGraphData } from '@renderer/features/graphSlice';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
+import { selectFileDirty } from '@renderer/features/uiSliceInputSelectors';
+import { setFileDirty } from '@renderer/features/uiSlice';
 import {
   FitScreenButton,
   SaveButton,
@@ -35,6 +37,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
   const mapObjectCollection = useAppSelector(selectMapObjectTypeCollection);
+  const fileDirty = useAppSelector(selectFileDirty);
   const workspaceName = useWorkspaceName(workspaceUid);
 
   const dispatch = useAppDispatch();
@@ -47,6 +50,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
       typeMap: mapObjectCollection,
     });
     if (result.status === WorkspaceStatusType.SUCCESS) {
+      dispatch(setFileDirty(false));
       dispatch(watchGraphData(workspaceUid));
     }
     // console.log('[INFO] File export result : ', result);
@@ -73,7 +77,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
           ml: 5,
         }}
       >
-        <SaveButton onClick={handleSaveButtonClick} />
+        <SaveButton visibleBadge={fileDirty} onClick={handleSaveButtonClick} />
         <SelectModuleButton onClick={handleModuleListModalOpen} />
         <ModuleListModal
           isOpen={openModuleListModal}
