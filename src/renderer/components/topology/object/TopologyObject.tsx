@@ -22,8 +22,7 @@ import { selectSelectedData } from '@renderer/features/graphSliceInputSelectors'
 import { getIcon } from '@renderer/components/topology/icon/IconFactory';
 import { NodeData } from '@renderer/types/graph';
 import { getIconColor } from '@renderer/utils/graph/draw';
-import { TerraformType } from '@renderer/types/terraform';
-import { getObjectType } from '../state/form/utils/getResourceInfo';
+import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
   backgroundColor: theme.palette.object.accordion,
@@ -97,8 +96,12 @@ const ListItemColorLabel = (props: ItemColorLabelProps) => {
 
 const getItemInfo = (item: Item) => {
   const { type, resourceName, instanceName } = item;
-  const itemType = getObjectType(type) === 2 ? resourceName : type;
-  const itemIcon = getObjectType(type) === 2 ? resourceName : instanceName;
+  const itemType =
+    getObjectDataType[type] === 'THREE_DEPTH_DATA_TYPE' ? resourceName : type;
+  const itemIcon =
+    getObjectDataType[type] === 'THREE_DEPTH_DATA_TYPE'
+      ? resourceName
+      : instanceName;
   return {
     itemType,
     itemIcon,
@@ -106,19 +109,19 @@ const getItemInfo = (item: Item) => {
 };
 
 const filterObjList = (
-  type: string,
+  type: TerraformType,
   item: Item,
   resourceName: string,
   instanceName: string
 ) => {
-  switch (getObjectType(type)) {
-    case 0: {
+  switch (getObjectDataType[type]) {
+    case 'ONE_DEPTH_DATA_TYPE': {
       return item.type === type;
     }
-    case 1: {
+    case 'TWO_DEPTH_DATA_TYPE': {
       return item.instanceName === instanceName;
     }
-    case 2: {
+    case 'THREE_DEPTH_DATA_TYPE': {
       return (
         item.instanceName === instanceName && item.resourceName === resourceName
       );
@@ -128,15 +131,15 @@ const filterObjList = (
   }
 };
 
-const getObject = (type: string, obj: any, instanceName: string) => {
-  switch (getObjectType(type)) {
-    case 0: {
+const getObject = (type: TerraformType, obj: any, instanceName: string) => {
+  switch (getObjectDataType[type]) {
+    case 'ONE_DEPTH_DATA_TYPE': {
       return obj[type];
     }
-    case 1: {
+    case 'TWO_DEPTH_DATA_TYPE': {
       return obj[instanceName];
     }
-    case 2: {
+    case 'THREE_DEPTH_DATA_TYPE': {
       return obj[instanceName];
     }
     default:
@@ -257,7 +260,7 @@ export interface ItemColorLabelProps {
 export interface Item {
   resourceName: string;
   instanceName: string;
-  type: string;
+  type: TerraformType;
 }
 
 export interface TopologyObjectProps {

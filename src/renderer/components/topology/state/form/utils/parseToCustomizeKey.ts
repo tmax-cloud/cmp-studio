@@ -1,18 +1,22 @@
+import {
+  TerraformType,
+  getObjectDataType,
+  getId,
+} from '@renderer/types/terraform';
 import * as _ from 'lodash-es';
 import { JSONSchema7 } from 'json-schema';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
-import { getObjectNameInfo, getObjectType, getId } from './getResourceInfo';
 import preDefinedFileObjects from './preDefinedFileObjects';
 
-const getContent = (type: string, object: any, resourceValue: any) => {
-  switch (getObjectType(type)) {
-    case 2: {
+const getContent = (type: TerraformType, object: any, resourceValue: any) => {
+  switch (getObjectDataType[type]) {
+    case 'THREE_DEPTH_DATA_TYPE': {
       return Object.values(resourceValue)[0];
     }
-    case 1: {
+    case 'TWO_DEPTH_DATA_TYPE': {
       return resourceValue;
     }
-    case 0: {
+    case 'ONE_DEPTH_DATA_TYPE': {
       return object;
     }
     default:
@@ -24,34 +28,33 @@ const parseToCustomizeKey = (fileObjects: any[]) => {
   const mapObjectTypeCollection = {};
 
   fileObjects.forEach((fileObject: any) => {
-    _.toPairs(fileObject.fileJson).forEach(
-      ([resourceType, resource]: [string, any]) => {
-        _.toPairs(resource).forEach(([resourceName, resourceValue]) => {
-          const { instanceName } = getObjectNameInfo(
-            resourceValue,
-            resourceType
-          );
-          const id = getId(resourceType, resourceName, instanceName);
-          const currentSchema = terraformSchemaMap.get(id);
-          const content = (type: string) => {
-            return getContent(type, resource, resourceValue);
-          };
-          const mapObjectTypeList = currentSchema
-            ? preDefinedFileObjects(
-                resourceType,
-                currentSchema as JSONSchema7,
-                content(resourceType),
-                resourceName,
-                Object.keys(resourceValue as any)[0]
-              )
-            : [];
+    _.toPairs(fileObject.fileJson).forEach(([resourceType, resource]) => {
+      _.toPairs(resource as any).forEach(([resourceName, resourceValue]) => {
+        const instanceName = Object.keys(resourceValue as any)[0];
+        const id = getId(
+          resourceType as TerraformType,
+          resourceName,
+          instanceName
+        );
+        const currentSchema = terraformSchemaMap.get(id);
+        const content = (type: string) => {
+          return getContent(type as TerraformType, resource, resourceValue);
+        };
+        const mapObjectTypeList = currentSchema
+          ? preDefinedFileObjects(
+              resourceType,
+              currentSchema as JSONSchema7,
+              content(resourceType),
+              resourceName,
+              Object.keys(resourceValue as any)[0]
+            )
+          : [];
 
-          Object.values(mapObjectTypeList).forEach((value) => {
-            _.assign(mapObjectTypeCollection, value);
-          });
+        Object.values(mapObjectTypeList).forEach((value) => {
+          _.assign(mapObjectTypeCollection, value);
         });
-      }
-    );
+      });
+    });
   });
 
   return {

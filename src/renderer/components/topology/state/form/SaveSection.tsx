@@ -11,6 +11,7 @@ import {
   selectMapObjectTypeCollection,
 } from '@renderer/features/codeSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
+import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
 import {
   setFileObjects,
   setSelectedContent,
@@ -23,7 +24,6 @@ import {
   watchGraphData,
 } from '@renderer/features/graphSlice';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
-import { getObjectType } from './utils/getResourceInfo';
 
 const useStyles = makeStyles({
   root: {
@@ -60,15 +60,15 @@ const SaveSection = (props: SaveSectionProps) => {
     selectCodeSelectedObjectInfo
   );
 
-  const getPath = (type: string) => {
-    switch (getObjectType(type)) {
-      case 2: {
+  const getPath = (type: TerraformType) => {
+    switch (getObjectDataType[type]) {
+      case 'THREE_DEPTH_DATA_TYPE': {
         return `${type}.${resourceName}.${instanceName}`;
       }
-      case 1: {
+      case 'TWO_DEPTH_DATA_TYPE': {
         return `${type}.${instanceName}`;
       }
-      case 0: {
+      case 'ONE_DEPTH_DATA_TYPE': {
         return `${type}`;
       }
       default:
@@ -161,9 +161,9 @@ const SaveSection = (props: SaveSectionProps) => {
     dispatch(setSidePanel(false));
   };
 
-  const setFileObject = (type: string, fileObject: any) => {
-    switch (getObjectType(type)) {
-      case 2: {
+  const setFileObject = (type: TerraformType, fileObject: any) => {
+    switch (getObjectDataType[type]) {
+      case 'THREE_DEPTH_DATA_TYPE': {
         return {
           ...fileObject,
           fileJson: {
@@ -177,7 +177,7 @@ const SaveSection = (props: SaveSectionProps) => {
           },
         };
       }
-      case 1: {
+      case 'TWO_DEPTH_DATA_TYPE': {
         return {
           ...fileObject,
           fileJson: {
@@ -189,7 +189,7 @@ const SaveSection = (props: SaveSectionProps) => {
           },
         };
       }
-      case 0: {
+      case 'ONE_DEPTH_DATA_TYPE': {
         return {
           ...fileObject,
           fileJson: {

@@ -1,9 +1,10 @@
+import { TerraformType } from '@renderer/types/terraform';
 import { JSONSchema7 } from 'json-schema';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 
-interface ObjcectInfo {
-  type: string;
+export interface ObjcectInfo {
+  type: TerraformType;
   resourceName: string;
   instanceName: string;
   content: any;
@@ -19,7 +20,7 @@ const initialState: CodeSlice = {
   fileObjects: [],
   mapObjectTypeCollection: {},
   selectedObjectInfo: {
-    type: '',
+    type: '' as TerraformType,
     resourceName: '',
     instanceName: '',
     content: {},

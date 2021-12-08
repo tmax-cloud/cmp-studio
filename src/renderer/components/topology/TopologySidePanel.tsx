@@ -6,19 +6,23 @@ import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { selectCodeSelectedObjectInfo } from '@renderer/features/codeSliceInputSelectors';
 import { selectUiToggleSidePanel } from '@renderer/features/uiSliceInputSelectors';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import { getObjectDataType, getId } from '@renderer/types/terraform';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
 import FormHeader from './state/form/Header';
 import FormTabs from './state/StateTabs';
 import preDefinedData from './state/form/utils/preDefinedData';
-import { setSelectedSourceSchema } from '../../features/codeSlice';
+import { setSelectedSourceSchema, ObjcectInfo } from '../../features/codeSlice';
 import { TOPOLOGY_TOOLBAR_HEIGHT } from './toolbar/TopologyToolbar';
-import { getObjectType, getId } from './state/form/utils/getResourceInfo';
-
 export const SIDEPANEL_WIDTH = 500;
 // 저장 버튼 누르면 redux objects에 content 덮어씌우기나이ㅓㄻ
 const TopologySidePanel = () => {
-  const { type, resourceName, content, sourceSchema, instanceName } =
-    useSelector(selectCodeSelectedObjectInfo);
+  const {
+    type,
+    resourceName,
+    content,
+    sourceSchema,
+    instanceName,
+  }: ObjcectInfo = useSelector(selectCodeSelectedObjectInfo);
 
   const id = getId(type, resourceName, instanceName);
 
@@ -40,7 +44,7 @@ const TopologySidePanel = () => {
     [currentSchema, content, type]
   );
   const title = React.useMemo(() => {
-    if (getObjectType(type) === 0) {
+    if (getObjectDataType[type] === 'ONE_DEPTH_DATA_TYPE') {
       return type;
     } else {
       return instanceName;
