@@ -10,8 +10,14 @@ import {
   Typography,
   IconButton,
 } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 import WrapIfAdditional from './WrapIfAdditional';
+
+const useStyles = makeStyles({
+  flexDiv: { display: 'flex', alignItems: 'center' },
+  flexItem: { flexGrow: 9 },
+});
 
 export const FieldTemplate = (props: FieldTemplateProps) => {
   const {
@@ -33,6 +39,8 @@ export const FieldTemplate = (props: FieldTemplateProps) => {
     uiSchema,
   } = props;
   const firstChildProperty: string[] = [];
+
+  const { flexDiv, flexItem } = useStyles();
   if (hidden) {
     return children;
   }
@@ -66,8 +74,8 @@ export const FieldTemplate = (props: FieldTemplateProps) => {
       schema={schema}
     >
       <FormControl fullWidth error={!!rawErrors.length} required={required}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ flexGrow: 9 }}>
+        <div className={flexDiv}>
+          <div className={flexItem}>
             {children}
             {displayLabel && rawDescription ? (
               <Typography variant="caption" color="textSecondary">

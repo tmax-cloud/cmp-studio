@@ -11,6 +11,7 @@ import {
   InputLabel,
   TextField,
   FormControl,
+  Divider,
 } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import {
@@ -139,6 +140,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               추가
             </Button>
           </div>
+          <Divider />
           <div
             style={{
               display: 'flex',

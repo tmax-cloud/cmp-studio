@@ -48,7 +48,7 @@ const TextWidget = ({
   return (
     <TextField
       id={id}
-      sx={{ width: '250px' }}
+      sx={{ width: '100%' }}
       className={classes.root}
       label={label || schema.title}
       placeholder={placeholder}
