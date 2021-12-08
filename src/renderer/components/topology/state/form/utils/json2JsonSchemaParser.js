@@ -32,26 +32,60 @@ function parseJson(clouds) {
           schemaData.properties[k].type[0] === 'list' ||
           schemaData.properties[k].type[0] === 'set'
         ) {
-          if (Array.isArray(schemaData.properties[k].type[1])) {
-            typeof schemaData.properties[k].type[1][1] === 'object' &&
-              Object.keys(schemaData.properties[k].type[1][1]).forEach(
-                function (l) {
-                  // if (k === 'egress' && l === 'cidr_blocks') {
-                  //   console.log(schemaData.properties[k].type[1][1][l]);
-                  // }
-                  // if (Array.isArray(schemaData.properties[k].type[1][1][l])) {
-                  //   return buildSchema({
-                  //     properties: {
-                  //       ...schemaData.properties[k].type[1][1],
-                  //       [l]: { type: schemaData.properties[k].type[1][1][l] },
-                  //     },
-                  //   });
-                  // }
-                  schemaData.properties[k].type[1][1][l] = {
-                    type: schemaData.properties[k].type[1][1][l],
+          if (
+            Array.isArray(schemaData.properties[k].type[1]) &&
+            typeof schemaData.properties[k].type[1][1] === 'object'
+          ) {
+            Object.keys(schemaData.properties[k].type[1][1]).forEach(function (
+              l
+            ) {
+              if (schemaData.properties[k].type[1][1][l] === 'bool') {
+                schemaData.properties[k].type[1][1][l] = {
+                  type: 'boolean',
+                };
+              } else if (
+                typeof schemaData.properties[k].type[1][1][l] === 'object' &&
+                Array.isArray(schemaData.properties[k].type[1][1][l])
+              ) {
+                if (
+                  schemaData.properties[k].type[1][1][l][0] === 'list' ||
+                  schemaData.properties[k].type[1][1][l][0] === 'set'
+                ) {
+                  if (
+                    Array.isArray(schemaData.properties[k].type[1][1][l][1])
+                  ) {
+                    // 아직 object[] 에 object[] 가 있는 경우는 아직 못봄
+                    const currentObject = {};
+                    Object.keys(
+                      schemaData.properties[k].type[1][1][l][1][1]
+                    ).forEach((key) => {
+                      currentObject.properties = {
+                        ...currentObject.properties,
+                        [key]:
+                          schemaData.properties[k].type[1][1][l][1][1][key],
+                      };
+                    });
+                    schemaData.properties[k].items = currentObject;
+                  } else {
+                    const currentObject = {
+                      type: 'array',
+                      items: { type: 'string' },
+                    };
+                    schemaData.properties[k].type[1][1][l] = currentObject;
+                  }
+                } else if (schemaData.properties[k].type[1][1][l] === 'map') {
+                  const currentObject = {
+                    type: 'map',
+                    items: { type: 'string' },
                   };
+                  schemaData.properties[k].type[1][1][l] = currentObject;
                 }
-              );
+              } else {
+                schemaData.properties[k].type[1][1][l] = {
+                  type: schemaData.properties[k].type[1][1][l],
+                };
+              }
+            });
             schemaData.properties[k].items = {
               properties: schemaData.properties[k].type[1][1],
             };
