@@ -1,8 +1,11 @@
-import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
+import {
+  TerraformType,
+  getObjectDataType,
+  getId,
+} from '@renderer/types/terraform';
 import * as _ from 'lodash-es';
 import { JSONSchema7 } from 'json-schema';
 import { getSchemaMap } from '@renderer/utils/storageAPI';
-import { getObjectNameInfo, getId } from './getResourceInfo';
 import preDefinedFileObjects from './preDefinedFileObjects';
 
 const getContent = (type: TerraformType, object: any, resourceValue: any) => {
@@ -27,7 +30,7 @@ const parseToCustomizeKey = (fileObjects: any[]) => {
   fileObjects.forEach((fileObject: any) => {
     _.toPairs(fileObject.fileJson).forEach(([resourceType, resource]) => {
       _.toPairs(resource as any).forEach(([resourceName, resourceValue]) => {
-        const { instanceName } = getObjectNameInfo(resourceValue, resourceType);
+        const instanceName = Object.keys(resourceValue as any)[0];
         const id = getId(
           resourceType as TerraformType,
           resourceName,

@@ -22,7 +22,6 @@ import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelector
 import { setSidePanel } from '@renderer/features/uiSlice';
 import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
 import parseToCustomizeKey from './state/form/utils/parseToCustomizeKey';
-import { getObjectNameInfo } from './state/form/utils/getResourceInfo';
 
 import {
   openExistFolder,
@@ -201,7 +200,7 @@ const TopologySidebar = () => {
     objResult
       .filter((result) => {
         const { type, resourceName, ...object } = result;
-        const { instanceName } = getObjectNameInfo(object, type);
+        const instanceName = Object.keys(object)[0];
         return !!instanceName;
       })
       .map((result) => {

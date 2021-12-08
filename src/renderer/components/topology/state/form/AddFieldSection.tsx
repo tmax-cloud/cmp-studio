@@ -22,8 +22,8 @@ import { getSchemaMap } from '@renderer/utils/storageAPI';
 import { ArrowDropDown } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectCodeSelectedObjectInfo } from '@renderer/features/codeSliceInputSelectors';
+import { getId } from '@renderer/types/terraform';
 import { addSchemaBasedField, addCustomField } from './utils/addInputField';
-import { getId } from './utils/getResourceInfo';
 
 const useStyles: any = makeStyles((theme) =>
   createStyles({

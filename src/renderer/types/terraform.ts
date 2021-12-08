@@ -42,3 +42,14 @@ export const getObjectDataType = {
 
 export const isTerraformType = (type: string) =>
   !!TerraformTypes.find((t) => type === t);
+
+export const getId = (
+  type: TerraformType,
+  resourceName: string,
+  instanceName: string
+) => {
+  if (getObjectDataType[type] === 2) {
+    return type + '-' + instanceName;
+  }
+  return type + '-' + resourceName;
+};
