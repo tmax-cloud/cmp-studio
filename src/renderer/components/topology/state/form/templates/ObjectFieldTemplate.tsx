@@ -49,24 +49,14 @@ export const ObjectFieldTemplate = ({
           description={description}
         />
       )}
-      <Grid
-        container
-        spacing={2}
-        className={classes.root}
-        style={{ marginLeft: '10px' }}
-      >
+      <Grid container spacing={2} className={classes.root}>
         {properties.map((element, index) =>
           // Remove the <Grid> if the inner element is hidden as the <Grid>
           // itself would otherwise still take up space.
           element.hidden ? (
             element.content
           ) : (
-            <Grid
-              item
-              xs={12}
-              key={index}
-              style={{ marginBottom: '10px', marginRight: '36px' }}
-            >
+            <Grid item xs={12} key={index} style={{ marginBottom: '10px' }}>
               {element.content}
             </Grid>
           )

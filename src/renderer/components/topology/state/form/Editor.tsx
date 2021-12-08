@@ -64,6 +64,7 @@ const EditorTab = (props: EditorTabProps) => {
           height: '663px',
           overflowY: 'auto',
           overflowX: 'hidden',
+          marginBottom: '5px',
         }}
       >
         <DynamicForm
