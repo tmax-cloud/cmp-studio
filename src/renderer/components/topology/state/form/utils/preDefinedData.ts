@@ -14,6 +14,10 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
   const fixedSchema = {};
   const customUISchema = {};
 
+  if (jsonSchema) {
+    _.set(fixedSchema, 'required', jsonSchema.required);
+  }
+
   const makeFixedSchema = (
     obj: any,
     prevSchemaPath: string,
@@ -105,7 +109,6 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
         }
       } else if (_.get(jsonSchema, makeSchemaPath + '.type') === 'map') {
         // type이 map일 때
-        console.log(_.get(formData, makeObjPath));
         const result = !Array.isArray(_.get(formData, makeObjPath))
           ? _.entries(_.get(formData, makeObjPath)).map(([key, value]) => {
               return { [key]: value };
