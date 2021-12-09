@@ -194,6 +194,13 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
           }
         } else {
           makeCustomUISchema(obj[currKey], makeSchemaPath, makeUIPath);
+          Object.keys(
+            _.get(fixedSchema, makeSchemaPath + '.properties')
+          ).forEach((cur) => {
+            _.set(customUISchema, makeUIPath + `.${cur}`, {
+              [`ui:dependency`]: { path: makeUIPath, type: 'child' },
+            });
+          });
         }
       } else if (
         _.get(fixedSchema, makeSchemaPath) &&
