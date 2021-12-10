@@ -29,6 +29,7 @@ export enum DataDepthType {
   TWO_DEPTH_DATA_TYPE = 'TWO_DEPTH_DATA_TYPE',
   THREE_DEPTH_DATA_TYPE = 'THREE_DEPTH_DATA_TYPE',
 }
+
 export const getObjectDataType = {
   terraform: DataDepthType.ONE_DEPTH_DATA_TYPE,
   locals: DataDepthType.ONE_DEPTH_DATA_TYPE,

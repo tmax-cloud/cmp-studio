@@ -129,3 +129,30 @@ export interface WorkspaceMainServiceInterface {
   workspaceManagementService: WorkspaceManagementServiceInterface;
   workspacesHistoryService: WorkspacesHistoryServiceInterface;
 }
+
+export type TerraformType =
+  | 'data'
+  | 'locals'
+  | 'module'
+  | 'output'
+  | 'provider'
+  | 'resource'
+  | 'terraform'
+  | 'variable';
+
+export enum DataDepthType {
+  ONE_DEPTH_DATA_TYPE = 'ONE_DEPTH_DATA_TYPE',
+  TWO_DEPTH_DATA_TYPE = 'TWO_DEPTH_DATA_TYPE',
+  THREE_DEPTH_DATA_TYPE = 'THREE_DEPTH_DATA_TYPE',
+}
+
+export const getObjectDataType = {
+  terraform: DataDepthType.ONE_DEPTH_DATA_TYPE,
+  locals: DataDepthType.ONE_DEPTH_DATA_TYPE,
+  module: DataDepthType.TWO_DEPTH_DATA_TYPE,
+  provider: DataDepthType.TWO_DEPTH_DATA_TYPE,
+  variable: DataDepthType.TWO_DEPTH_DATA_TYPE,
+  output: DataDepthType.TWO_DEPTH_DATA_TYPE,
+  resource: DataDepthType.THREE_DEPTH_DATA_TYPE,
+  data: DataDepthType.THREE_DEPTH_DATA_TYPE,
+};
