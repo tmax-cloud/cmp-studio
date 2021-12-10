@@ -171,7 +171,8 @@ const SaveSection = (props: SaveSectionProps) => {
             [type]: {
               ...fileObject.fileJson[type],
               [resourceName]: {
-                [instanceName]: formState,
+                ...fileObject.fileJson[type][resourceName],
+                [instanceName]: !_.isEmpty(formState) ? formState : {},
               },
             },
           },
@@ -184,7 +185,7 @@ const SaveSection = (props: SaveSectionProps) => {
             ...fileObject.fileJson,
             [type]: {
               ...fileObject.fileJson[type],
-              [instanceName]: formState,
+              [instanceName]: !_.isEmpty(formState) ? formState : {},
             },
           },
         };
@@ -194,7 +195,7 @@ const SaveSection = (props: SaveSectionProps) => {
           ...fileObject,
           fileJson: {
             ...fileObject.fileJson,
-            [type]: formState,
+            [type]: !_.isEmpty(formState) ? formState : {},
           },
         };
       }
@@ -244,7 +245,7 @@ const SaveSection = (props: SaveSectionProps) => {
 
             // TemporaryDataPath에 변경사항 저장 (terraform plan 용도)
             const result = await exportProject({
-              objects: fileObjects,
+              objects: newFileObjects,
               workspaceUid,
               isAllSave: false,
               typeMap: mapObjectCollection,

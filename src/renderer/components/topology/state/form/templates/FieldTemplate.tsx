@@ -38,7 +38,6 @@ export const FieldTemplate = (props: FieldTemplateProps) => {
     schema,
     uiSchema,
   } = props;
-  const firstChildProperty: string[] = [];
 
   const { flexDiv, flexItem } = useStyles();
   if (hidden) {
@@ -48,17 +47,13 @@ export const FieldTemplate = (props: FieldTemplateProps) => {
   const isRemovableProperty = (label: string) => {
     if (
       !label ||
+      required ||
       ('ui:dependency' in uiSchema &&
         uiSchema['ui:dependency'].type === 'child')
     ) {
       return false;
     }
-    if (firstChildProperty.findIndex((property) => property === label) < 0) {
-      firstChildProperty.push(label);
-      return true;
-    } else {
-      return false;
-    }
+    return true;
   };
 
   return (

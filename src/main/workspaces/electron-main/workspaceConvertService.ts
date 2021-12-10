@@ -3,6 +3,7 @@ import path from 'path';
 import * as FileUtils from '../../base/common/fileUtils';
 import * as WorkspaceTypes from '../common/workspace';
 import { WorkspaceManagementService } from './workspaceManagementService';
+import { getObjectDataType, TerraformType } from '../common/workspace';
 const Converter = require('../../utils/hcljsonconverter');
 
 export class WorkspaceConvertService
@@ -55,23 +56,37 @@ export class WorkspaceConvertService
         targetPath = temporaryDataFolderUri + filePath.split(folderUri)[1];
         console.log('targetPath (temporary Data): ', targetPath);
       }
+      console.log('Is this file empty? => ', this.isFileObjectEmpty(fileJson));
+      if (!this.isFileObjectEmpty(fileJson)) {
+        const buf = Buffer.from(JSON.stringify(fileJson));
+        const result = Converter.JsonToHcl(buf, JSON.stringify(typeMap || {}));
+        const resultStr = Buffer.from(result).toString();
+        if (!fs.existsSync(FileUtils.getDirName(targetPath))) {
+          fs.mkdirSync(FileUtils.getDirName(targetPath), { recursive: true });
+        }
 
-      const buf = Buffer.from(JSON.stringify(fileJson));
-      const result = Converter.JsonToHcl(buf, JSON.stringify(typeMap || {}));
-      const resultStr = Buffer.from(result).toString();
-      if (!fs.existsSync(FileUtils.getDirName(targetPath))) {
-        fs.mkdirSync(FileUtils.getDirName(targetPath), { recursive: true });
-      }
-
-      if (fs.existsSync(targetPath)) {
-        // MEMO : 원본파일이 있는 경우 원본과 저장할 파일 내용 비교 후 합침
-        const originalTf = FileUtils.readFileString(targetPath);
-        const prettyNewTf = this.getPrettyString(resultStr);
-        const finalTf = Converter.HclToHcl(originalTf, prettyNewTf);
-        fs.writeFileSync(targetPath, finalTf);
+        if (fs.existsSync(targetPath)) {
+          // MEMO : 원본파일이 있는 경우 원본과 저장할 파일 내용 비교 후 합침
+          const originalTf = FileUtils.readFileString(targetPath);
+          const prettyNewTf = this.getPrettyString(resultStr);
+          const finalTf = Converter.HclToHcl(originalTf, prettyNewTf);
+          fs.writeFileSync(targetPath, finalTf);
+        } else {
+          // MEMO : 원본파일이 없는 경우 그냥 새 파일 생성
+          fs.writeFileSync(targetPath, this.getPrettyString(resultStr));
+        }
       } else {
-        // MEMO : 원본파일이 없는 경우 그냥 새 파일 생성
-        fs.writeFileSync(targetPath, this.getPrettyString(resultStr));
+        if (!fs.existsSync(FileUtils.getDirName(targetPath))) {
+          fs.mkdirSync(FileUtils.getDirName(targetPath), { recursive: true });
+        }
+
+        if (fs.existsSync(targetPath)) {
+          // MEMO : 원본파일이 있는 경우 원본과 저장할 파일 내용 비교 후 합침
+          fs.writeFileSync(targetPath, '');
+        } else {
+          // MEMO : 원본파일이 없는 경우 그냥 새 파일 생성
+          fs.writeFileSync(targetPath, this.getPrettyString(''));
+        }
       }
     });
     console.log('[INFO] File Export Finished.');
@@ -89,5 +104,55 @@ export class WorkspaceConvertService
         `
     `
       );
+  }
+
+  isFileObjectEmpty(fileObject: any): boolean {
+    let result = false;
+    Object.keys(fileObject).forEach((currObjectType) => {
+      switch (getObjectDataType[currObjectType as TerraformType]) {
+        case 'THREE_DEPTH_DATA_TYPE': {
+          Object.keys(fileObject[currObjectType]).forEach(
+            (currObjectResourceName) => {
+              Object.keys(
+                fileObject[currObjectType][currObjectResourceName]
+              ).forEach((currObjectInstanceName) => {
+                if (
+                  Object.keys(
+                    fileObject[currObjectType][currObjectResourceName][
+                      currObjectInstanceName
+                    ]
+                  ).length === 0
+                ) {
+                  result = true;
+                }
+              });
+            }
+          );
+          break;
+        }
+        case 'TWO_DEPTH_DATA_TYPE': {
+          Object.keys(fileObject[currObjectType]).forEach(
+            (currObjectInstanceName) => {
+              if (
+                Object.keys(fileObject[currObjectType][currObjectInstanceName])
+                  .length === 0
+              ) {
+                result = true;
+              }
+            }
+          );
+          break;
+        }
+        case 'ONE_DEPTH_DATA_TYPE': {
+          if (Object.keys(fileObject[currObjectType]).length === 0) {
+            console.log('great job!!');
+            result = true;
+          }
+          break;
+        }
+        default:
+      }
+    });
+    return result;
   }
 }
