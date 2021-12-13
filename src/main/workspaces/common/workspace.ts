@@ -15,11 +15,17 @@ export type WorkspaceGetProjectJsonArgs = {
   folderUri: string;
 };
 
+export type DeleteTypeInfo = {
+  filePath: string;
+  isFileDeleted: boolean;
+};
+
 export type WorkspaceExportProjectArgs = {
   objects: TerraformFileJsonMeta[];
   typeMap: any;
   workspaceUid: string;
   isAllSave: boolean;
+  deleteTypeInfo: DeleteTypeInfo;
 };
 
 export type WorkspaceSetConfigItemArgs = {
@@ -121,7 +127,8 @@ export interface WorkspaceConvertServiceInterface {
     objList: TerraformFileJsonMeta[],
     typeMap: any,
     workspaceUid: string,
-    isAllSave: boolean
+    isAllSave: boolean,
+    deleteTypeInfo: DeleteTypeInfo
   ): void;
 }
 
