@@ -238,6 +238,12 @@ export const getCodeInfo = (
       instanceName: node.instanceName,
       content: codeInfo,
     };
+  } else {
+    return {
+      type: '',
+      resourceName: '',
+      instanceName: '',
+      content: {},
+    };
   }
-  return codeInfo;
 };
