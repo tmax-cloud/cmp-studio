@@ -248,6 +248,8 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
   if (!_.isEmpty(formData)) {
     makeFixedSchema(formData, '', '');
     makeCustomUISchema(formData, '', '');
+  } else {
+    _.set(fixedSchema, 'properties', {});
   }
   return { customUISchema, formData, fixedSchema };
 };
