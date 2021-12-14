@@ -35,8 +35,7 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
         _.set(formData, makeObjPath, formValue);
       };
 
-      const fillSchemaByFormData = (obj: any) => {
-        const currentKey = makeObjPath;
+      const fillSchemaByFormData = (obj: any, currentKey: string) => {
         const currentValue = obj[currentKey];
         if (currentKey) {
           switch (typeof obj[currentKey]) {
@@ -51,13 +50,27 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
             // [TODO]: 사용자가 terraform schema에 없는 프로퍼티를 tf파일에 직접 정의할 경우에 대한 case 추가 필요
             // => cmp-studio에서는 map형식의 object만 추가하는 기능만 제공하긴 함.
             case 'object': {
-              if (isArray(currentValue)) {
-                setSchema({
-                  type: 'array',
-                  items: {
-                    type: 'string',
-                  },
-                });
+              if (Array.isArray(currentValue)) {
+                const obj = currentValue[0];
+                setSchema({ type: 'array' });
+                if (typeof obj === 'object') {
+                  if (!Array.isArray(obj)) {
+                    Object.keys(obj).forEach((objKey) => {
+                      makeFixedSchema(
+                        obj[objKey],
+                        makeSchemaPath + '.items.properties.' + objKey,
+                        ''
+                      );
+                    });
+                  }
+                } else {
+                  setSchema({
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                    },
+                  });
+                }
               } else {
                 const result = _.entries(_.get(formData, makeObjPath)).map(
                   ([key, value]) => {
@@ -84,7 +97,7 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
       };
       if (!_.get(jsonSchema, makeSchemaPath)) {
         // tf_schema에 정의되지 않은 프로퍼티
-        fillSchemaByFormData(obj);
+        fillSchemaByFormData(obj, makeObjPath);
       } else if (
         // type이 object인 경우 -> 재귀
         _.get(jsonSchema, makeSchemaPath) &&
@@ -235,5 +248,6 @@ type SchemaField = {
 };
 type SchemaType = {
   type: string;
+  properties?: any;
 };
 export default preDefinedData;
