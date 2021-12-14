@@ -49,10 +49,13 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
             // => cmp-studio에서는 map형식의 object만 추가하는 기능만 제공하긴 함.
             case 'object': {
               if (Array.isArray(currentValue)) {
+                // array
                 const currObj = currentValue[0];
                 setSchema({ type: 'array' });
                 if (typeof currObj === 'object') {
                   if (!Array.isArray(currObj)) {
+                    // array 안에 object
+                    // [TODO] array안에 array일 경우 아직 안함.
                     Object.keys(currObj).forEach((objKey) => {
                       makeFixedSchema(
                         currObj[objKey],
@@ -62,6 +65,7 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
                     });
                   }
                 } else {
+                  // array안에 string
                   setSchema({
                     type: 'array',
                     items: {
@@ -70,25 +74,23 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
                   });
                 }
               } else {
+                // object
                 Object.keys(currentValue).forEach((objKey) => {
-                  makeFixedSchema(
-                    currentValue[objKey],
-                    makeSchemaPath + '.properties.' + objKey,
-                    ''
-                  );
+                  //[TODO] object안에 array 아직 안함.
+                  if (typeof currentValue[objKey] === 'object') {
+                    makeFixedSchema(
+                      currentValue[objKey],
+                      makeSchemaPath + '.properties.' + objKey,
+                      ''
+                    );
+                  } else {
+                    _.set(
+                      fixedSchema,
+                      makeSchemaPath + '.properties.' + objKey,
+                      { type: 'string' }
+                    );
+                  }
                 });
-                // const result = _.entries(_.get(formData, makeObjPath)).map(
-                //   ([key, value]) => {
-                //     return { [key]: value };
-                //   }
-                // );
-                // setFormData(result);
-                // setSchema({
-                //   type: 'map',
-                //   items: {
-                //     type: 'string',
-                //   },
-                // });
               }
               break;
             }
