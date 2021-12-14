@@ -141,7 +141,6 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
   const folderUri = useWorkspaceUri(workspaceUid);
-  //const addedObjectJSON = { key1: 'value1' }; //temp
   const addedObjectJSON = {}; //temp
   const graphData = useAppSelector(selectGraphData);
   const accordions = [
@@ -155,7 +154,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
   return (
     <>
       {accordions.map((accordion) => (
-        <AccordionLayout key={accordion.id} defaultExpanded>
+        <AccordionLayout key={accordion.id}>
           <AccordionHeader
             expandIcon={<AccordionHeaderIcon fontSize="small" />}
             id={accordion.id}
@@ -196,8 +195,6 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                               filePath:
                                 `${folderUri}` +
                                 path.sep +
-                                `${item.resourceName}` +
-                                path.sep +
                                 `${newInstanceName}.tf`,
                               fileJson: {
                                 [item.resourceName]: {
@@ -229,8 +226,6 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                             {
                               filePath:
                                 `${folderUri}` +
-                                path.sep +
-                                `${item.type}` +
                                 path.sep +
                                 `${newInstanceName}.tf`,
                               fileJson: {
@@ -442,17 +437,20 @@ const TopologyLibrary = () => {
         >
           <MenuItem value="aws">AWS</MenuItem>
           <MenuItem value="tls">TLS</MenuItem>
+          {/*
           <MenuItem value="azure">Microsoft Azure</MenuItem>
           <MenuItem value="gcp">Google Cloud Platform</MenuItem>
           <MenuItem value="openstack">OpenStack</MenuItem>
           <MenuItem value="vmware">Vmware vSphere</MenuItem>
+          */}
         </Select>
         <div>
           <TextField
             value={searchText}
             placeholder="검색"
+            label="검색"
             onChange={searchTextChange}
-            style={{ marginTop: '10px' }}
+            style={{ marginTop: '10px', marginBottom: '10px' }}
             fullWidth
           />
           <Delete
@@ -489,103 +487,15 @@ const TopologyLibrary = () => {
         )}
         {/* 테스트용 Object 표시 */}
         {/* 테스트 코드 주석 처리
-        <InputLabel>------</InputLabel>
-        <InputLabel>Object 표시 - 임시</InputLabel>
-        <ShowItemList items={itemsList} title="Object" />
         <Button onClick={handleModuleListModalOpen} value="test1">
           Modal Test
         </Button>
-        <Button onClick={() => dispatch(setFileObjects([]))} value="test2">
-          Delete Object for Test
-        </Button>
-        <Button
-          onClick={() =>
-            dispatch(
-              setFileObjects([
-                {
-                  filePath:
-                    'C:\\Users\\ParkHyowook\\Documents\\CMPStudioProjects\\tf-init-test\\test.tf',
-                  fileJson: {
-                    module: {
-                      'aws-network-configs': {
-                        source: './network-configs',
-                      },
-                    },
-                    provider: {
-                      aws: {
-                        region: 'test-region',
-                      },
-                    },
-                  },
-                },
-                {
-                  filePath:
-                    'C:\\Users\\ParkHyowook\\Documents\\CMPStudioProjects\\tf-init-test\\a.tf',
-                  fileJson: {
-                    resource: {
-                      aws_instance: {
-                        'ubuntu-ssh-server': {
-                          ami: 'ami-0b9064170e32bde34',
-                          associate_public_ip_address: true,
-                          count: 1,
-                          instance_type: 't2.micro',
-                          key_name: '{var.key_pair}',
-                          subnet_id:
-                            '{module.aws-network-configs.test-subnet-a-id}',
-                          tags: { Naem: 'test-instance' },
-                          vpc_security_group_ids: [
-                            '{module.aws-network-configs.test-sg-id}',
-                          ],
-                        },
-                      },
-                    },
-                    variable: {
-                      key_pair: {
-                        default: 'aws-key',
-                      },
-                    },
-                  },
-                },
-                {
-                  filePath:
-                    'C:\\Users\\ParkHyowook\\Documents\\CMPStudioProjects\\tf-init-test\\b.tf',
-                  fileJson: {
-                    resource: {
-                      aws_key_pair: {
-                        'terraform-key': {
-                          key_name: 'aws-key',
-                          public_key:
-                            '{tls_private_key.example.public_key_openssh}',
-                        },
-                      },
-                      tls_private_key: {
-                        example: {
-                          algorithm: 'RSA',
-                          provisioner: {
-                            'local-exec': {
-                              command:
-                                "echo '@@@{self.private_key_pem}@@@' > ./aws-key.pem",
-                            },
-                            rsa_bits: 4096,
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              ])
-            )
-          }
-          value="test3"
-        >
-          Set Object for Test
-        </Button>
-        */}
         <ModuleImportModal
           isOpen={openModuleListModal}
           onClose={handleModuleListModalClose}
           moduleName={importModule}
         />
+        */}
       </Box>
     </>
   );
