@@ -29,6 +29,7 @@ const initialState: GraphState = {
   loadingMsg: null,
 };
 
+// 테라폼 데이터를 가공한 그래프 데이터 가져오기
 export const fetchGraphDataByTerraform = createAsyncThunk(
   'graph/fetchGraphDataByTerraform',
   async (rawData: string, { dispatch, rejectWithValue }) => {
@@ -43,6 +44,7 @@ export const fetchGraphDataByTerraform = createAsyncThunk(
   }
 );
 
+// 테라폼 데이터 및 가공한 그래프 데이터 가져오기
 export const fetchGraphDataByWorkspaceId = createAsyncThunk(
   'graph/fetchGraphDataByWorkspaceId',
   async (workspaceUid: string, { dispatch, rejectWithValue }) => {
@@ -58,6 +60,7 @@ export const fetchGraphDataByWorkspaceId = createAsyncThunk(
   }
 );
 
+// 이전 테라폼 데이터와 비교하여, 다를 경우 그래프 데이터 가져오기
 export const watchGraphData = createAsyncThunk(
   'graph/watchGraphData',
   async (workspaceUid: string, { getState, dispatch, rejectWithValue }) => {
@@ -94,11 +97,11 @@ const graphSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // watchGraphData
+    // watchGraphData: 에러 상황에 대해서만 처리
     builder.addCase(watchGraphData.rejected, (state, { payload }) => {
       state.errorMsg = payload as string;
     });
-    // fetchGraphDataByWorkspaceId
+    // fetchGraphDataByWorkspaceId: 테라폼 데이터 가져오기 및 로딩 메시지 처리
     builder.addCase(
       fetchGraphDataByWorkspaceId.pending,
       (state, { payload }) => {
@@ -122,7 +125,7 @@ const graphSlice = createSlice({
         state.errorMsg = payload as string;
       }
     );
-    // fetchGraphDataByTerraform
+    // fetchGraphDataByTerraform: 가공한 그래프 데이터 가져오기 및 selected data 처리
     builder.addCase(
       fetchGraphDataByTerraform.fulfilled,
       (state, { payload }) => {
