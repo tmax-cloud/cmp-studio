@@ -6,23 +6,10 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
   Typography,
-  Divider,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useAppDispatch, useAppSelector } from '@renderer/app/store';
-import { setSelectedObjectInfo } from '@renderer/features/codeSlice';
-import { setSidePanel } from '@renderer/features/uiSlice';
-import { setSelectedNode } from '@renderer/features/graphSlice';
-import { selectSelectedData } from '@renderer/features/graphSliceInputSelectors';
-import { getIcon } from '@renderer/components/topology/icon/IconFactory';
-import { NodeData } from '@renderer/types/graph';
-import { getIconColor } from '@renderer/utils/graph/draw';
-import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
+import TopologyObjectTable, { Data } from './TopologyObjectTable';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
   backgroundColor: theme.palette.object.accordion,
@@ -63,95 +50,8 @@ const AccordionHeaderDesc = styled(Typography)(({ theme }) => ({
   alignItems: 'center',
 }));
 
-const ListItemTypeText = styled(Typography)(({ theme }) => ({
-  color: theme.palette.object.accordionHeader.secondary,
-  fontSize: '0.625rem',
-  wordBreak: 'break-word',
-}));
-
-const ListItemNameText = styled(Typography)(({ theme }) => ({
-  color: theme.palette.object.accordionHeader.primary,
-  fontSize: '0.875rem',
-  wordBreak: 'break-word',
-}));
-
-const isVar = (type: string) => type === 'output' || type === 'variable';
-
-const ListItemColorLabel = (props: ItemColorLabelProps) => {
-  const { type } = props;
-  return !isVar(type) ? (
-    <Divider
-      orientation="vertical"
-      flexItem
-      sx={{
-        marginRight: 2,
-        borderWidth: 2,
-        borderColor: getIconColor(type, 1),
-      }}
-    />
-  ) : (
-    <></>
-  );
-};
-
-const getItemInfo = (item: Item) => {
-  const { type, resourceName, instanceName } = item;
-  const itemType =
-    getObjectDataType[type] === 'THREE_DEPTH_DATA_TYPE' ? resourceName : type;
-  const itemIcon =
-    getObjectDataType[type] === 'THREE_DEPTH_DATA_TYPE'
-      ? resourceName
-      : instanceName;
-  return {
-    itemType,
-    itemIcon,
-  };
-};
-
-const filterObjList = (
-  type: TerraformType,
-  item: Item,
-  resourceName: string,
-  instanceName: string
-) => {
-  switch (getObjectDataType[type]) {
-    case 'ONE_DEPTH_DATA_TYPE': {
-      return item.type === type;
-    }
-    case 'TWO_DEPTH_DATA_TYPE': {
-      return item.instanceName === instanceName;
-    }
-    case 'THREE_DEPTH_DATA_TYPE': {
-      return (
-        item.instanceName === instanceName && item.resourceName === resourceName
-      );
-    }
-    default:
-      return false;
-  }
-};
-
-const getObject = (type: TerraformType, obj: any, instanceName: string) => {
-  switch (getObjectDataType[type]) {
-    case 'ONE_DEPTH_DATA_TYPE': {
-      return obj[type];
-    }
-    case 'TWO_DEPTH_DATA_TYPE': {
-      return obj[instanceName];
-    }
-    case 'THREE_DEPTH_DATA_TYPE': {
-      return obj[instanceName];
-    }
-    default:
-      return {};
-  }
-};
-
 const TopologyObject = (props: TopologyObjectProps) => {
   const { items, objResult } = props;
-
-  const dispatch = useAppDispatch();
-  const graphData = useAppSelector(selectSelectedData);
 
   const accordions = [
     {
@@ -170,39 +70,6 @@ const TopologyObject = (props: TopologyObjectProps) => {
     },
   ];
 
-  const handleClick = (
-    event: React.MouseEvent<any>,
-    objResult: any[],
-    item: Item
-  ) => {
-    const selectedObj = objResult.filter((cur: any) => {
-      const { type, resourceName, instanceName } = cur;
-      return filterObjList(type, item, resourceName, instanceName);
-    })[0];
-
-    const { type, resourceName, instanceName, ...obj } = selectedObj;
-
-    // 그래프 연동
-    const node = (graphData.nodes as NodeData[]).find((node) => {
-      const { type, resourceName, instanceName } = node;
-      const isEqual = resourceName ? resourceName === item.resourceName : true;
-      return (
-        type === item.type && instanceName === item.instanceName && isEqual
-      );
-    });
-    node ? dispatch(setSelectedNode(node)) : dispatch(setSelectedNode(null));
-
-    // 폼 에디터 연동
-    const object = {
-      type,
-      resourceName,
-      instanceName,
-      content: getObject(type, obj, instanceName),
-    };
-    dispatch(setSelectedObjectInfo(object));
-    dispatch(setSidePanel(true));
-  };
-
   return (
     <Box>
       {accordions.map((accordion) => (
@@ -218,30 +85,10 @@ const TopologyObject = (props: TopologyObjectProps) => {
             </Box>
           </AccordionHeader>
           <AccordionDetails sx={{ backgroundColor: 'white', padding: 0 }}>
-            <List>
-              {accordion.content.map((item, index) => {
-                const { itemType, itemIcon } = getItemInfo(item);
-                return (
-                  <ListItem disablePadding key={`item-${index}`}>
-                    <ListItemButton
-                      onClick={(event) => handleClick(event, objResult, item)}
-                      sx={{ paddingLeft: isVar(item.type) ? '16px' : 0 }}
-                    >
-                      <ListItemColorLabel type={item.type as TerraformType} />
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        {getIcon(itemIcon, 24)}
-                      </ListItemIcon>
-                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <ListItemTypeText>
-                          {itemType.toUpperCase()}
-                        </ListItemTypeText>
-                        <ListItemNameText>{item.instanceName}</ListItemNameText>
-                      </Box>
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })}
-            </List>
+            <TopologyObjectTable
+              rows={accordion.content}
+              objResult={objResult}
+            />
           </AccordionDetails>
         </AccordionLayout>
       ))}
@@ -249,22 +96,8 @@ const TopologyObject = (props: TopologyObjectProps) => {
   );
 };
 
-export interface AccordionContentProps {
-  children: React.ReactElement;
-}
-
-export interface ItemColorLabelProps {
-  type: TerraformType;
-}
-
-export interface Item {
-  resourceName: string;
-  instanceName: string;
-  type: TerraformType;
-}
-
-export interface TopologyObjectProps {
-  items: Item[];
+interface TopologyObjectProps {
+  items: Data[];
   objResult: any[];
 }
 
