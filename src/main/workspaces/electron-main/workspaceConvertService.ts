@@ -103,7 +103,7 @@ export class WorkspaceConvertService
           console.log('originalTf', originalTf);
           console.log('prettyNewTf', prettyNewTf);
           console.log('finalTf', finalTf);
-          fs.writeFileSync(targetPath, finalTf);
+          fs.writeFileSync(targetPath, prettyNewTf);
         } else {
           // MEMO : 원본파일이 없는 경우 그냥 새 파일 생성
           fs.writeFileSync(targetPath, this.getPrettyString(resultStr));
