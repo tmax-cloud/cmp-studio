@@ -19,6 +19,7 @@ export function makeDir(dirPath: string) {
 }
 
 export function copyDir(source: string, destination: string) {
+  fs.rmdirSync(destination, { recursive: true });
   fs.mkdirSync(destination, { recursive: true });
 
   fs.readdirSync(source, { withFileTypes: true }).forEach((entry) => {
