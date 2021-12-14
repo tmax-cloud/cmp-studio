@@ -87,8 +87,10 @@ export class WorkspaceConvertService
         console.log('buf#####:', buf);
         const result = Converter.JsonToHcl(buf, JSON.stringify(typeMap || {}));
         console.log('result %%%%:', result);
-        const resultStr = Buffer.from(result).toString();
-        console.log('resultStr: ', resultStr);
+        const resultStr = unescape(
+          Buffer.from(result).toString().replaceAll('\\', '%')
+        );
+        console.log('resultStr3: ', resultStr);
         if (!fs.existsSync(FileUtils.getDirName(targetPath))) {
           fs.mkdirSync(FileUtils.getDirName(targetPath), { recursive: true });
         }
