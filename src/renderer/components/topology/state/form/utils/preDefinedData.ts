@@ -51,13 +51,13 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
             // => cmp-studio에서는 map형식의 object만 추가하는 기능만 제공하긴 함.
             case 'object': {
               if (Array.isArray(currentValue)) {
-                const obj = currentValue[0];
+                const currObj = currentValue[0];
                 setSchema({ type: 'array' });
-                if (typeof obj === 'object') {
-                  if (!Array.isArray(obj)) {
-                    Object.keys(obj).forEach((objKey) => {
+                if (typeof currObj === 'object') {
+                  if (!Array.isArray(currObj)) {
+                    Object.keys(currObj).forEach((objKey) => {
                       makeFixedSchema(
-                        obj[objKey],
+                        currObj[objKey],
                         makeSchemaPath + '.items.properties.' + objKey,
                         ''
                       );
@@ -72,18 +72,25 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
                   });
                 }
               } else {
-                const result = _.entries(_.get(formData, makeObjPath)).map(
-                  ([key, value]) => {
-                    return { [key]: value };
-                  }
-                );
-                setFormData(result);
-                setSchema({
-                  type: 'map',
-                  items: {
-                    type: 'string',
-                  },
+                Object.keys(currentValue).forEach((objKey) => {
+                  makeFixedSchema(
+                    currentValue[objKey],
+                    makeSchemaPath + '.properties.' + objKey,
+                    ''
+                  );
                 });
+                // const result = _.entries(_.get(formData, makeObjPath)).map(
+                //   ([key, value]) => {
+                //     return { [key]: value };
+                //   }
+                // );
+                // setFormData(result);
+                // setSchema({
+                //   type: 'map',
+                //   items: {
+                //     type: 'string',
+                //   },
+                // });
               }
               break;
             }
@@ -191,7 +198,10 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
           _.get(jsonSchema, makeSchemaPath + '.items.properties'))
       ) {
         _.set(customUISchema, makeUIPath, {
-          [`ui:dependency`]: { path: makeUIPath, type: 'parent' },
+          [`ui:dependency`]: {
+            path: makeUIPath,
+            type: !!prevUISchemaPath ? 'child' : 'parent',
+          },
         });
         if (Array.isArray(obj[currKey])) {
           Object.keys(
@@ -210,13 +220,6 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
           }
         } else {
           makeCustomUISchema(obj[currKey], makeSchemaPath, makeUIPath);
-          Object.keys(
-            _.get(fixedSchema, makeSchemaPath + '.properties')
-          ).forEach((cur) => {
-            _.set(customUISchema, makeUIPath + `.${cur}`, {
-              [`ui:dependency`]: { path: makeUIPath, type: 'child' },
-            });
-          });
         }
       } else if (
         _.get(fixedSchema, makeSchemaPath) &&
@@ -224,6 +227,13 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
       ) {
         _.set(customUISchema, makeUIPath, {
           [`ui:field`]: 'MapField',
+        });
+      } else {
+        _.set(customUISchema, makeUIPath, {
+          [`ui:dependency`]: {
+            path: makeUIPath,
+            type: prevUISchemaPath ? 'child' : 'parent',
+          },
         });
       }
 

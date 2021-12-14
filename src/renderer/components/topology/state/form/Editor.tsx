@@ -15,11 +15,24 @@ const EditorTab = (props: EditorTabProps) => {
   }, [formData]);
 
   const validateFormData = (obj: any) => {
-    const target = Object.keys(
+    let target = Object.keys(
       _.pickBy(obj, (cur) => typeof cur === 'object' && _.isEmpty(cur))
     )[0];
+    Object.keys(obj).forEach((currObjKey) => {
+      if (typeof obj[currObjKey] === 'object') {
+        if (
+          !_.isEmpty(obj[currObjKey]) &&
+          Object.values(obj[currObjKey]).filter((cur) => !_.isEmpty(cur))
+            .length === 0
+        ) {
+          target = currObjKey;
+          return _.omit(obj, [`${currObjKey}`]);
+        }
+      }
+    });
     if (uiSchema[target]?.['ui:dependency'].type === 'parent') {
-      return _.omitBy(obj, (cur) => typeof cur === 'object' && _.isEmpty(cur));
+      return _.omitBy(obj, (cur) => typeof cur === 'object');
+      // && _.isEmpty(cur));
     }
     return obj;
   };
