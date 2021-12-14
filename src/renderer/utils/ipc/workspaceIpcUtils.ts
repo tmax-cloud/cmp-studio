@@ -40,6 +40,7 @@ export const exportProject = (args: {
   typeMap: any;
   workspaceUid: string;
   isAllSave: boolean;
+  deleteTypeInfo: WorkspaceTypes.DeleteTypeInfo;
 }) => window.electron.ipcRenderer.invoke('studio:exportProject', args);
 
 export const setWorkspaceConfigItem = (

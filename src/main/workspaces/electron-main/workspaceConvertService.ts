@@ -3,7 +3,11 @@ import path from 'path';
 import * as FileUtils from '../../base/common/fileUtils';
 import * as WorkspaceTypes from '../common/workspace';
 import { WorkspaceManagementService } from './workspaceManagementService';
-import { getObjectDataType, TerraformType } from '../common/workspace';
+import {
+  getObjectDataType,
+  TerraformType,
+  DeleteTypeInfo,
+} from '../common/workspace';
 const Converter = require('../../utils/hcljsonconverter');
 
 export class WorkspaceConvertService
@@ -38,7 +42,8 @@ export class WorkspaceConvertService
     objList: WorkspaceTypes.TerraformFileJsonMeta[],
     typeMap: any,
     workspaceUid: string,
-    isAllSave: boolean
+    isAllSave: boolean,
+    deleteTypeInfo: DeleteTypeInfo
   ) {
     const workspaceManagementService = new WorkspaceManagementService();
     const folderUri = workspaceManagementService.getFolderUriByWorkspaceId(
@@ -47,20 +52,43 @@ export class WorkspaceConvertService
     const temporaryDataFolderUri =
       workspaceManagementService.getWorkspaceTemporaryFolderPath(workspaceUid);
 
+    const getExactFolderUri = (filePath: string) => {
+      if (!isAllSave) {
+        return temporaryDataFolderUri + filePath.split(folderUri)[1];
+      }
+      return filePath;
+    };
+
+    if (deleteTypeInfo.isFileDeleted) {
+      const targetPath = getExactFolderUri(deleteTypeInfo.filePath);
+      fs.unlinkSync(targetPath);
+      return;
+    }
+
     objList.forEach((obj) => {
       const { fileJson, filePath } = obj;
+      console.log('obj: ************', obj);
 
       // 임시저장 path or 전체 저장 path
-      let targetPath = filePath;
-      if (!isAllSave) {
-        targetPath = temporaryDataFolderUri + filePath.split(folderUri)[1];
-        console.log('targetPath (temporary Data): ', targetPath);
-      }
+      const targetPath = getExactFolderUri(filePath);
       console.log('Is this file empty? => ', this.isFileObjectEmpty(fileJson));
+      console.log('fileJson => ', fileJson);
+
+      // function replacer(key: string, value: any): any {
+      //   if (typeof value === 'object' && Object.keys(value).length === 0) {
+      //     return '{}';
+      //   }
+      //   return value;
+      // }
+
       if (!this.isFileObjectEmpty(fileJson)) {
+        console.log('buff: ', JSON.stringify(fileJson));
         const buf = Buffer.from(JSON.stringify(fileJson));
+        console.log('buf#####:', buf);
         const result = Converter.JsonToHcl(buf, JSON.stringify(typeMap || {}));
+        console.log('result %%%%:', result);
         const resultStr = Buffer.from(result).toString();
+        console.log('resultStr: ', resultStr);
         if (!fs.existsSync(FileUtils.getDirName(targetPath))) {
           fs.mkdirSync(FileUtils.getDirName(targetPath), { recursive: true });
         }
@@ -70,12 +98,16 @@ export class WorkspaceConvertService
           const originalTf = FileUtils.readFileString(targetPath);
           const prettyNewTf = this.getPrettyString(resultStr);
           const finalTf = Converter.HclToHcl(originalTf, prettyNewTf);
+          console.log('originalTf', originalTf);
+          console.log('prettyNewTf', prettyNewTf);
+          console.log('finalTf', finalTf);
           fs.writeFileSync(targetPath, finalTf);
         } else {
           // MEMO : 원본파일이 없는 경우 그냥 새 파일 생성
           fs.writeFileSync(targetPath, this.getPrettyString(resultStr));
         }
       } else {
+        console.log('error');
         if (!fs.existsSync(FileUtils.getDirName(targetPath))) {
           fs.mkdirSync(FileUtils.getDirName(targetPath), { recursive: true });
         }
@@ -107,7 +139,7 @@ export class WorkspaceConvertService
   }
 
   isFileObjectEmpty(fileObject: any): boolean {
-    let result = false;
+    let result = true;
     Object.keys(fileObject).forEach((currObjectType) => {
       switch (getObjectDataType[currObjectType as TerraformType]) {
         case 'THREE_DEPTH_DATA_TYPE': {
@@ -117,13 +149,14 @@ export class WorkspaceConvertService
                 fileObject[currObjectType][currObjectResourceName]
               ).forEach((currObjectInstanceName) => {
                 if (
+                  result &&
                   Object.keys(
                     fileObject[currObjectType][currObjectResourceName][
                       currObjectInstanceName
                     ]
-                  ).length === 0
+                  ).length > 0
                 ) {
-                  result = true;
+                  result = false;
                 }
               });
             }
@@ -134,19 +167,20 @@ export class WorkspaceConvertService
           Object.keys(fileObject[currObjectType]).forEach(
             (currObjectInstanceName) => {
               if (
+                result &&
                 Object.keys(fileObject[currObjectType][currObjectInstanceName])
-                  .length === 0
+                  .length > 0
               ) {
-                result = true;
+                result = false;
               }
             }
           );
           break;
         }
         case 'ONE_DEPTH_DATA_TYPE': {
-          if (Object.keys(fileObject[currObjectType]).length === 0) {
+          if (result && Object.keys(fileObject[currObjectType]).length > 0) {
             console.log('great job!!');
-            result = true;
+            result = false;
           }
           break;
         }

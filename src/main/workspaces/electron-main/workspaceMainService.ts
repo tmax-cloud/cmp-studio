@@ -286,13 +286,15 @@ export class WorkspaceMainService
         event,
         arg: WorkspaceTypes.WorkspaceExportProjectArgs
       ): WorkspaceTypes.WorkspaceResponse => {
-        const { objects, typeMap, workspaceUid, isAllSave } = arg;
+        const { objects, typeMap, workspaceUid, isAllSave, deleteTypeInfo } =
+          arg;
         try {
           this.workspaceConvertService.convertAllJsonToHcl(
             objects,
             typeMap,
             workspaceUid,
-            isAllSave
+            isAllSave,
+            deleteTypeInfo
           );
           return {
             status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,

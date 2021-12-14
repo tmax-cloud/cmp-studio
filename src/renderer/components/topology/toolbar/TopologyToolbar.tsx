@@ -48,6 +48,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
       workspaceUid,
       isAllSave: true,
       typeMap: mapObjectCollection,
+      deleteTypeInfo: { isFileDeleted: false, filePath: '' },
     });
     if (result.status === WorkspaceStatusType.SUCCESS) {
       dispatch(setFileDirty(false));

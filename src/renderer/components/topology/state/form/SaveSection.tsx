@@ -80,6 +80,7 @@ const SaveSection = (props: SaveSectionProps) => {
 
   const dispatch = useAppDispatch();
   const onDeleteObject = async () => {
+    let isFileDeleted = false;
     const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
       if (_.get(cur.fileJson, path as string)) {
         return true;
@@ -87,58 +88,82 @@ const SaveSection = (props: SaveSectionProps) => {
         return false;
       }
     });
-    const newFileObjects = fileObjects.map((cur: any, idx: number) => {
+    const { filePath } = fileObjects[fileIdx];
+    const newFileObjects = fileObjects.map((fileObject: any, idx: number) => {
       if (idx === fileIdx) {
-        if (_.size(cur.fileJson) > 1) {
-          // 동일한 파일에 데이터가 여러개인 경우
-          if (_.size(cur.fileJson[type]) > 1) {
+        if (_.size(fileObject.fileJson) > 1) {
+          // 동일한 파일에 타입이 여러개인 경우
+          if (_.size(fileObject.fileJson[type]) > 1) {
             // 동일한 타입의 데이터가 여러개인 경우
             if (resourceName) {
               // resourceName이 있는 경우
-              if (_.size(cur.fileJson[type][resourceName]) > 1) {
+              // 동일한 타입의 리소스이름이 여러개인 경우
+              if (_.size(fileObject.fileJson[type][resourceName]) > 1) {
                 // 동일한 리소스이름의 인스턴스가 여러개인 경우
-                return _.omit(cur, [
+                return _.omit(fileObject, [
                   `fileJson.${type}.${resourceName}.${instanceName}`,
                 ]);
               }
-              // 동일한 리소스이름의 인스턴스가 하나인 경우
-              return _.omit(cur, [`fileJson.${type}.${resourceName}`]);
-            } else {
-              // resourceName이 없는 경우
-              if (instanceName) {
-                return _.omit(cur, [`fileJson.${type}.${instanceName}`]);
-              }
-              return _.omit(cur, [`fileJson.${type}`]);
+            }
+            // resourceName이 없고 instanceName만 있는 경우
+            if (_.size(fileObject.fileJson[type][instanceName]) > 1) {
+              // 동일한 타입의 instanceName이 여러개인 경우
+              return _.omit(fileObject, [`fileJson.${type}.${instanceName}`]);
             }
           }
           // 동일한 타입의 데이터가 하나인 경우
-          return _.omit(cur, [`fileJson.${type}`]);
+          else if (resourceName) {
+            // 리소스 이름이 있을 경우
+            if (_.size(fileObject.fileJson[type][resourceName]) > 1) {
+              // 해당 리소스이름인 인스턴스가 여러개인 경우
+              return _.omit(fileObject, [
+                `fileJson.${type}.${resourceName}.${instanceName}`,
+              ]);
+            }
+          } else if (
+            instanceName &&
+            _.size(fileObject.fileJson[type][instanceName]) > 1
+          ) {
+            // 동일한 타입의 instanceName이 여러개인 경우
+            return _.omit(fileObject, [`fileJson.${type}.${instanceName}`]);
+          }
+          return _.omit(fileObject, [`fileJson.${type}`]);
         } else {
-          // 동일한 파일에 데이터가 하나인 경우
-          if (_.size(cur.fileJson[type]) > 1) {
+          // 동일한 파일에 타입이 하나인 경우
+          if (_.size(fileObject.fileJson[type]) > 1) {
             // 동일한 타입의 데이터가 여러개인 경우
             if (resourceName) {
               // resourceName이 있는 경우
-              if (_.size(cur.fileJson[type][resourceName]) > 1) {
+              if (_.size(fileObject.fileJson[type][resourceName]) > 1) {
                 // 동일한 리소스이름의 인스턴스가 여러개인 경우
-                return _.omit(cur, [
+                return _.omit(fileObject, [
                   `fileJson.${type}.${resourceName}.${instanceName}`,
                 ]);
               }
               // 동일한 리소스이름의 인스턴스가 하나인 경우
-              return _.omit(cur, [`fileJson.${type}.${resourceName}`]);
-            } else {
-              // resourceName이 없는 경우
-              if (instanceName) {
-                return _.omit(cur, [`fileJson.${type}.${instanceName}`]);
-              }
-              return _.omit(cur, [`fileJson.${type}`]);
+              return _.omit(fileObject, [`fileJson.${type}.${resourceName}`]);
+            } else if (
+              instanceName &&
+              _.size(fileObject.fileJson[type][instanceName]) > 1
+            ) {
+              // resourceName이 없는 경우 (terraform이나 locals는 단일 type으로서 존재할 수 밖에 없는 것 - 아니면 수정 필요)
+              return _.omit(fileObject, [`fileJson.${type}.${instanceName}`]);
             }
           }
-          return null;
+          //동일한 타입의 데이터가 하나인 경우
+          if (resourceName) {
+            if (_.size(fileObject.fileJson[type][resourceName]) > 1) {
+              // 동일한 리소스이름의 인스턴스가 여러개인 경우
+              return _.omit(fileObject, [
+                `fileJson.${type}.${resourceName}.${instanceName}`,
+              ]);
+            }
+          }
         }
+        isFileDeleted = true;
+        return _.omit(fileObject, [`fileJson`]);
       }
-      return cur;
+      return fileObject;
     });
 
     dispatch(
@@ -153,6 +178,7 @@ const SaveSection = (props: SaveSectionProps) => {
       workspaceUid,
       isAllSave: false,
       typeMap: mapObjectCollection,
+      deleteTypeInfo: { isFileDeleted, filePath },
     });
     if (result.status === WorkspaceStatusType.SUCCESS) {
       dispatch(setFileDirty(true));
@@ -249,6 +275,7 @@ const SaveSection = (props: SaveSectionProps) => {
               workspaceUid,
               isAllSave: false,
               typeMap: mapObjectCollection,
+              deleteTypeInfo: { isFileDeleted: false, filePath: '' },
             });
             if (result.status === WorkspaceStatusType.SUCCESS) {
               dispatch(setFileDirty(true));
