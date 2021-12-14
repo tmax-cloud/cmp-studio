@@ -16,7 +16,11 @@ import WrapIfAdditional from './WrapIfAdditional';
 
 const useStyles = makeStyles({
   flexDiv: { display: 'flex', alignItems: 'center' },
-  flexItem: { flexGrow: 9 },
+  flexItem: {
+    flexGrow: 9,
+    marginLeft: (props: FieldTemplateProps) =>
+      props?.uiSchema?.['ui:dependency']?.type === 'child' ? '16px' : '0px',
+  },
 });
 
 export const FieldTemplate = (props: FieldTemplateProps) => {
@@ -39,7 +43,7 @@ export const FieldTemplate = (props: FieldTemplateProps) => {
     uiSchema,
   } = props;
 
-  const { flexDiv, flexItem } = useStyles();
+  const { flexDiv, flexItem } = useStyles(props);
   if (hidden) {
     return children;
   }
