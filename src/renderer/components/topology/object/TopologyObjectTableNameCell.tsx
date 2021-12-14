@@ -126,13 +126,6 @@ const TopologyObjectTableNameCell = (props: NameCellProps) => {
       dispatch(setSelectedObjectInfo(object));
       dispatch(setSidePanel(true));
     } else {
-      const object = {
-        type: '' as TerraformType,
-        resourceName: '',
-        instanceName: '',
-        content: {},
-      };
-      dispatch(setSelectedObjectInfo(object));
       dispatch(setSidePanel(false));
     }
   };
