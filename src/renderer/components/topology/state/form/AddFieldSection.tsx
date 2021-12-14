@@ -45,7 +45,7 @@ const useStyles: any = makeStyles((theme) =>
 );
 
 const AddFieldSection = (props: AddFieldSectionProps) => {
-  const { formData, sourceSchema } = props;
+  const { formData, sourceSchema, setFormState } = props;
   const classes = useStyles();
 
   const inputTypeList = ['string', 'object', 'array', 'boolean'];
@@ -135,6 +135,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                 );
                 dispatch(setSelectedContent(result));
                 setAdditionalSchema('');
+                setFormState(result);
               }}
             >
               추가
@@ -187,6 +188,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                   },
                   sourceSchema
                 );
+                setFormState(object);
                 dispatch(setSelectedContent(object));
                 dispatch(setSelectedSourceSchema(schema));
                 setCustomFieldType('');
@@ -205,6 +207,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 type AddFieldSectionProps = {
   formData: any;
   sourceSchema: JSONSchema7;
+  setFormState: any;
 };
 
 export default AddFieldSection;

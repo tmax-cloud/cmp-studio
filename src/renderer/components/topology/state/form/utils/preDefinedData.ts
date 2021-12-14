@@ -3,8 +3,6 @@ import * as _ from 'lodash';
 
 const supportedSchemaList = ['resource', 'provider', 'data'];
 
-const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
-
 const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
   const formData = _.cloneDeep(object);
   if (!jsonSchema && _.findIndex(supportedSchemaList, type) >= 0) {
