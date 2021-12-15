@@ -199,22 +199,42 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                         } else if (item.type === 'default') {
                           const newInstanceName =
                             item.resourceName + '-' + fileObjects.length;
-                          const newFileObjects = [
-                            {
-                              filePath:
-                                `${folderUri}` +
-                                path.sep +
-                                `${newInstanceName}.tf`,
-                              fileJson: {
-                                [item.resourceName]: {
-                                  [newInstanceName]: addedObjectJSON,
+                          let newFileObject;
+                          if (
+                            item.resourceName === 'terraform' ||
+                            item.resourceName === 'locals'
+                          ) {
+                            newFileObject = [
+                              {
+                                filePath:
+                                  `${folderUri}` +
+                                  path.sep +
+                                  `${newInstanceName}.tf`,
+                                fileJson: {
+                                  [item.resourceName]: {
+                                    [newInstanceName]: addedObjectJSON,
+                                  },
                                 },
                               },
-                            },
-                          ];
-                          dispatch(
-                            setFileObjects(fileObjects.concat(newFileObjects))
-                          );
+                            ];
+                          } else {
+                            newFileObject = [
+                              {
+                                filePath:
+                                  `${folderUri}` +
+                                  path.sep +
+                                  `${newInstanceName}.tf`,
+                                fileJson: {
+                                  [item.resourceName]: {
+                                    [newInstanceName]: addedObjectJSON,
+                                  },
+                                },
+                              },
+                            ];
+                          }
+                          const newFileObjects =
+                            fileObjects.concat(newFileObject);
+                          dispatch(setFileObjects(newFileObjects));
                           const object = {
                             type: item.resourceName,
                             resourceName: '',
@@ -266,7 +286,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                             item.resourceName +
                             '-' +
                             fileObjects.length;
-                          const newFileObjects = [
+                          const newFileObject = [
                             {
                               filePath:
                                 `${folderUri}` +
@@ -281,9 +301,9 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                               },
                             },
                           ];
-                          dispatch(
-                            setFileObjects(fileObjects.concat(newFileObjects))
-                          );
+                          const newFileObjects =
+                            fileObjects.concat(newFileObject);
+                          dispatch(setFileObjects(newFileObjects));
                           const object = {
                             type: item.type,
                             resourceName: item.resourceName,
