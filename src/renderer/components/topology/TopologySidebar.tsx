@@ -39,7 +39,7 @@ import { setWorkspaceUid } from '../../features/commonSlice';
 import CreateWorkspaceModal from '../workspace/CreateWorkspaceModal';
 import StudioTheme from '../../theme';
 import { TopologyObject } from './object';
-import { Item } from './object/TopologyObject';
+import { Data } from './object/TopologyObjectTable';
 
 export const SIDEBAR_WIDTH = '300px';
 
@@ -98,7 +98,7 @@ function a11yProps(index: number) {
 const TopologySidebar = () => {
   const classes = useStyles();
   const history = useHistory();
-  const [items, setItems] = React.useState<Item[]>([]);
+  const [items, setItems] = React.useState<Data[]>([]);
   const [prjContextMenuOpen, setPrjContextMenuOpen] = React.useState(false);
   const [prjAnchorEl, setPrjAnchorEl] = React.useState(null);
   const [tabIndex, setTabIndex] = React.useState(0);
@@ -196,7 +196,7 @@ const TopologySidebar = () => {
     });
 
   React.useEffect(() => {
-    const itemsList: Item[] = [];
+    const itemsList: Data[] = [];
     objResult
       .filter((result) => {
         const { type, resourceName, ...object } = result;
@@ -208,7 +208,7 @@ const TopologySidebar = () => {
         const instanceName = Object.keys(object)[0];
         return { type, resourceName, instanceName };
       })
-      .forEach((i: Item) => {
+      .forEach((i: Data) => {
         itemsList.push({
           instanceName: i.instanceName,
           resourceName: i.resourceName,
