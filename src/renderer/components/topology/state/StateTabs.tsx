@@ -42,7 +42,7 @@ function a11yProps(index: number) {
 }
 
 const FormTabs = (props: FormTabsProps) => {
-  const { schema, formData, uiSchema } = props;
+  const { schema, formData, uiSchema, id } = props;
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: any, newValue: number) => {
@@ -62,7 +62,12 @@ const FormTabs = (props: FormTabsProps) => {
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        <EditorTab schema={schema} formData={formData} uiSchema={uiSchema} />
+        <EditorTab
+          schema={schema}
+          formData={formData}
+          uiSchema={uiSchema}
+          id={id}
+        />
       </TabPanel>
       <TabPanel value={value} index={1}>
         <StateTab />
@@ -78,6 +83,7 @@ type FormTabsProps = {
   schema: any;
   formData: any;
   uiSchema: any;
+  id: string;
 };
 
 export default FormTabs;

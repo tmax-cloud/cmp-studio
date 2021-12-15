@@ -32,14 +32,14 @@ const preDefinedFileObjects = (
       const makeObjPath = prevObjPath
         ? `${prevObjPath}.properties.${currKey}`
         : `properties.${currKey}`;
-      const makeSpecialSchemaPath = prevSchemaPath
-        ? `${prevSchemaPath}.properties.${specialKey({
+      const makeSpecialSchemaPath = prevObjPath
+        ? `${prevObjPath}.${specialKey({
             resourceType,
             resourceName,
             instanceName,
             propertyName: currKey,
           })}`
-        : `properties.${specialKey({
+        : `${specialKey({
             resourceType,
             resourceName,
             instanceName,
@@ -73,13 +73,14 @@ const preDefinedFileObjects = (
               makeObjPath + `[${idx}]`
             );
           }
+          mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'block' });
         } else {
           makeMapObjectTypeList(obj[currKey], makeSchemaPath, makeObjPath);
+          mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'object' });
           // if (prevObjPath) {
           //   mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'block' });
           // }
         }
-        mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'object' });
       } else if (_.get(jsonSchema, makeSchemaPath + '.type') === 'map') {
         // type이 map일 때
         mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'map' });

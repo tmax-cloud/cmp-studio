@@ -12,7 +12,6 @@ const useStyles = makeStyles({
   root: {
     '& .css-1sqnrkk-MuiInputBase-input-MuiOutlinedInput-input': {
       resize: 'vertical',
-      width: '222px',
       minHeight: '23px',
     },
   },

@@ -44,10 +44,10 @@ export const TopologyPage = () => {
     dispatch(fetchGraphDataByWorkspaceId(workspaceUid));
   }, [dispatch, workspaceUid]);
 
-  if (!localStorage.getItem('schemaJson')) {
-    const schemaJson = parseJson(['aws', 'tls']);
-    setSchemaMap(JSON.stringify(Array.from(schemaJson.entries())));
-  }
+  // if (!localStorage.getItem('schemaJson')) {
+  const schemaJson = parseJson(['aws', 'tls']);
+  setSchemaMap(JSON.stringify(Array.from(schemaJson.entries())));
+  // }
   const { graphRef, graphOption, graphHandler } = useGraphProps();
 
   const classes = useStyles({ isSidePanelOpen });
