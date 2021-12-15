@@ -174,8 +174,8 @@ const TopologySidebar = () => {
       }
       case 'ONE_DEPTH_DATA_TYPE': {
         objResult.push(
-          ..._.entries(file.fileJson[type]).map((object) => ({
-            [type]: { [object[0]]: object[1] },
+          ..._.entries(file.fileJson).map((object) => ({
+            [object[0]]: object[1],
             type,
             resourceName: '',
             instanceName: '',

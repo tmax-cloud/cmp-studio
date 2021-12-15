@@ -84,11 +84,17 @@ export class WorkspaceConvertService
       if (!this.isFileObjectEmpty(fileJson)) {
         console.log('buff: ', JSON.stringify(fileJson));
         const buf = Buffer.from(JSON.stringify(fileJson));
-        console.log('buf#####:', buf);
+        console.log('buf#####:', buf.toString('hex'));
         const result = Converter.JsonToHcl(buf, JSON.stringify(typeMap || {}));
-        console.log('result %%%%:', result);
+        console.log('result %%%%:', result.toString('hex'));
         const resultStr = unescape(
-          Buffer.from(result).toString().replaceAll('\\', '%')
+          Buffer.from(result)
+            .toString()
+            .replaceAll('\\', '%')
+            .replaceAll('%"', '\\"')
+          // Buffer.from(result)
+          //   .toString()
+          //   .replace(/(\\)([^\\"])/gi, '%')
         );
         console.log('resultStr3: ', resultStr);
         if (!fs.existsSync(FileUtils.getDirName(targetPath))) {
