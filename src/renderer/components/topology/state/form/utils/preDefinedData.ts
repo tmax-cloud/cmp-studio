@@ -3,8 +3,6 @@ import * as _ from 'lodash';
 
 const supportedSchemaList = ['resource', 'provider', 'data'];
 
-const isArray = (currentValue: any) => currentValue.hasOwnProperty('length');
-
 const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
   const formData = _.cloneDeep(object);
   if (!jsonSchema && _.findIndex(supportedSchemaList, type) >= 0) {
@@ -35,8 +33,7 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
         _.set(formData, makeObjPath, formValue);
       };
 
-      const fillSchemaByFormData = (obj: any) => {
-        const currentKey = makeObjPath;
+      const fillSchemaByFormData = (obj: any, currentKey: string) => {
         const currentValue = obj[currentKey];
         if (currentKey) {
           switch (typeof obj[currentKey]) {
@@ -51,25 +48,48 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
             // [TODO]: 사용자가 terraform schema에 없는 프로퍼티를 tf파일에 직접 정의할 경우에 대한 case 추가 필요
             // => cmp-studio에서는 map형식의 object만 추가하는 기능만 제공하긴 함.
             case 'object': {
-              if (isArray(currentValue)) {
-                setSchema({
-                  type: 'array',
-                  items: {
-                    type: 'string',
-                  },
-                });
-              } else {
-                const result = _.entries(_.get(formData, makeObjPath)).map(
-                  ([key, value]) => {
-                    return { [key]: value };
+              if (Array.isArray(currentValue)) {
+                // array
+                const currObj = currentValue[0];
+                setSchema({ type: 'array' });
+                if (typeof currObj === 'object') {
+                  if (!Array.isArray(currObj)) {
+                    // array 안에 object
+                    // [TODO] array안에 array일 경우 아직 안함.
+                    Object.keys(currObj).forEach((objKey) => {
+                      makeFixedSchema(
+                        currObj[objKey],
+                        makeSchemaPath + '.items.properties.' + objKey,
+                        ''
+                      );
+                    });
                   }
-                );
-                setFormData(result);
-                setSchema({
-                  type: 'map',
-                  items: {
-                    type: 'string',
-                  },
+                } else {
+                  // array안에 string
+                  setSchema({
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                    },
+                  });
+                }
+              } else {
+                // object
+                Object.keys(currentValue).forEach((objKey) => {
+                  //[TODO] object안에 array 아직 안함.
+                  if (typeof currentValue[objKey] === 'object') {
+                    makeFixedSchema(
+                      currentValue[objKey],
+                      makeSchemaPath + '.properties.' + objKey,
+                      ''
+                    );
+                  } else {
+                    _.set(
+                      fixedSchema,
+                      makeSchemaPath + '.properties.' + objKey,
+                      { type: 'string' }
+                    );
+                  }
                 });
               }
               break;
@@ -84,7 +104,7 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
       };
       if (!_.get(jsonSchema, makeSchemaPath)) {
         // tf_schema에 정의되지 않은 프로퍼티
-        fillSchemaByFormData(obj);
+        fillSchemaByFormData(obj, makeObjPath);
       } else if (
         // type이 object인 경우 -> 재귀
         _.get(jsonSchema, makeSchemaPath) &&
@@ -178,7 +198,10 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
           _.get(jsonSchema, makeSchemaPath + '.items.properties'))
       ) {
         _.set(customUISchema, makeUIPath, {
-          [`ui:dependency`]: { path: makeUIPath, type: 'parent' },
+          [`ui:dependency`]: {
+            path: makeUIPath,
+            type: !!prevUISchemaPath ? 'child' : 'parent',
+          },
         });
         if (Array.isArray(obj[currKey])) {
           Object.keys(
@@ -197,13 +220,6 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
           }
         } else {
           makeCustomUISchema(obj[currKey], makeSchemaPath, makeUIPath);
-          Object.keys(
-            _.get(fixedSchema, makeSchemaPath + '.properties')
-          ).forEach((cur) => {
-            _.set(customUISchema, makeUIPath + `.${cur}`, {
-              [`ui:dependency`]: { path: makeUIPath, type: 'child' },
-            });
-          });
         }
       } else if (
         _.get(fixedSchema, makeSchemaPath) &&
@@ -211,6 +227,13 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
       ) {
         _.set(customUISchema, makeUIPath, {
           [`ui:field`]: 'MapField',
+        });
+      } else {
+        _.set(customUISchema, makeUIPath, {
+          [`ui:dependency`]: {
+            path: makeUIPath,
+            type: prevUISchemaPath ? 'child' : 'parent',
+          },
         });
       }
 
@@ -225,6 +248,8 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
   if (!_.isEmpty(formData)) {
     makeFixedSchema(formData, '', '');
     makeCustomUISchema(formData, '', '');
+  } else {
+    _.set(fixedSchema, 'properties', {});
   }
   return { customUISchema, formData, fixedSchema };
 };
@@ -235,5 +260,6 @@ type SchemaField = {
 };
 type SchemaType = {
   type: string;
+  properties?: any;
 };
 export default preDefinedData;

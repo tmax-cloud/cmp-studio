@@ -1,57 +1,29 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import { JSONSchema7 } from 'json-schema';
 import SaveSection from '@renderer/components/topology/state/form/SaveSection';
 import DynamicForm from './index';
 import AddFieldSection from './AddFieldSection';
 
 const EditorTab = (props: EditorTabProps) => {
-  const { schema, formData, uiSchema } = props;
+  const { schema, formData, uiSchema, id } = props;
 
   const [formState, setFormState] = React.useState(formData);
+  const [formSchema, setFormSchema] = React.useState(schema);
+  const [currentId, setCurrentId] = React.useState(id);
 
   React.useEffect(() => {
-    setFormState(formData);
-  }, [formData]);
-
-  const validateFormData = (obj: any) => {
-    const target = Object.keys(
-      _.pickBy(obj, (cur) => typeof cur === 'object' && _.isEmpty(cur))
-    )[0];
-    if (uiSchema[target]?.['ui:dependency'].type === 'parent') {
-      return _.omitBy(obj, (cur) => typeof cur === 'object' && _.isEmpty(cur));
+    if (currentId !== id) {
+      setCurrentId(id);
+      setFormState(formData);
     }
-    return obj;
-  };
-
-  const getCustomedSchema = (schema: JSONSchema7, formState: any): any => {
-    if (_.isEmpty(schema) || _.isEmpty(formData)) {
-      return schema;
-    }
-    const currentFormData = validateFormData(formState);
-    const filteredValues = _.xor(
-      Object.keys(currentFormData),
-      Object.keys(formData)
+    const filteredValues = _.xor(Object.keys(formState), Object.keys(formData));
+    setFormSchema(
+      _.omit(
+        schema,
+        filteredValues.map((property) => `properties.${property}`)
+      )
     );
-
-    return !!filteredValues.length
-      ? {
-          customizedFormData: currentFormData,
-          customizedSchema: _.omit(
-            schema,
-            filteredValues.map((property) => `properties.${property}`)
-          ),
-        }
-      : {
-          customizedFormData: currentFormData,
-          customizedSchema: schema,
-        };
-  };
-
-  const { customizedFormData, customizedSchema } = getCustomedSchema(
-    schema,
-    formState
-  );
+  }, [formState, formData, id]);
 
   const onChange = React.useCallback(({ formData }, e) => {
     setFormState(formData);
@@ -68,21 +40,18 @@ const EditorTab = (props: EditorTabProps) => {
         }}
       >
         <DynamicForm
-          schema={customizedSchema}
-          formData={_.defaultsDeep(customizedFormData)}
+          schema={formSchema}
+          formData={_.defaultsDeep(formState)}
           uiSchema={uiSchema}
           onChange={onChange}
         />
       </div>
       <AddFieldSection
-        formData={customizedFormData}
-        sourceSchema={customizedSchema}
+        formData={formState}
+        sourceSchema={formSchema}
+        setFormState={setFormState}
       />
-      <SaveSection
-        saveLabel="저장"
-        cancelLabel="취소"
-        formState={customizedFormData}
-      />
+      <SaveSection saveLabel="저장" cancelLabel="취소" formState={formState} />
     </>
   );
 };
@@ -91,6 +60,7 @@ type EditorTabProps = {
   schema: any;
   formData: any;
   uiSchema: any;
+  id: string;
 };
 
 export default EditorTab;

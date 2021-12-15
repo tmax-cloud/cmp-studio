@@ -87,8 +87,10 @@ export class WorkspaceConvertService
         console.log('buf#####:', buf);
         const result = Converter.JsonToHcl(buf, JSON.stringify(typeMap || {}));
         console.log('result %%%%:', result);
-        const resultStr = Buffer.from(result).toString();
-        console.log('resultStr: ', resultStr);
+        const resultStr = unescape(
+          Buffer.from(result).toString().replaceAll('\\', '%')
+        );
+        console.log('resultStr3: ', resultStr);
         if (!fs.existsSync(FileUtils.getDirName(targetPath))) {
           fs.mkdirSync(FileUtils.getDirName(targetPath), { recursive: true });
         }
@@ -101,7 +103,7 @@ export class WorkspaceConvertService
           console.log('originalTf', originalTf);
           console.log('prettyNewTf', prettyNewTf);
           console.log('finalTf', finalTf);
-          fs.writeFileSync(targetPath, finalTf);
+          fs.writeFileSync(targetPath, prettyNewTf);
         } else {
           // MEMO : 원본파일이 없는 경우 그냥 새 파일 생성
           fs.writeFileSync(targetPath, this.getPrettyString(resultStr));

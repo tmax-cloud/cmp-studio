@@ -45,7 +45,7 @@ const makeObject = ({ input }: makeObjectType) => {
       return { [input.key]: '' };
     }
     case 'object': {
-      return { [input.key]: {} };
+      return { [input.key]: [] };
       break;
     }
     case 'array': {
