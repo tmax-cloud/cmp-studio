@@ -30,7 +30,6 @@ import {
 import { setTerraformState } from '@renderer/features/commonSlice';
 import {
   selectCodeFileObjects,
-  selectCodeSelectedObjectInfo,
   selectMapObjectTypeCollection,
 } from '@renderer/features/codeSliceInputSelectors';
 import { setFileDirty, setSidePanel } from '@renderer/features/uiSlice';
@@ -41,13 +40,11 @@ import {
   setSelectedData,
   setSelectedModule,
   setSelectedNode,
-  fetchGraphDataByWorkspaceId,
   watchGraphData,
 } from '@renderer/features/graphSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
 import { useWorkspaceUri } from '@renderer/hooks/useWorkspaceUri';
 import parseJson from './state/form/utils/json2JsonSchemaParser';
-import { ModuleImportModal } from './modal';
 import { getIcon } from './icon/IconFactory';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
@@ -385,6 +382,7 @@ const TopologyLibrary = () => {
   };
   const [isSearchResultEmpty, setIsSearchResultEmpty] = React.useState(false);
 
+  /*
   const [openModuleListModal, setOpenModuleListModal] = React.useState(false);
   const [importModule, setImportModule] = React.useState('');
 
@@ -394,6 +392,7 @@ const TopologyLibrary = () => {
   };
   const handleModuleListModalClose = () => setOpenModuleListModal(false);
   const dispatch = useAppDispatch();
+  */
 
   const objResult: any[] = [];
 
