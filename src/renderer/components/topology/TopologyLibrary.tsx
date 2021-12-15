@@ -1,6 +1,8 @@
 import * as React from 'react';
 import path from 'path';
 import _ from 'lodash';
+import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
+import * as TerraformTypes from '@main/terraform-command/common/terraform';
 import {
   List,
   styled,
@@ -20,12 +22,18 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Delete } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import { exportProject } from '@renderer/utils/ipc/workspaceIpcUtils';
 import {
   setFileObjects,
   setSelectedObjectInfo,
 } from '@renderer/features/codeSlice';
-import { setSidePanel } from '@renderer/features/uiSlice';
-import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import { setTerraformState } from '@renderer/features/commonSlice';
+import {
+  selectCodeFileObjects,
+  selectCodeSelectedObjectInfo,
+  selectMapObjectTypeCollection,
+} from '@renderer/features/codeSliceInputSelectors';
+import { setFileDirty, setSidePanel } from '@renderer/features/uiSlice';
 import { getModuleNodeByName, getPrunedGraph } from '@renderer/utils/graph';
 import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
@@ -33,7 +41,10 @@ import {
   setSelectedData,
   setSelectedModule,
   setSelectedNode,
+  fetchGraphDataByWorkspaceId,
+  watchGraphData,
 } from '@renderer/features/graphSlice';
+import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
 import { useWorkspaceUri } from '@renderer/hooks/useWorkspaceUri';
 import parseJson from './state/form/utils/json2JsonSchemaParser';
 import { ModuleImportModal } from './modal';
@@ -140,6 +151,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
   const dispatch = useAppDispatch();
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
+  const mapObjectCollection = useAppSelector(selectMapObjectTypeCollection);
   const folderUri = useWorkspaceUri(workspaceUid);
   const addedObjectJSON = {}; //temp
   const graphData = useAppSelector(selectGraphData);
@@ -171,7 +183,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                 return (
                   <ListItem disablePadding key={`item-${index}`}>
                     <ListItemButton
-                      onClick={() => {
+                      onClick={async () => {
                         if (item.type === 'module') {
                           const name = item.resourceName;
                           const selectedModule = getModuleNodeByName(
@@ -214,6 +226,41 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                           };
                           dispatch(setSelectedObjectInfo(object));
                           dispatch(setSidePanel(true));
+                          // TemporaryDataPath에 변경사항 저장 (terraform plan 용도)
+                          const result = await exportProject({
+                            objects: newFileObjects,
+                            workspaceUid,
+                            isAllSave: false,
+                            typeMap: mapObjectCollection,
+                            deleteTypeInfo: {
+                              isFileDeleted: false,
+                              filePath: '',
+                            },
+                          });
+                          if (result.status === WorkspaceStatusType.SUCCESS) {
+                            dispatch(setFileDirty(true));
+                            dispatch(watchGraphData(workspaceUid));
+                          }
+                          await getTerraformPlan({ workspaceUid })
+                            .then((res: TerraformTypes.TerraformResponse) => {
+                              const { status, data } = res;
+                              const { planData } =
+                                data as TerraformTypes.TerraformPlanSuccessData;
+                              const { message } =
+                                data as TerraformTypes.TerraformErrorData;
+                              dispatch(
+                                setTerraformState({
+                                  status,
+                                  data: planData,
+                                  message,
+                                })
+                              );
+                              return res;
+                            })
+                            .catch((e: any) => {
+                              console.log(e);
+                            });
+                          console.log('[INFO] File export result : ', result);
                         } else {
                           const { type } = item;
                           const newInstanceName =
@@ -248,6 +295,41 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                           };
                           dispatch(setSelectedObjectInfo(object));
                           dispatch(setSidePanel(true));
+                          // TemporaryDataPath에 변경사항 저장 (terraform plan 용도)
+                          const result = await exportProject({
+                            objects: newFileObjects,
+                            workspaceUid,
+                            isAllSave: false,
+                            typeMap: mapObjectCollection,
+                            deleteTypeInfo: {
+                              isFileDeleted: false,
+                              filePath: '',
+                            },
+                          });
+                          if (result.status === WorkspaceStatusType.SUCCESS) {
+                            dispatch(setFileDirty(true));
+                            dispatch(watchGraphData(workspaceUid));
+                          }
+                          await getTerraformPlan({ workspaceUid })
+                            .then((res: TerraformTypes.TerraformResponse) => {
+                              const { status, data } = res;
+                              const { planData } =
+                                data as TerraformTypes.TerraformPlanSuccessData;
+                              const { message } =
+                                data as TerraformTypes.TerraformErrorData;
+                              dispatch(
+                                setTerraformState({
+                                  status,
+                                  data: planData,
+                                  message,
+                                })
+                              );
+                              return res;
+                            })
+                            .catch((e: any) => {
+                              console.log(e);
+                            });
+                          console.log('[INFO] File export result : ', result);
                         }
                       }}
                     >
