@@ -5,9 +5,18 @@ const specialKey = (props: {
   resourceType: string;
   resourceName: string;
   instanceName: string;
-  propertyName: string;
+  propertyList: string;
 }) => {
-  return Object.values(props).join('**##**');
+  const { resourceType, resourceName, instanceName, propertyList } = props;
+  let propertyName;
+  if (propertyList.split('.').length >= 0) {
+    propertyName = Object.values(propertyList.split('.')).join('**##**');
+  }
+  if (resourceType === 'terraform') {
+    return resourceType + '**##**' + propertyName;
+  }
+  const resultArr = [resourceType, resourceName, instanceName, propertyName];
+  return Object.values(resultArr).join('**##**');
   // return resourceType + '**##**' + resourceName + '**##**' + propertyName;
 };
 
@@ -30,28 +39,29 @@ const preDefinedFileObjects = (
         ? `${prevSchemaPath}.properties.${currKey}`
         : `properties.${currKey}`;
       const makeObjPath = prevObjPath
-        ? `${prevObjPath}.properties.${currKey}`
-        : `properties.${currKey}`;
-      const makeSpecialSchemaPath = prevObjPath
-        ? `${prevObjPath}.${specialKey({
-            resourceType,
-            resourceName,
-            instanceName,
-            propertyName: currKey,
-          })}`
-        : `${specialKey({
-            resourceType,
-            resourceName,
-            instanceName,
-            propertyName: currKey,
-          })}`;
+        ? `${prevObjPath}.${currKey}`
+        : `${currKey}`;
+      const makeSpecialSchemaPath = `${specialKey({
+        resourceType,
+        resourceName,
+        instanceName,
+        propertyList: makeObjPath,
+      })}`;
       const fillSchemaByFormData = (obj: any) => {
-        const currentKey = makeObjPath;
-        const currentValue = obj[currentKey];
+        const currentKey =
+          makeObjPath.indexOf('.') >= 0
+            ? makeObjPath.split('.')[makeObjPath.split('.').length - 1]
+            : makeObjPath;
+        const currentValue = _.get(obj, currentKey);
 
-        if (currentKey && typeof obj[currentKey] === 'object') {
+        if (currentKey && typeof currentValue === 'object') {
           if (!Array.isArray(currentValue)) {
-            mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'object' });
+            if (makeObjPath === 'required_providers.aws') {
+              mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'map' });
+            } else {
+              mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'object' });
+              makeMapObjectTypeList(currentValue, makeSchemaPath, makeObjPath);
+            }
           }
         }
       };
