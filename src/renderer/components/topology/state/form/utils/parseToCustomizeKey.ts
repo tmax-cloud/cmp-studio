@@ -40,15 +40,16 @@ const parseToCustomizeKey = (fileObjects: any[]) => {
         const content = (type: string) => {
           return getContent(type as TerraformType, resource, resourceValue);
         };
-        const mapObjectTypeList = currentSchema
-          ? preDefinedFileObjects(
-              resourceType,
-              currentSchema as JSONSchema7,
-              content(resourceType),
-              resourceName,
-              Object.keys(resourceValue as any)[0]
-            )
-          : [];
+        const mapObjectTypeList =
+          currentSchema || resourceType === 'terraform'
+            ? preDefinedFileObjects(
+                resourceType,
+                currentSchema as JSONSchema7,
+                content(resourceType),
+                resourceName,
+                Object.keys(resourceValue as any)[0]
+              )
+            : [];
 
         Object.values(mapObjectTypeList).forEach((value) => {
           _.assign(mapObjectTypeCollection, value);
