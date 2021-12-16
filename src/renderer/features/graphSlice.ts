@@ -19,6 +19,11 @@ interface GraphState {
   loadingMsg: string | null; // 로딩 메시지
 }
 
+interface Data {
+  terraform: string;
+  graph: GraphData;
+}
+
 const initialState: GraphState = {
   terraformData: '',
   graphData: { nodes: [], links: [] },
@@ -65,12 +70,16 @@ export const watchGraphData = createAsyncThunk(
   'graph/watchGraphData',
   async (workspaceUid: string, { getState, dispatch, rejectWithValue }) => {
     try {
-      const data = await getTerraformData(workspaceUid);
+      const newTerraformData = await getTerraformData(workspaceUid);
       const { terraformData } = (getState() as any).graph as GraphState;
-      if (data !== terraformData) {
-        dispatch(fetchGraphDataByWorkspaceId(workspaceUid));
+      if (newTerraformData !== terraformData) {
+        const newGraphData = await getGraphData(newTerraformData);
+        return {
+          terraform: newTerraformData,
+          graph: newGraphData,
+        };
       }
-      return data;
+      return null;
     } catch (error) {
       const { message } = error as Error;
       dispatch(setSidePanel(false));
@@ -97,8 +106,19 @@ const graphSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // watchGraphData: 에러 상황에 대해서만 처리
+    // watchGraphData: 데이터 가져오기 및 에러 상황에 대해서만 처리, 로딩메시지 x
+    builder.addCase(watchGraphData.fulfilled, (state, { payload }) => {
+      if (payload) {
+        state.terraformData = (payload as Data).terraform;
+        state.graphData = (payload as Data).graph;
+        state.selectedData = (payload as Data).graph;
+        state.errorMsg = _.isEmpty(state.graphData.nodes) ? QUICK_START : null;
+      }
+    });
     builder.addCase(watchGraphData.rejected, (state, { payload }) => {
+      state.terraformData = '';
+      state.graphData = { nodes: [], links: [] };
+      state.selectedData = { nodes: [], links: [] };
       state.errorMsg = payload as string;
     });
     // fetchGraphDataByWorkspaceId: 테라폼 데이터 가져오기 및 로딩 메시지 처리
@@ -106,14 +126,13 @@ const graphSlice = createSlice({
       fetchGraphDataByWorkspaceId.pending,
       (state, { payload }) => {
         state.loadingMsg = '테라폼 그래프를 불러오는 중입니다.';
-        state.selectedNode = null;
-        state.selectedModule = null;
       }
     );
     builder.addCase(
       fetchGraphDataByWorkspaceId.fulfilled,
       (state, { payload }) => {
         state.terraformData = payload as string;
+        state.loadingMsg = null;
         state.errorMsg = null;
       }
     );
@@ -126,6 +145,11 @@ const graphSlice = createSlice({
       }
     );
     // fetchGraphDataByTerraform: 가공한 그래프 데이터 가져오기 및 selected data 처리
+    builder.addCase(fetchGraphDataByTerraform.pending, (state, { payload }) => {
+      state.loadingMsg = '테라폼 그래프를 불러오는 중입니다.';
+      state.selectedNode = null;
+      state.selectedModule = null;
+    });
     builder.addCase(
       fetchGraphDataByTerraform.fulfilled,
       (state, { payload }) => {

@@ -22,5 +22,10 @@ export const useGraphInitOutput = () => {
       }
     );
   }, []);
+
+  if (output === INIT_FINISHED) {
+    setOutput(undefined);
+  }
+
   return output;
 };

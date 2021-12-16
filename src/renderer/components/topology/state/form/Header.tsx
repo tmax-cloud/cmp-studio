@@ -11,20 +11,13 @@ import {
   selectCodeSelectedObjectInfo,
   selectMapObjectTypeCollection,
 } from '@renderer/features/codeSliceInputSelectors';
-import {
-  getObjectDataType,
-  getId,
-  TerraformType,
-} from '@renderer/types/terraform';
+import { getObjectDataType, TerraformType } from '@renderer/types/terraform';
 import { exportProject } from '@renderer/utils/ipc/workspaceIpcUtils';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import { setTerraformState } from '@renderer/features/commonSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
-import {
-  fetchGraphDataByWorkspaceId,
-  watchGraphData,
-} from '@renderer/features/graphSlice';
+import { watchGraphData } from '@renderer/features/graphSlice';
 import { getIcon } from '../../icon/IconFactory';
 
 const FormHeader = (props: FormHeaderProps) => {
@@ -147,8 +140,8 @@ const FormHeader = (props: FormHeaderProps) => {
         justifyContent: 'space-between',
       }}
     >
-      <Box sx={{ margin: '16px', display: 'flex' }}>
-        {getIcon(resourceName || title, 32)}
+      <Box sx={{ margin: '16px', display: 'flex', alignItems: 'center' }}>
+        {getIcon(resourceName || title, 64)}
         {isFixed ? (
           <Typography variant="h3" sx={{ ml: 1.5 }}>
             {title}
@@ -160,7 +153,7 @@ const FormHeader = (props: FormHeaderProps) => {
               placeholder="Name"
               label="InstanceName"
               onChange={newTitleChange}
-              style={{ marginTop: '10px' }}
+              style={{ marginLeft: '10px' }}
               fullWidth
             />
             <IconButton

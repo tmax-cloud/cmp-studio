@@ -142,7 +142,7 @@ const WorkspacesListPage: React.FC = (props) => {
         if (status === ConfigStatusType.SUCCESS) {
           // TODO : 초반에 terraformPath설정해주는 부분 구현하기
           // TODO : terraform 명령어 사용할 때 에러나도 다시 설정해달라고 모달 띄워야 할듯
-          console.log('[INFO] terraform.exe 경로를 설정해주세요.');
+          // console.log('[INFO] terraform.exe 경로를 설정해주세요.');
           const response: TerraformTypes.TerraformResponse =
             await checkTerraformExe({ terraformExePath: data });
           const { status } = response;
