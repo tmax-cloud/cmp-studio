@@ -17,10 +17,12 @@ import { selectFileDirty } from '@renderer/features/uiSliceInputSelectors';
 import { setFileDirty } from '@renderer/features/uiSlice';
 import {
   FitScreenButton,
+  TerraformApplyButton,
   SaveButton,
   SelectModuleButton,
   ZoomInButton,
   ZoomOutButton,
+  TerraformPlanButton,
 } from './button';
 import ViewBreadcrumbs from './breadcrumb/ViewBreadcrumb';
 import { ModuleListModal } from '../modal';
@@ -78,6 +80,16 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
           ml: 5,
         }}
       >
+        <TerraformApplyButton
+          onClick={() => {
+            console.log('apply');
+          }}
+        />
+        <TerraformPlanButton
+          onClick={() => {
+            console.log('plan');
+          }}
+        />
         <SaveButton visibleBadge={fileDirty} onClick={handleSaveButtonClick} />
         <SelectModuleButton onClick={handleModuleListModalOpen} />
         <ModuleListModal
