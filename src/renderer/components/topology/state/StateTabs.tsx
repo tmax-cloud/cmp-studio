@@ -3,7 +3,7 @@ import * as _ from 'lodash-es';
 import { Tabs, Tab, Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import EditorTab from './form/Editor';
-import StateTab from './state/State';
+// import StateTab from './state/State';
 // import DiffTab from './diff/Diff';
 const useStyles = makeStyles({
   root: {
@@ -57,7 +57,7 @@ const FormTabs = (props: FormTabsProps) => {
           aria-label="basic tabs example"
         >
           <Tab label="에디터" {...a11yProps(0)} />
-          <Tab label="Diff" {...a11yProps(1)} />
+          {/* <Tab label="Diff" {...a11yProps(1)} /> */}
           {/* <Tab label="Diff (가공 전)" {...a11yProps(2)} /> */}
         </Tabs>
       </Box>
@@ -69,9 +69,9 @@ const FormTabs = (props: FormTabsProps) => {
           id={id}
         />
       </TabPanel>
-      <TabPanel value={value} index={1}>
+      {/* <TabPanel value={value} index={1}>
         <StateTab />
-      </TabPanel>
+      </TabPanel> */}
       {/* <TabPanel value={value} index={2}>
         <DiffTab />
       </TabPanel> */}
