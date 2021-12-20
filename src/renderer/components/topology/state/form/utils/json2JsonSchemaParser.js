@@ -187,9 +187,6 @@ function parseJson(clouds) {
           renameKey(schemaData, 'attributes', 'properties');
           mergeKey(schemaData, 'block_types', 'properties');
         }
-        if (key === 'aws_security_group') {
-          // console.log(key);
-        }
         schemaData.properties &&
           Object.keys(schemaData.properties).length > 0 &&
           buildSchema(schemaData);
