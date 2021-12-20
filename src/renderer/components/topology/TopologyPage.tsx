@@ -1,17 +1,31 @@
 import * as React from 'react';
-import { Box, styled, Theme } from '@mui/material';
+import {
+  Box,
+  styled,
+  Theme,
+  ToggleButtonGroup,
+  ToggleButton,
+} from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import { setSchemaMap } from '@renderer/utils/storageAPI';
 import { useGraphProps } from '@renderer/hooks/useGraphProps';
 import { fetchGraphDataByWorkspaceId } from '@renderer/features/graphSlice';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
-import { selectUiToggleSidePanel } from '@renderer/features/uiSliceInputSelectors';
+import {
+  selectUiToggleSidePanel,
+  selectUiCommandPage,
+  selectUiLoadingModal,
+  selectUiLoadingMsg,
+} from '@renderer/features/uiSliceInputSelectors';
+import { setCommandPage } from '@renderer/features/uiSlice';
+
 import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 import TopologyToolbar from './toolbar/TopologyToolbar';
 import TopologyGraph from './graph/TopologyGraph';
 import TopologyCommand from './command/TopologyCommand';
+import LoadingModal from './modal/LoadingModal';
 import parseJson from './state/form/utils/json2JsonSchemaParser';
 
 type StyleProps = {
@@ -39,7 +53,11 @@ const useStyles = makeStyles<Theme, StyleProps>((theme) =>
 export const TopologyPage = () => {
   const workspaceUid = useAppSelector(selectWorkspaceUid);
   const isSidePanelOpen = useAppSelector(selectUiToggleSidePanel);
+  const isCommandPageOpen = useAppSelector(selectUiCommandPage);
+  const isLoadingModalOpen = useAppSelector(selectUiLoadingModal);
+  const loadingMsg = useAppSelector(selectUiLoadingMsg);
   const dispatch = useAppDispatch();
+  const [alignment, setAlignment] = React.useState('graph');
 
   React.useEffect(() => {
     dispatch(fetchGraphDataByWorkspaceId(workspaceUid));
@@ -53,8 +71,24 @@ export const TopologyPage = () => {
 
   const classes = useStyles({ isSidePanelOpen });
 
+  const handleToggle = (event: React.MouseEvent, newAlignment: string) => {
+    setAlignment(newAlignment);
+    dispatch(setCommandPage(newAlignment === 'command'));
+  };
+
   return (
     <TopologyLayoutRoot>
+      <LoadingModal isOpen={isLoadingModalOpen} loadingMsg={loadingMsg} />
+      <ToggleButtonGroup
+        sx={{ position: 'absolute', left: '330px', top: '126px', zIndex: '1' }}
+        color="primary"
+        value={alignment}
+        exclusive
+        onChange={handleToggle}
+      >
+        <ToggleButton value="graph">Graph</ToggleButton>
+        <ToggleButton value="command">command</ToggleButton>
+      </ToggleButtonGroup>
       <Box sx={{ width: SIDEBAR_WIDTH }}>
         <TopologySidebar />
       </Box>
@@ -67,8 +101,11 @@ export const TopologyPage = () => {
       >
         <TopologyToolbar handlers={graphHandler} />
         <div className={classes.topologyLayoutWrapper}>
-          <TopologyCommand />
-          {/* <TopologyGraph graphRef={graphRef} graphOptions={graphOption} /> */}
+          {isCommandPageOpen ? (
+            <TopologyCommand />
+          ) : (
+            <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
+          )}
           <TopologySidePanel />
         </div>
       </Box>
