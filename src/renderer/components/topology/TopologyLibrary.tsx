@@ -144,7 +144,11 @@ function getModuleList(items: Item[]) {
 }
 */
 
-const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
+const ShowItemList: React.FC<ShowItemListProps> = ({
+  items,
+  title,
+  provider = '',
+}) => {
   const dispatch = useAppDispatch();
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
@@ -197,19 +201,36 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                             dispatch(setSelectedModule(selectedModule));
                           }
                         } else if (item.type === 'default') {
-                          const newInstanceName =
+                          const newFileName =
                             item.resourceName + '-' + fileObjects.length;
                           let newFileObject;
+                          let newInstanceName = newFileName;
                           if (
                             item.resourceName === 'terraform' ||
                             item.resourceName === 'locals'
                           ) {
+                            newInstanceName = item.resourceName;
                             newFileObject = [
                               {
                                 filePath:
                                   `${folderUri}` +
                                   path.sep +
-                                  `${newInstanceName}.tf`,
+                                  `${newFileName}.tf`,
+                                fileJson: {
+                                  [item.resourceName]: {
+                                    [newInstanceName]: addedObjectJSON,
+                                  },
+                                },
+                              },
+                            ];
+                          } else if (item.resourceName === 'provider') {
+                            newInstanceName = provider;
+                            newFileObject = [
+                              {
+                                filePath:
+                                  `${folderUri}` +
+                                  path.sep +
+                                  `${newFileName}.tf`,
                                 fileJson: {
                                   [item.resourceName]: {
                                     [newInstanceName]: addedObjectJSON,
@@ -223,7 +244,7 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
                                 filePath:
                                   `${folderUri}` +
                                   path.sep +
-                                  `${newInstanceName}.tf`,
+                                  `${newFileName}.tf`,
                                 fileJson: {
                                   [item.resourceName]: {
                                     [newInstanceName]: addedObjectJSON,
@@ -365,9 +386,12 @@ const ShowItemList: React.FC<ShowItemListProps> = ({ items, title }) => {
     </>
   );
 };
+ShowItemList.defaultProps = { provider: '' };
+
 type ShowItemListProps = {
   items: Item[];
   title: string;
+  provider?: string;
 };
 
 interface Item {
@@ -571,7 +595,11 @@ const TopologyLibrary = () => {
           })}
           title="로컬 모듈"
         />
-        <ShowItemList items={defaltItems} title="테라폼 디폴트" />
+        <ShowItemList
+          items={defaltItems}
+          title="테라폼 디폴트"
+          provider={provider}
+        />
         {isSearchResultEmpty ? (
           <div>
             <InputLabel>------</InputLabel>
