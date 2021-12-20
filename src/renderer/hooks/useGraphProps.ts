@@ -153,6 +153,7 @@ export const useGraphProps = () => {
       dispatch(setSelectedNode(_.omit(node, ['vx', 'vy'])));
     } else {
       dispatch(setSelectedNode(null));
+      dispatch(setSidePanel(false));
     }
   };
 
@@ -206,7 +207,6 @@ export const useGraphProps = () => {
 
   const handleEngineStop = () => {
     if (!configRef.current.isMounted) {
-      handleZoomToFit();
       configRef.current.isMounted = true;
     }
   };

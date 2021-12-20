@@ -30,10 +30,6 @@ const TopologyGraph = (props: TopologyGraphProps) => {
   const isInitFinished = !initOutputMsg || initOutputMsg === INIT_FINISHED;
   const isLoadFinished = isInitFinished && !loadingMsg;
 
-  React.useEffect(() => {
-    graphRef.current?.zoomToFit();
-  }, [graphRef, width, height]);
-
   return (
     <Box
       sx={{

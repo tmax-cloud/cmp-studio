@@ -63,6 +63,11 @@ const ObjectTable = (props: ObjectTabeProps) => {
     <Box sx={{ width: '100%' }}>
       <TableContainer>
         <Table sx={{ maxWidth: 300, mb: 2 }} aria-labelledby="tableTitle">
+          {rows.length === 0 && (
+            <caption style={{ textAlign: 'center' }}>
+              데이터가 없습니다.
+            </caption>
+          )}
           <TopologyObjectTableHead
             order={order}
             orderBy={orderBy}
