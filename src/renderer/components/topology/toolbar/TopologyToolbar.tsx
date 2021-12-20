@@ -14,13 +14,12 @@ import { useWorkspaceName } from '@renderer/hooks/useWorkspaceName';
 import { watchGraphData } from '@renderer/features/graphSlice';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
 import { selectFileDirty } from '@renderer/features/uiSliceInputSelectors';
-import { setFileDirty } from '@renderer/features/uiSlice';
 import {
-  setTerraformCommandResponse,
-  setTerraformPlanErrorMsg,
-} from '@renderer/features/commandSlice';
-import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
-import * as TerraformTypes from '@main/terraform-command/common/terraform';
+  setFileDirty,
+  setLoadingModal,
+  setLoadingMsg,
+} from '@renderer/features/uiSlice';
+import { fetchTerraformPlanDataByWorkspaceId } from '@renderer/features/commandSlice';
 import {
   FitScreenButton,
   TerraformApplyButton,
@@ -66,28 +65,8 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
   };
 
   const handleTerraformPlanButton = async () => {
-    await getTerraformPlan({ workspaceUid })
-      .then((res: TerraformTypes.TerraformResponse) => {
-        const { status, data } = res;
-        const { planData } = data as TerraformTypes.TerraformPlanSuccessData;
-        const { message } = data as TerraformTypes.TerraformErrorData;
-        if (status === 'ERROR_PLAN') {
-          dispatch(setTerraformPlanErrorMsg(message));
-        }
-        // else if (status === 'SUCCES_PLAN') {
-        // }
-        dispatch(
-          setTerraformCommandResponse({
-            status,
-            data: planData,
-            message,
-          })
-        );
-        return res;
-      })
-      .catch((e: any) => {
-        console.log(e);
-      });
+    dispatch(fetchTerraformPlanDataByWorkspaceId(workspaceUid));
+    dispatch(setLoadingModal(true));
   };
 
   return (

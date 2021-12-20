@@ -1,25 +1,12 @@
 import * as React from 'react';
 import * as _ from 'lodash';
-import {
-  useTerraformPlanOutput,
-  TERRAFORM_SUCCES_MSG,
-} from '@renderer/hooks/useTerraformPlanOutput';
-import { useAppSelector } from '@renderer/app/store';
-import { Box } from '@mui/material';
-import {
-  selectCommandLoadingMsg,
-  selectCommandErrorMsg,
-} from '@renderer/features/commandSliceInputSelectors';
-import Error from './Error';
-import StateTab from '../state/state/State';
-import TerraformPlanLoadingModal from '../modal/TerraformPlanLoadingModal';
+import { useAppSelector, useAppDispatch } from '@renderer/app/store';
+import { selectTerraformState } from '@renderer/features/commonSliceInputSelectors';
+import { Box, Typography } from '@mui/material';
 
 const TopologyCommand = () => {
-  const initOutputMsg = useTerraformPlanOutput(); // subtitle
-  const loadingMsg = useAppSelector(selectCommandLoadingMsg); // title (redux로 관리)
-  const errorMsg = useAppSelector(selectCommandErrorMsg); // (redux로 관리)
-  const isLoadedFinished =
-    !initOutputMsg || initOutputMsg === TERRAFORM_SUCCES_MSG;
+  const dispatch = useAppDispatch();
+  const { status, data, message } = useAppSelector(selectTerraformState);
 
   return (
     <Box
@@ -30,19 +17,19 @@ const TopologyCommand = () => {
         overflow: 'hidden',
       }}
     >
-      {StateTab}
-      {!isLoadedFinished || errorMsg ? (
-        <>
-          <Error isLoading={!isLoadedFinished} message={errorMsg} />
-          <TerraformPlanLoadingModal
-            isOpen={!isLoadedFinished}
-            initMsg={initOutputMsg}
-            loadingMsg={loadingMsg}
-          />
-        </>
-      ) : (
-        'TerraformPlan 출력 결과물'
-      )}
+      <Typography
+        variant="overline"
+        noWrap={true}
+        style={{
+          whiteSpace: 'pre-wrap',
+          overflow: 'auto',
+          width: '100%',
+          marginTop: '100px',
+          marginLeft: '30px',
+        }}
+      >
+        {status === 'SUCCESS' ? data : message}
+      </Typography>
     </Box>
   );
 };
