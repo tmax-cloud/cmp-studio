@@ -225,7 +225,7 @@ const CreateWorkspaceModal: React.FC<CreateWorkspaceModalProps> = ({
           const uid = (data as WorkspaceSuccessUidData)?.uid;
           if (uid) {
             closeModal();
-            openWorkspace(newProjectPath);
+            openWorkspace(newProjectPath.concat('\\', newProjectName));
           }
         } else if (status === WorkspaceStatusType.ERROR_FILE_EXISTS) {
           setPrjNameErrMsg('이미 존재하는 프로젝트 이름입니다.');
