@@ -54,3 +54,14 @@ export const getId = (
   }
   return type + '-' + resourceName;
 };
+
+export enum TerraformCommandResponseStatusType {
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR',
+  LOADING = 'LOADING',
+}
+
+export type TerraformCommandResponseStatus =
+  | TerraformCommandResponseStatusType.SUCCESS
+  | TerraformCommandResponseStatusType.ERROR
+  | TerraformCommandResponseStatusType.LOADING;

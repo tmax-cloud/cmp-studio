@@ -11,6 +11,7 @@ import TopologySidebar, { SIDEBAR_WIDTH } from './TopologySidebar';
 import TopologySidePanel, { SIDEPANEL_WIDTH } from './TopologySidePanel';
 import TopologyToolbar from './toolbar/TopologyToolbar';
 import TopologyGraph from './graph/TopologyGraph';
+import TopologyCommand from './command/TopologyCommand';
 import parseJson from './state/form/utils/json2JsonSchemaParser';
 
 type StyleProps = {
@@ -66,7 +67,8 @@ export const TopologyPage = () => {
       >
         <TopologyToolbar handlers={graphHandler} />
         <div className={classes.topologyLayoutWrapper}>
-          <TopologyGraph graphRef={graphRef} graphOptions={graphOption} />
+          <TopologyCommand />
+          {/* <TopologyGraph graphRef={graphRef} graphOptions={graphOption} /> */}
           <TopologySidePanel />
         </div>
       </Box>

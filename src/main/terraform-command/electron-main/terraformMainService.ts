@@ -182,7 +182,11 @@ export class TerraformMainService {
     });
   }
 
-  doTerraformPlan(folderUri: string, tfExePath: string): Promise<string> {
+  doTerraformPlan(
+    folderUri: string,
+    tfExePath: string,
+    event: Electron.IpcMainInvokeEvent
+  ): Promise<string> {
     return new Promise(async (resolve, reject) => {
       const appTfExePath = this.appConfigurationMainService.getItem(
         TERRAFORM_EXE_PATH_KEY
@@ -196,7 +200,8 @@ export class TerraformMainService {
       let planData = '';
       for await (const chunk of tfPlanCmd.stdout) {
         planData += chunk;
-        // graphData += iconv.decode(chunk, 'euc-kr');
+        const chunkString = Buffer.from(chunk).toString();
+        event.sender.send('studio:terraformPlanStdout', chunkString);
       }
 
       let planError = '';
@@ -332,7 +337,11 @@ export class TerraformMainService {
 
         const folderUri = workspaceConfig.workspaceRealPath;
         try {
-          const planData: string = await this.doTerraformPlan(folderUri, '');
+          const planData: string = await this.doTerraformPlan(
+            folderUri,
+            '',
+            event
+          );
           return {
             status: TerraformStatusType.SUCCESS,
             data: { planData },

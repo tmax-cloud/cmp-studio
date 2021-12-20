@@ -16,6 +16,12 @@ import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
 import { selectFileDirty } from '@renderer/features/uiSliceInputSelectors';
 import { setFileDirty } from '@renderer/features/uiSlice';
 import {
+  setTerraformCommandResponse,
+  setTerraformPlanErrorMsg,
+} from '@renderer/features/commandSlice';
+import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
+import * as TerraformTypes from '@main/terraform-command/common/terraform';
+import {
   FitScreenButton,
   TerraformApplyButton,
   SaveButton,
@@ -59,6 +65,31 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
     // console.log('[INFO] File export result : ', result);
   };
 
+  const handleTerraformPlanButton = async () => {
+    await getTerraformPlan({ workspaceUid })
+      .then((res: TerraformTypes.TerraformResponse) => {
+        const { status, data } = res;
+        const { planData } = data as TerraformTypes.TerraformPlanSuccessData;
+        const { message } = data as TerraformTypes.TerraformErrorData;
+        if (status === 'ERROR_PLAN') {
+          dispatch(setTerraformPlanErrorMsg(message));
+        }
+        // else if (status === 'SUCCES_PLAN') {
+        // }
+        dispatch(
+          setTerraformCommandResponse({
+            status,
+            data: planData,
+            message,
+          })
+        );
+        return res;
+      })
+      .catch((e: any) => {
+        console.log(e);
+      });
+  };
+
   return (
     <Toolbar
       style={{ minHeight: 48, paddingLeft: 20, paddingRight: 20 }}
@@ -85,11 +116,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
             console.log('apply');
           }}
         />
-        <TerraformPlanButton
-          onClick={() => {
-            console.log('plan');
-          }}
-        />
+        <TerraformPlanButton onClick={handleTerraformPlanButton} />
         <SaveButton visibleBadge={fileDirty} onClick={handleSaveButtonClick} />
         <SelectModuleButton onClick={handleModuleListModalOpen} />
         <ModuleListModal
