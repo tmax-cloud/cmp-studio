@@ -49,7 +49,7 @@ const FormHeader = (props: FormHeaderProps) => {
   };
   React.useEffect(() => {
     setNewTitle(title);
-    setIsFixed(!isInstanceName(type));
+    setIsFixed(!isInstanceName(type) || type === 'provider');
   }, [title, type]);
 
   const getPath = (type: TerraformType) => {
@@ -151,7 +151,7 @@ const FormHeader = (props: FormHeaderProps) => {
             <TextField
               value={newTitle}
               placeholder="Name"
-              label="InstanceName"
+              label="Instance Name"
               onChange={newTitleChange}
               style={{ marginLeft: '10px' }}
               fullWidth
@@ -214,7 +214,7 @@ const FormHeader = (props: FormHeaderProps) => {
                   .catch((e: any) => {
                     console.log(e);
                   });
-                console.log('[INFO] File export result : ', result);
+                console.log('[INFO] Change Instance Name : ', result);
               }}
             >
               <Save />
