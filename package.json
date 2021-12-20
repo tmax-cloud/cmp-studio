@@ -62,9 +62,7 @@
       ]
     },
     "win": {
-      "target": [
-        "nsis"
-      ],
+      "target": "msi",
       "files": [
         "!assets/**"
       ]
@@ -74,6 +72,9 @@
         "AppImage"
       ],
       "category": "Development"
+    },
+    "msi": {
+      "artifactName": "${productName} Setup ${version}.${ext}"
     },
     "directories": {
       "app": "build/app",
@@ -94,9 +95,8 @@
     "url": "git+https://github.com/tmax-cloud/cmp-studio.git"
   },
   "author": {
-    "name": "CMP Studio Maintainers",
-    "email": "",
-    "url": ""
+    "name": "TmaxCloud",
+    "url": "https://github.com/tmax-cloud/cmp-studio"
   },
   "license": "MIT",
   "bugs": {

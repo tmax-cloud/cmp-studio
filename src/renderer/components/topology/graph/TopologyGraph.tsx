@@ -36,10 +36,6 @@ const TopologyGraph = (props: TopologyGraphProps) => {
     dispatch(setLoadingModal(!isLoadFinished));
   }, [isInitFinished, loadingMsg, isLoadFinished, errorMsg, dispatch]);
 
-  React.useEffect(() => {
-    graphRef.current?.zoomToFit();
-  }, [graphRef, width, height]);
-
   return (
     <Box
       sx={{
