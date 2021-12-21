@@ -189,7 +189,7 @@ export class TerraformMainService {
         TERRAFORM_EXE_PATH_KEY
       );
       const tfPlanCmd = spawn(
-        `"${appTfExePath}" -chdir="${folderUri}" plan -no-color`,
+        `"${appTfExePath}" -chdir="${folderUri}" plan -no-color -input=false`,
         {
           shell: true,
         }
@@ -227,7 +227,7 @@ export class TerraformMainService {
         TERRAFORM_EXE_PATH_KEY
       );
       const tfPlanCmd = spawn(
-        `"${appTfExePath}" -chdir="${folderUri}" apply -no-color -auto-approve`,
+        `"${appTfExePath}" -chdir="${folderUri}" apply -no-color -auto-approve -input=false`,
         {
           shell: true,
         }
