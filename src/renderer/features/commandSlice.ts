@@ -3,9 +3,16 @@ import {
   TerraformCommandResponseStatus,
   TerraformCommandResponseStatusType,
 } from '@renderer/types/terraform';
-import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
-import { setSidePanel, setLoadingMsg, setLoadingModal } from './uiSlice';
-import { setTerraformState } from './commonSlice';
+import {
+  getTerraformPlan,
+  getTerraformApply,
+} from '@renderer/utils/ipc/terraformIpcUtils';
+import {
+  setSidePanel,
+  setLoadingMsg,
+  setLoadingModal,
+  setCommandPage,
+} from './uiSlice';
 
 type CommandResponseDataType = {
   type: string;
@@ -15,17 +22,36 @@ type CommandResponseDataType = {
 };
 
 type CommandSlice = {
-  planResponseData: CommandResponseDataType;
+  terraformResponseData: CommandResponseDataType;
 };
 
 const initialState: CommandSlice = {
-  planResponseData: {
+  terraformResponseData: {
     type: '',
-    status: 'LOADING' as TerraformCommandResponseStatusType,
+    status: 'INIT' as TerraformCommandResponseStatusType,
     data: '',
     message: '',
   },
 };
+
+export const fetchTerraformApplyDataByWorkspaceId = createAsyncThunk(
+  'command/fetchTerraformApplyDataByWorkspaceId',
+  async (workspaceUid: string, { dispatch, rejectWithValue }) => {
+    dispatch(setLoadingMsg('테라폼 어플라이 명령어를 실행하는 중입니다.'));
+    try {
+      const response = await getTerraformApply({ workspaceUid });
+      return response;
+    } catch (error) {
+      const { message } = error as any;
+      return rejectWithValue(message);
+    } finally {
+      dispatch(setSidePanel(false));
+      dispatch(setLoadingMsg(null));
+      dispatch(setLoadingModal(false));
+      dispatch(setCommandPage(true));
+    }
+  }
+);
 
 export const fetchTerraformPlanDataByWorkspaceId = createAsyncThunk(
   'command/fetchTerraformPlanDataByWorkspaceId',
@@ -33,28 +59,15 @@ export const fetchTerraformPlanDataByWorkspaceId = createAsyncThunk(
     dispatch(setLoadingMsg('테라폼 플랜 명령어를 실행하는 중입니다.'));
     try {
       const response = await getTerraformPlan({ workspaceUid });
-      dispatch(
-        setTerraformState({
-          status: response.status,
-          message: response.data.message,
-          data: response.data.planData,
-        })
-      );
       return response;
     } catch (error) {
       const { message } = error as any;
-      dispatch(
-        setTerraformState({
-          status: 'Error',
-          data: '',
-          message,
-        })
-      );
       return rejectWithValue(message);
     } finally {
       dispatch(setSidePanel(false));
       dispatch(setLoadingMsg(null));
       dispatch(setLoadingModal(false));
+      dispatch(setCommandPage(true));
     }
   }
 );
@@ -64,7 +77,7 @@ const commandSlice = createSlice({
   initialState,
   reducers: {
     setTerraformCommandResponse: (state, action: PayloadAction<any>) => {
-      state.planResponseData = action.payload;
+      state.terraformResponseData = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -75,10 +88,9 @@ const commandSlice = createSlice({
     builder.addCase(
       fetchTerraformPlanDataByWorkspaceId.fulfilled,
       (state, { payload }) => {
-        console.log('플랜 성공: ', payload);
-        state.planResponseData = {
-          type: payload.status.split('_')[1],
-          status: payload.status.split('_')[0],
+        state.terraformResponseData = {
+          type: 'PLAN',
+          status: payload.status,
           data: payload.data.planData,
           message: payload.data.message,
         };
@@ -87,8 +99,34 @@ const commandSlice = createSlice({
     builder.addCase(
       fetchTerraformPlanDataByWorkspaceId.rejected,
       (state, { payload }: any) => {
-        state.planResponseData = {
+        state.terraformResponseData = {
           type: 'PLAN',
+          status: TerraformCommandResponseStatusType.ERROR,
+          data: null,
+          message: payload.data.message,
+        };
+      }
+    );
+    builder.addCase(
+      fetchTerraformApplyDataByWorkspaceId.pending,
+      (state, { payload }) => {}
+    );
+    builder.addCase(
+      fetchTerraformApplyDataByWorkspaceId.fulfilled,
+      (state, { payload }) => {
+        state.terraformResponseData = {
+          type: 'APPLY',
+          status: payload.status,
+          data: payload.data.applyData,
+          message: payload.data.message,
+        };
+      }
+    );
+    builder.addCase(
+      fetchTerraformApplyDataByWorkspaceId.rejected,
+      (state, { payload }: any) => {
+        state.terraformResponseData = {
+          type: 'APPLY',
           status: TerraformCommandResponseStatusType.ERROR,
           data: null,
           message: payload.data.message,

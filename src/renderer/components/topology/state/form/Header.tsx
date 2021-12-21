@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import * as TerraformTypes from '@main/terraform-command/common/terraform';
 import { Box, IconButton, Typography, TextField } from '@mui/material';
 import { Close, Save } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
@@ -14,8 +13,6 @@ import {
 import { getObjectDataType, TerraformType } from '@renderer/types/terraform';
 import { exportProject } from '@renderer/utils/ipc/workspaceIpcUtils';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
-import { setTerraformState } from '@renderer/features/commonSlice';
-import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
 import { watchGraphData } from '@renderer/features/graphSlice';
 import { getIcon } from '../../icon/IconFactory';
@@ -194,27 +191,6 @@ const FormHeader = (props: FormHeaderProps) => {
                   dispatch(setFileDirty(true));
                   dispatch(watchGraphData(workspaceUid));
                 }
-
-                await getTerraformPlan({ workspaceUid })
-                  .then((res: TerraformTypes.TerraformResponse) => {
-                    const { status, data } = res;
-                    const { planData } =
-                      data as TerraformTypes.TerraformPlanSuccessData;
-                    const { message } =
-                      data as TerraformTypes.TerraformErrorData;
-                    dispatch(
-                      setTerraformState({
-                        status,
-                        data: planData,
-                        message,
-                      })
-                    );
-                    return res;
-                  })
-                  .catch((e: any) => {
-                    console.log(e);
-                  });
-                console.log('[INFO] Change Instance Name : ', result);
               }}
             >
               <Save />
