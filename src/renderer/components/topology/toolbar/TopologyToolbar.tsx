@@ -14,13 +14,20 @@ import { useWorkspaceName } from '@renderer/hooks/useWorkspaceName';
 import { watchGraphData } from '@renderer/features/graphSlice';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
 import { selectFileDirty } from '@renderer/features/uiSliceInputSelectors';
-import { setFileDirty } from '@renderer/features/uiSlice';
+import {
+  setFileDirty,
+  setLoadingModal,
+  setLoadingMsg,
+} from '@renderer/features/uiSlice';
+import { fetchTerraformPlanDataByWorkspaceId } from '@renderer/features/commandSlice';
 import {
   FitScreenButton,
+  TerraformApplyButton,
   SaveButton,
   SelectModuleButton,
   ZoomInButton,
   ZoomOutButton,
+  TerraformPlanButton,
 } from './button';
 import ViewBreadcrumbs from './breadcrumb/ViewBreadcrumb';
 import { ModuleListModal } from '../modal';
@@ -57,6 +64,11 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
     // console.log('[INFO] File export result : ', result);
   };
 
+  const handleTerraformPlanButton = async () => {
+    dispatch(fetchTerraformPlanDataByWorkspaceId(workspaceUid));
+    dispatch(setLoadingModal(true));
+  };
+
   return (
     <Toolbar
       style={{ minHeight: 48, paddingLeft: 20, paddingRight: 20 }}
@@ -78,6 +90,18 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
           ml: 5,
         }}
       >
+        <TerraformApplyButton
+          onClick={() => {
+            console.log('apply');
+          }}
+        />
+        <TerraformPlanButton onClick={handleTerraformPlanButton} />
+        <Divider
+          orientation="vertical"
+          variant="middle"
+          flexItem
+          sx={{ mx: 1 }}
+        />
         <SaveButton visibleBadge={fileDirty} onClick={handleSaveButtonClick} />
         <SelectModuleButton onClick={handleModuleListModalOpen} />
         <ModuleListModal

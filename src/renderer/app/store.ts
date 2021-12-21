@@ -6,6 +6,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import graphReducer from '@renderer/features/graphSlice';
 import codeReducer from '../features/codeSlice';
 import commonReducer from '../features/commonSlice';
+import commandReducer from '../features/commandSlice';
 import uiReducer from '../features/uiSlice';
 
 const rootPersistConfig = {
@@ -23,6 +24,7 @@ const codePersistConfig = {
 const rootReducer: any = combineReducers({
   code: persistReducer(codePersistConfig, codeReducer),
   common: commonReducer,
+  command: commandReducer,
   graph: graphReducer,
   ui: uiReducer,
 });
