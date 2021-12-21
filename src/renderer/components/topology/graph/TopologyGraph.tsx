@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as _ from 'lodash';
 import ForceGraph2D, {
   ForceGraphMethods,
   ForceGraphProps,
@@ -12,9 +11,8 @@ import {
   selectErrorMsg,
   selectSelectedData,
 } from '@renderer/features/graphSliceInputSelectors';
-import { setLoadingModal, setLoadingMsg } from '@renderer/features/uiSlice';
+import { setLoadingModal } from '@renderer/features/uiSlice';
 import { selectUiLoadingMsg } from '@renderer/features/uiSliceInputSelectors';
-import { INIT_FINISHED } from '@renderer/utils/graph';
 import Box from '@mui/material/Box';
 import Error from './Error';
 
@@ -23,18 +21,15 @@ const TopologyGraph = (props: TopologyGraphProps) => {
 
   const dispatch = useAppDispatch();
   const selectedData = useAppSelector(selectSelectedData);
-
   const graphData = useGraphData(selectedData);
 
   useGraphInitOutput();
   const loadingMsg = useAppSelector(selectUiLoadingMsg);
   const errorMsg = useAppSelector(selectErrorMsg);
-  const isInitFinished = !loadingMsg || loadingMsg === INIT_FINISHED;
-  const isLoadFinished = isInitFinished && !loadingMsg;
+
   React.useEffect(() => {
-    dispatch(setLoadingMsg(loadingMsg as string | null));
-    dispatch(setLoadingModal(!isLoadFinished));
-  }, [isInitFinished, loadingMsg, isLoadFinished, errorMsg, dispatch]);
+    dispatch(setLoadingModal(!!loadingMsg));
+  }, [dispatch, loadingMsg]);
 
   return (
     <Box
@@ -45,8 +40,8 @@ const TopologyGraph = (props: TopologyGraphProps) => {
         overflow: 'hidden',
       }}
     >
-      {!isLoadFinished || errorMsg ? (
-        <Error isLoading={!isLoadFinished} message={errorMsg} />
+      {loadingMsg || errorMsg ? (
+        <Error isLoading={!!loadingMsg} message={errorMsg} />
       ) : (
         <ForceGraph2D
           ref={graphRef}

@@ -14,11 +14,7 @@ import { useWorkspaceName } from '@renderer/hooks/useWorkspaceName';
 import { watchGraphData } from '@renderer/features/graphSlice';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
 import { selectFileDirty } from '@renderer/features/uiSliceInputSelectors';
-import {
-  setFileDirty,
-  setLoadingModal,
-  setLoadingMsg,
-} from '@renderer/features/uiSlice';
+import { setFileDirty, setLoadingModal } from '@renderer/features/uiSlice';
 import { fetchTerraformPlanDataByWorkspaceId } from '@renderer/features/commandSlice';
 import {
   FitScreenButton,

@@ -16,7 +16,11 @@ import {
   setFileObjects,
   setSelectedContent,
 } from '@renderer/features/codeSlice';
-import { setFileDirty, setSidePanel } from '@renderer/features/uiSlice';
+import {
+  setFileDirty,
+  setLoadingMsg,
+  setSidePanel,
+} from '@renderer/features/uiSlice';
 import { setTerraformState } from '@renderer/features/commonSlice';
 import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
 import {
@@ -24,6 +28,7 @@ import {
   watchGraphData,
 } from '@renderer/features/graphSlice';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
+import { LOADING } from '@renderer/utils/graph';
 
 const useStyles = makeStyles({
   root: {
@@ -80,6 +85,7 @@ const SaveSection = (props: SaveSectionProps) => {
 
   const dispatch = useAppDispatch();
   const onDeleteObject = async () => {
+    dispatch(setLoadingMsg(LOADING));
     let isFileDeleted = false;
     const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
       if (_.get(cur.fileJson, path as string)) {
@@ -247,6 +253,7 @@ const SaveSection = (props: SaveSectionProps) => {
           variant="contained"
           onClick={async () => {
             // redux fileObjects에 변경된 부분 저장하기
+            dispatch(setLoadingMsg(LOADING));
             const fileIdx = _.findIndex(fileObjects, (cur: any, idx) => {
               if (_.get(cur.fileJson, path as string)) {
                 return true;
