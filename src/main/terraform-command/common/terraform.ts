@@ -27,7 +27,6 @@ export enum TerraformStatusType {
   ERROR = 'ERROR',
   ERROR_INIT = 'ERROR_INIT',
   ERROR_GRAPH = 'ERROR_GRAPH',
-  ERROR_PLAN = 'ERROR_PLAN',
   ERROR_TF_EXE_PATH = 'ERROR_TF_EXE_PATH',
 }
 
@@ -36,7 +35,6 @@ type TerraformStatus =
   | TerraformStatusType.ERROR
   | TerraformStatusType.ERROR_INIT
   | TerraformStatusType.ERROR_GRAPH
-  | TerraformStatusType.ERROR_PLAN
   | TerraformStatusType.ERROR_TF_EXE_PATH;
 
 export type TerraformApplySuccessData = { applyData: string };
