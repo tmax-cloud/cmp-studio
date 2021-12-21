@@ -4,7 +4,7 @@ import { Box, Modal, Typography } from '@mui/material';
 import LoadingIcon from '../../../../../assets/images/loading64x64.gif';
 
 const LoadingModal = (props: LoadingModalProps) => {
-  const { isOpen, initMsg, loadingMsg } = props;
+  const { isOpen, loadingMsg } = props;
 
   return (
     <Modal
@@ -43,7 +43,7 @@ const LoadingModal = (props: LoadingModalProps) => {
           시각화 중...
         </Typography>
         <Typography align="center" variant="subtitle2" sx={{ color: 'gray' }}>
-          {initMsg || loadingMsg}
+          {loadingMsg}
         </Typography>
       </Box>
     </Modal>
@@ -52,7 +52,6 @@ const LoadingModal = (props: LoadingModalProps) => {
 
 export interface LoadingModalProps {
   isOpen: boolean;
-  initMsg?: string;
   loadingMsg: string | null;
 }
 
