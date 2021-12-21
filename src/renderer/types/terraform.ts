@@ -1,4 +1,3 @@
-import * as _ from 'lodash-es';
 export type TerraformType =
   | 'data'
   | 'locals'
