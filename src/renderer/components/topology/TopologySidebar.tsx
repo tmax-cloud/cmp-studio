@@ -116,6 +116,7 @@ const TopologySidebar = () => {
         const uid = response?.data?.uid;
         if (uid) {
           const projectJsonRes = await getProjectJson(args);
+          console.log('error throw: ', projectJsonRes);
           const { data, mapObjectTypeCollection } = parseToCustomizeKey(
             projectJsonRes.data
           );

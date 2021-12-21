@@ -12,10 +12,7 @@ import {
   TerraformCheckExeArgs,
   TerraformPlanArgs,
 } from '../common/terraform';
-import {
-  WorkspaceIdentifier,
-  WorkspaceMainServiceInterface,
-} from '../../workspaces/common/workspace';
+import { WorkspaceMainServiceInterface } from '../../workspaces/common/workspace';
 import { isWindows, isLinux, isMacintosh } from '../../base/common/platform';
 import { TERRAFORM_EXE_PATH_KEY } from '../../configs/common/configuration';
 import { AppConfigurationMainService } from '../../configs/electron-main/appConfigurationMainService';
@@ -384,7 +381,7 @@ export class TerraformMainService {
           };
         } catch (message: any) {
           return {
-            status: TerraformStatusType.ERROR_PLAN,
+            status: TerraformStatusType.ERROR,
             data: { message },
           };
         }
@@ -411,7 +408,7 @@ export class TerraformMainService {
           };
         } catch (message: any) {
           return {
-            status: TerraformStatusType.ERROR_PLAN,
+            status: TerraformStatusType.ERROR,
             data: { message },
           };
         }

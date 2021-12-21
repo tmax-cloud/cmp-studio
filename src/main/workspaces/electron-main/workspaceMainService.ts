@@ -259,14 +259,18 @@ export class WorkspaceMainService
         arg: WorkspaceTypes.WorkspaceGetProjectJsonArgs
       ): WorkspaceTypes.WorkspaceResponse => {
         const { folderUri } = arg;
+        console.log('Im start point');
         try {
+          console.log('while converter');
           const result =
             this.workspaceConvertService.convertAllHclToJson(folderUri);
+          console.log('after converter');
           return {
             status: WorkspaceTypes.WorkspaceStatusType.SUCCESS,
             data: result,
           };
         } catch (e: any) {
+          console.log('converter or case block');
           if (e === WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT) {
             return {
               status: WorkspaceTypes.WorkspaceStatusType.ERROR_NO_PROJECT,
