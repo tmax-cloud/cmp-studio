@@ -1,6 +1,6 @@
 import * as React from 'react';
 import path from 'path';
-import _ from 'lodash';
+import _, { debounce } from 'lodash';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
 import * as TerraformTypes from '@main/terraform-command/common/terraform';
 import {
@@ -410,7 +410,6 @@ let selectedProvider = '';
 
 const TopologyLibrary = () => {
   const [provider, setProvider] = React.useState(selectedProvider || 'aws');
-  const [defaltItems, setDefaltItems] = React.useState<Item[]>([]);
   const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
   const [datasourceItems, setdatasourceItems] = React.useState<Item[]>([]);
   const providerHandleChange = (event: any) => {
@@ -534,8 +533,6 @@ const TopologyLibrary = () => {
         }
       }
     });
-
-    setDefaltItems(defaultList);
     setResourceItems(resourceList);
     setdatasourceItems(datasourceList);
     //setTerraformModuleItems(moduleList);
@@ -596,7 +593,7 @@ const TopologyLibrary = () => {
           title="로컬 모듈"
         />
         <ShowItemList
-          items={defaltItems}
+          items={defaultList}
           title="테라폼 디폴트"
           provider={provider}
         />
