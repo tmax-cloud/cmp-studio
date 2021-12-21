@@ -4,7 +4,7 @@ import { Box, MenuItem, InputLabel, Select, TextField } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { useAppSelector } from '@renderer/app/store';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
-import TopologyLibararyItemList from './TopologyLibararyItemList';
+import TopologyLibararyItemList from './TopologyLibrararyItemList';
 import parseJson from '../state/form/utils/json2JsonSchemaParser';
 
 const defaultList = [
@@ -35,7 +35,7 @@ const defaultList = [
   },
 ];
 
-function seartchByName(searchText: string, name: string) {
+function searchByName(searchText: string, name: string) {
   if (name.toUpperCase().indexOf(searchText.toUpperCase()) !== -1) {
     return true;
   } else {
@@ -172,7 +172,7 @@ const TopologyLibrary = () => {
     const datasourceList: Item[] = [];
 
     items.forEach((i: Item) => {
-      if (seartchByName(searchText, i.resourceName)) {
+      if (searchByName(searchText, i.resourceName)) {
         if (i.type === 'resource') {
           resourceList.push({
             provider: i.provider,
