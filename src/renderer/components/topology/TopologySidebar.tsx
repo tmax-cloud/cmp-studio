@@ -123,6 +123,7 @@ const TopologySidebar = () => {
           dispatch(setLoadingMsg(LOADING));
           dispatch(setFileDirty(false));
           const projectJsonRes = await getProjectJson(args);
+          console.log('error throw: ', projectJsonRes);
           const { data, mapObjectTypeCollection } = parseToCustomizeKey(
             projectJsonRes.data
           );

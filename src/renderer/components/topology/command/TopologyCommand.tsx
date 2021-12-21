@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as _ from 'lodash';
-import { useAppSelector, useAppDispatch } from '@renderer/app/store';
+import { useAppSelector } from '@renderer/app/store';
 import { selectCommandTerraformResponseData } from '@renderer/features/commandSliceInputSelectors';
 import { Box, Typography } from '@mui/material';
 import { useTerraformApplyOutput } from '@renderer/hooks/useTerraformApplyOutput';
@@ -24,6 +24,7 @@ const TopologyCommand = () => {
         return INIT_STRING;
       }
       default:
+        return '';
     }
   };
 

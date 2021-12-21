@@ -12,10 +12,7 @@ import {
   TerraformCheckExeArgs,
   TerraformPlanArgs,
 } from '../common/terraform';
-import {
-  WorkspaceIdentifier,
-  WorkspaceMainServiceInterface,
-} from '../../workspaces/common/workspace';
+import { WorkspaceMainServiceInterface } from '../../workspaces/common/workspace';
 import { isWindows, isLinux, isMacintosh } from '../../base/common/platform';
 import { TERRAFORM_EXE_PATH_KEY } from '../../configs/common/configuration';
 import { AppConfigurationMainService } from '../../configs/electron-main/appConfigurationMainService';
@@ -192,7 +189,7 @@ export class TerraformMainService {
         TERRAFORM_EXE_PATH_KEY
       );
       const tfPlanCmd = spawn(
-        `"${appTfExePath}" -chdir="${folderUri}" plan -no-color`,
+        `"${appTfExePath}" -chdir="${folderUri}" plan -no-color -input=false`,
         {
           shell: true,
         }
@@ -230,7 +227,7 @@ export class TerraformMainService {
         TERRAFORM_EXE_PATH_KEY
       );
       const tfPlanCmd = spawn(
-        `"${appTfExePath}" -chdir="${folderUri}" apply -no-color -auto-approve`,
+        `"${appTfExePath}" -chdir="${folderUri}" apply -no-color -auto-approve -input=false`,
         {
           shell: true,
         }
@@ -384,7 +381,7 @@ export class TerraformMainService {
           };
         } catch (message: any) {
           return {
-            status: TerraformStatusType.ERROR_PLAN,
+            status: TerraformStatusType.ERROR,
             data: { message },
           };
         }
@@ -411,7 +408,7 @@ export class TerraformMainService {
           };
         } catch (message: any) {
           return {
-            status: TerraformStatusType.ERROR_PLAN,
+            status: TerraformStatusType.ERROR,
             data: { message },
           };
         }
