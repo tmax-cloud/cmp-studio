@@ -19,8 +19,13 @@ import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { OptionProperties, OpenType } from '@main/dialog/common/dialog';
 import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
-import { setSidePanel } from '@renderer/features/uiSlice';
+import {
+  setFileDirty,
+  setLoadingMsg,
+  setSidePanel,
+} from '@renderer/features/uiSlice';
 import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
+import { LOADING } from '@renderer/utils/graph';
 import parseToCustomizeKey from './state/form/utils/parseToCustomizeKey';
 
 import {
@@ -115,6 +120,8 @@ const TopologySidebar = () => {
       .then(async (response: any) => {
         const uid = response?.data?.uid;
         if (uid) {
+          dispatch(setLoadingMsg(LOADING));
+          dispatch(setFileDirty(false));
           const projectJsonRes = await getProjectJson(args);
           const { data, mapObjectTypeCollection } = parseToCustomizeKey(
             projectJsonRes.data
