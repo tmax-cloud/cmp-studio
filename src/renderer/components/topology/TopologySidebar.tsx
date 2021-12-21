@@ -29,7 +29,7 @@ import {
 } from '../../utils/ipc/workspaceIpcUtils';
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
-import TopologyLibrary from './TopologyLibrary';
+import TopologyLibrary from './library/TopologyLibrary';
 import {
   setFileObjects,
   setMapObjectTypeCollection,
