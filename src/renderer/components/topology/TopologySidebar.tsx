@@ -34,7 +34,7 @@ import {
 } from '../../utils/ipc/workspaceIpcUtils';
 import { openDialog } from '../../utils/ipc/dialogIpcUtils';
 import { TOP_NAVBAR_HEIGHT } from '../MainNavbar';
-import TopologyLibrary from './library2/TopologyLibrary';
+import TopologyLibrary from './library/TopologyLibrary';
 import {
   setFileObjects,
   setMapObjectTypeCollection,
