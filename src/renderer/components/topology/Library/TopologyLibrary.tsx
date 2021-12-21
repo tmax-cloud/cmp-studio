@@ -4,7 +4,7 @@ import { Box, MenuItem, InputLabel, Select, TextField } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { useAppSelector } from '@renderer/app/store';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
-import TopologyLibararyItemList from './TopologyLibrararyItemList';
+import TopologyLibararyItemList from './TopologyLibraryItemList';
 import parseJson from '../state/form/utils/json2JsonSchemaParser';
 
 const defaultList = [
