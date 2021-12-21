@@ -96,6 +96,12 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
           }}
         />
         <TerraformPlanButton onClick={handleTerraformPlanButton} />
+        <Divider
+          orientation="vertical"
+          variant="middle"
+          flexItem
+          sx={{ mx: 1 }}
+        />
         <SaveButton visibleBadge={fileDirty} onClick={handleSaveButtonClick} />
         <SelectModuleButton onClick={handleModuleListModalOpen} />
         <ModuleListModal
