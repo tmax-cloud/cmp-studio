@@ -3,8 +3,8 @@ import * as React from 'react';
 import { Box, Modal, Typography } from '@mui/material';
 import LoadingIcon from '../../../../../assets/images/loading64x64.gif';
 
-const GraphLoadingModal = (props: GraphLoadingModalProps) => {
-  const { isOpen, initMsg, loadingMsg } = props;
+const LoadingModal = (props: LoadingModalProps) => {
+  const { isOpen, loadingMsg } = props;
 
   return (
     <Modal
@@ -43,17 +43,16 @@ const GraphLoadingModal = (props: GraphLoadingModalProps) => {
           시각화 중...
         </Typography>
         <Typography align="center" variant="subtitle2" sx={{ color: 'gray' }}>
-          {initMsg || loadingMsg}
+          {loadingMsg}
         </Typography>
       </Box>
     </Modal>
   );
 };
 
-export interface GraphLoadingModalProps {
+export interface LoadingModalProps {
   isOpen: boolean;
-  initMsg?: string;
   loadingMsg: string | null;
 }
 
-export default GraphLoadingModal;
+export default LoadingModal;
