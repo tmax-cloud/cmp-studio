@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
-import * as TerraformTypes from '@main/terraform-command/common/terraform';
 import { Box, IconButton, Typography, TextField } from '@mui/material';
 import { Close, Save } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
@@ -47,7 +46,7 @@ const FormHeader = (props: FormHeaderProps) => {
   };
   React.useEffect(() => {
     setNewTitle(title);
-    setIsFixed(!isInstanceName(type));
+    setIsFixed(!isInstanceName(type) || type === 'provider');
   }, [title, type]);
 
   const getPath = (type: TerraformType) => {
@@ -149,7 +148,7 @@ const FormHeader = (props: FormHeaderProps) => {
             <TextField
               value={newTitle}
               placeholder="Name"
-              label="InstanceName"
+              label="Instance Name"
               onChange={newTitleChange}
               style={{ marginLeft: '10px' }}
               fullWidth

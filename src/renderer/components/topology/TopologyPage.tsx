@@ -86,7 +86,7 @@ export const TopologyPage = () => {
     <TopologyLayoutRoot>
       <LoadingModal isOpen={isLoadingModalOpen} loadingMsg={loadingMsg} />
       <ToggleButtonGroup
-        sx={{ position: 'absolute', left: '330px', top: '126px', zIndex: '1' }}
+        sx={{ position: 'absolute', left: '316px', top: '105px', zIndex: '1' }}
         color="primary"
         value={alignment}
         exclusive

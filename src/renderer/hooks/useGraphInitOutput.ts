@@ -1,19 +1,18 @@
-import { useEffect, useState } from 'react';
-import { INIT_FINISHED } from '@renderer/utils/graph';
+import { useEffect } from 'react';
+import { LOADING } from '@renderer/utils/graph';
 import { useAppDispatch } from '@renderer/app/store';
 import { setLoadingMsg } from '@renderer/features/uiSlice';
 
 export const useGraphInitOutput = () => {
-  const [output, setOutput] = useState<string>();
   const dispatch = useAppDispatch();
   const succeessMsg = 'Terraform has been successfully initialized!';
+
   useEffect(() => {
     window.electron.ipcRenderer.on(
       'studio:terraformInitStdout',
       (res: string) => {
         if (res.includes(succeessMsg)) {
-          dispatch(setLoadingMsg(INIT_FINISHED));
-          // setOutput(INIT_FINISHED);
+          dispatch(setLoadingMsg(LOADING));
         } else {
           const skipMsg = [
             'Warning',
@@ -22,13 +21,8 @@ export const useGraphInitOutput = () => {
           ];
           const skip = skipMsg.some((msg) => res.includes(msg));
           !skip && dispatch(setLoadingMsg(res));
-          if (res === INIT_FINISHED) {
-            dispatch(setLoadingMsg(''));
-          }
         }
       }
     );
-  }, []);
-
-  return output;
+  }, [dispatch]);
 };

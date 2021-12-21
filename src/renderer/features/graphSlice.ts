@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
   getGraphData,
   getTerraformData,
+  LOADING,
   QUICK_START,
 } from '@renderer/utils/graph';
 import { GraphData } from 'react-force-graph-2d';
@@ -36,8 +37,8 @@ const initialState: GraphState = {
 export const fetchGraphDataByTerraform = createAsyncThunk(
   'graph/fetchGraphDataByTerraform',
   async (rawData: string, { dispatch, rejectWithValue }) => {
-    dispatch(setLoadingMsg('테라폼 그래프를 불러오는 중입니다.'));
     try {
+      dispatch(setLoadingMsg(LOADING));
       const data = await getGraphData(rawData);
       return data;
     } catch (error) {
@@ -54,8 +55,8 @@ export const fetchGraphDataByTerraform = createAsyncThunk(
 export const fetchGraphDataByWorkspaceId = createAsyncThunk(
   'graph/fetchGraphDataByWorkspaceId',
   async (workspaceUid: string, { dispatch, rejectWithValue }) => {
-    dispatch(setLoadingMsg('테라폼 그래프를 불러오는 중입니다.'));
     try {
+      dispatch(setLoadingMsg(LOADING));
       const data = await getTerraformData(workspaceUid);
       dispatch(fetchGraphDataByTerraform(data));
       return data;
@@ -88,6 +89,8 @@ export const watchGraphData = createAsyncThunk(
       const { message } = error as Error;
       dispatch(setSidePanel(false));
       return rejectWithValue(message);
+    } finally {
+      dispatch(setLoadingMsg(null));
     }
   }
 );
@@ -110,7 +113,7 @@ const graphSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // watchGraphData: 데이터 가져오기 및 에러 상황에 대해서만 처리, 로딩메시지 x
+    // watchGraphData: 데이터 가져오기 및 에러 상황 처리
     builder.addCase(watchGraphData.fulfilled, (state, { payload }) => {
       if (payload) {
         state.terraformData = (payload as Data).terraform;
@@ -125,11 +128,7 @@ const graphSlice = createSlice({
       state.selectedData = { nodes: [], links: [] };
       state.errorMsg = payload as string;
     });
-    // fetchGraphDataByWorkspaceId: 테라폼 데이터 가져오기 및 로딩 메시지 처리
-    builder.addCase(
-      fetchGraphDataByWorkspaceId.pending,
-      (state, { payload }) => {}
-    );
+    // fetchGraphDataByWorkspaceId: 테라폼 데이터 가져오기
     builder.addCase(
       fetchGraphDataByWorkspaceId.fulfilled,
       (state, { payload }) => {
