@@ -22,7 +22,7 @@ import {
 } from './draw';
 
 export const QUICK_START = 'CMP Studio 시작하기';
-export const INIT_FINISHED = '테라폼 초기화가 완료되었습니다.';
+export const LOADING = '테라폼 그래프를 불러오는 중입니다.';
 
 export const getTerraformData = async (workspaceUid: string) => {
   let graphData;
@@ -239,4 +239,5 @@ export const getCodeInfo = (
       content: codeInfo,
     };
   }
+  return codeInfo;
 };
