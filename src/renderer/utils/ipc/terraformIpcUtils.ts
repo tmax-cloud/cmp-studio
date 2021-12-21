@@ -13,5 +13,8 @@ export const getTerraformVersion = (
 export const getTerraformPlan = (args: TerraformTypes.TerraformPlanArgs) =>
   window.electron.ipcRenderer.invoke('studio:getTerraformPlan', args);
 
+export const getTerraformApply = (args: TerraformTypes.TerraformApplyArgs) =>
+  window.electron.ipcRenderer.invoke('studio:getTerraformApply', args);
+
 export const checkTerraformExe = (args: TerraformTypes.TerraformCheckExeArgs) =>
   window.electron.ipcRenderer.invoke('studio:checkTerraformExe', args);

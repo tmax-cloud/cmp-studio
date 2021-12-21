@@ -63,6 +63,10 @@ export const TopologyPage = () => {
     dispatch(fetchGraphDataByWorkspaceId(workspaceUid));
   }, [dispatch, workspaceUid]);
 
+  React.useEffect(() => {
+    setAlignment(isCommandPageOpen ? 'command' : 'graph');
+  }, [isCommandPageOpen]);
+
   // if (!localStorage.getItem('schemaJson')) {
   const schemaJson = parseJson(['aws', 'tls']);
   setSchemaMap(JSON.stringify(Array.from(schemaJson.entries())));
@@ -72,7 +76,9 @@ export const TopologyPage = () => {
   const classes = useStyles({ isSidePanelOpen });
 
   const handleToggle = (event: React.MouseEvent, newAlignment: string) => {
-    setAlignment(newAlignment);
+    if (newAlignment !== null) {
+      setAlignment(newAlignment);
+    }
     dispatch(setCommandPage(newAlignment === 'command'));
   };
 

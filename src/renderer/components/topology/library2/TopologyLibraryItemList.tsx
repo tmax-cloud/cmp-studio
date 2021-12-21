@@ -21,7 +21,6 @@ import {
   setFileObjects,
   setSelectedObjectInfo,
 } from '@renderer/features/codeSlice';
-import { setTerraformState } from '@renderer/features/commonSlice';
 import {
   selectCodeFileObjects,
   selectMapObjectTypeCollection,
@@ -36,7 +35,6 @@ import {
   setSelectedNode,
   watchGraphData,
 } from '@renderer/features/graphSlice';
-import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
 import { useWorkspaceUri } from '@renderer/hooks/useWorkspaceUri';
 import { getIcon } from '@renderer/components/topology/icon/IconFactory';
 
@@ -219,26 +217,6 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
                             dispatch(setFileDirty(true));
                             dispatch(watchGraphData(workspaceUid));
                           }
-                          await getTerraformPlan({ workspaceUid })
-                            .then((res: TerraformTypes.TerraformResponse) => {
-                              const { status, data } = res;
-                              const { planData } =
-                                data as TerraformTypes.TerraformPlanSuccessData;
-                              const { message } =
-                                data as TerraformTypes.TerraformErrorData;
-                              dispatch(
-                                setTerraformState({
-                                  status,
-                                  data: planData,
-                                  message,
-                                })
-                              );
-                              return res;
-                            })
-                            .catch((e: any) => {
-                              console.log(e);
-                            });
-                          console.log('[INFO] File export result : ', result);
                         } else {
                           const { type } = item;
                           const newInstanceName =
@@ -288,26 +266,6 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
                             dispatch(setFileDirty(true));
                             dispatch(watchGraphData(workspaceUid));
                           }
-                          await getTerraformPlan({ workspaceUid })
-                            .then((res: TerraformTypes.TerraformResponse) => {
-                              const { status, data } = res;
-                              const { planData } =
-                                data as TerraformTypes.TerraformPlanSuccessData;
-                              const { message } =
-                                data as TerraformTypes.TerraformErrorData;
-                              dispatch(
-                                setTerraformState({
-                                  status,
-                                  data: planData,
-                                  message,
-                                })
-                              );
-                              return res;
-                            })
-                            .catch((e: any) => {
-                              console.log(e);
-                            });
-                          console.log('[INFO] File export result : ', result);
                         }
                       }}
                     >
