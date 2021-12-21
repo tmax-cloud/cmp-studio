@@ -45,24 +45,17 @@ const TopologyGraph = (props: TopologyGraphProps) => {
         overflow: 'hidden',
       }}
     >
-      {/* {!isLoadFinished || errorMsg ? (
-        <> */}
-      <Error isLoading={!isLoadFinished} message={errorMsg} />
-      {/* <GraphLoadingModal
-            isOpen={!isLoadFinished}
-            initMsg={initOutputMsg}
-            loadingMsg={loadingMsg}
-          /> */}
-      {/* </>
-      ) : ( */}
-      <ForceGraph2D
-        ref={graphRef}
-        width={width}
-        height={height}
-        graphData={graphData}
-        {...graphOptions}
-      />
-      {/* )} */}
+      {!isLoadFinished || errorMsg ? (
+        <Error isLoading={!isLoadFinished} message={errorMsg} />
+      ) : (
+        <ForceGraph2D
+          ref={graphRef}
+          width={width}
+          height={height}
+          graphData={graphData}
+          {...graphOptions}
+        />
+      )}
     </Box>
   );
 };
