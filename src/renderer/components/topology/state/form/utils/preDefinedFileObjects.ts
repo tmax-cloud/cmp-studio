@@ -83,7 +83,6 @@ const preDefinedFileObjects = (
               makeObjPath + `[${idx}]`
             );
           }
-          mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'block' });
         } else {
           makeMapObjectTypeList(obj[currKey], makeSchemaPath, makeObjPath);
           mapObjectTypeList.push({ [makeSpecialSchemaPath]: 'object' });
