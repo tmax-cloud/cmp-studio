@@ -10,6 +10,9 @@ export type TerraformGraphArgs = {
 export type TerraformPlanArgs = {
   workspaceUid: string;
 };
+export type TerraformApplyArgs = {
+  workspaceUid: string;
+};
 
 export type TerraformVersionArgs = {
   workspaceUid: string;
@@ -36,6 +39,7 @@ type TerraformStatus =
   | TerraformStatusType.ERROR_PLAN
   | TerraformStatusType.ERROR_TF_EXE_PATH;
 
+export type TerraformApplySuccessData = { applyData: string };
 export type TerraformPlanSuccessData = { planData: string };
 export type TerraformVersionSuccessData = { versionData: string };
 export type TerraformGraphSuccessData = { graphData: string };
@@ -46,6 +50,7 @@ type TerraformData =
   | TerraformErrorData
   | TerraformVersionSuccessData
   | TerraformPlanSuccessData
+  | TerraformApplySuccessData
   | string;
 
 export type TerraformResponse = IPCResponse<TerraformStatus, TerraformData>;

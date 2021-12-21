@@ -220,6 +220,44 @@ export class TerraformMainService {
     });
   }
 
+  doTerraformApply(
+    folderUri: string,
+    tfExePath: string,
+    event: Electron.IpcMainInvokeEvent
+  ): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+      const appTfExePath = this.appConfigurationMainService.getItem(
+        TERRAFORM_EXE_PATH_KEY
+      );
+      const tfPlanCmd = spawn(
+        `"${appTfExePath}" -chdir="${folderUri}" apply -no-color -auto-approve`,
+        {
+          shell: true,
+        }
+      );
+      let applyData = '';
+      for await (const chunk of tfPlanCmd.stdout) {
+        applyData += chunk;
+        const chunkString = Buffer.from(chunk).toString();
+        event.sender.send('studio:terraformApplyStdout', chunkString);
+      }
+
+      let applyError = '';
+      for await (const chunk of tfPlanCmd.stderr) {
+        applyError += chunk;
+      }
+
+      const applyExitCode = await new Promise((resolve, reject) => {
+        tfPlanCmd.on('close', resolve);
+      });
+
+      if (applyExitCode) {
+        reject(applyError);
+      }
+      resolve(applyData);
+    });
+  }
+
   registerListeners() {
     ipcMain.handle(
       'studio:doTerraformInit',
@@ -330,12 +368,10 @@ export class TerraformMainService {
       async (event, arg: TerraformPlanArgs): Promise<TerraformResponse> => {
         const { workspaceUid } = arg;
 
-        const workspaceConfig: WorkspaceIdentifier =
-          this.workspaceMainService.workspaceManagementService.getWorkspaceConfig(
+        const folderUri =
+          this.workspaceMainService.workspaceManagementService.getWorkspaceTemporaryFolderPath(
             workspaceUid
           );
-
-        const folderUri = workspaceConfig.workspaceRealPath;
         try {
           const planData: string = await this.doTerraformPlan(
             folderUri,
@@ -345,6 +381,33 @@ export class TerraformMainService {
           return {
             status: TerraformStatusType.SUCCESS,
             data: { planData },
+          };
+        } catch (message: any) {
+          return {
+            status: TerraformStatusType.ERROR_PLAN,
+            data: { message },
+          };
+        }
+      }
+    );
+    ipcMain.handle(
+      'studio:getTerraformApply',
+      async (event, arg: TerraformPlanArgs): Promise<TerraformResponse> => {
+        const { workspaceUid } = arg;
+
+        const folderUri =
+          this.workspaceMainService.workspaceManagementService.getWorkspaceTemporaryFolderPath(
+            workspaceUid
+          );
+        try {
+          const applyData: string = await this.doTerraformApply(
+            folderUri,
+            '',
+            event
+          );
+          return {
+            status: TerraformStatusType.SUCCESS,
+            data: { applyData },
           };
         } catch (message: any) {
           return {

@@ -22,15 +22,13 @@ export const useGraphInitOutput = () => {
           ];
           const skip = skipMsg.some((msg) => res.includes(msg));
           !skip && dispatch(setLoadingMsg(res));
+          if (res === INIT_FINISHED) {
+            dispatch(setLoadingMsg(''));
+          }
         }
       }
     );
   }, []);
-
-  if (output === INIT_FINISHED) {
-    // setOutput(undefined);
-    dispatch(setLoadingMsg(''));
-  }
 
   return output;
 };

@@ -1,13 +1,33 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import { useAppSelector, useAppDispatch } from '@renderer/app/store';
-import { selectTerraformState } from '@renderer/features/commonSliceInputSelectors';
+import { selectCommandTerraformResponseData } from '@renderer/features/commandSliceInputSelectors';
 import { Box, Typography } from '@mui/material';
+import { useTerraformApplyOutput } from '@renderer/hooks/useTerraformApplyOutput';
+
+const INIT_STRING = '데이터가 없습니다.';
 
 const TopologyCommand = () => {
-  const dispatch = useAppDispatch();
-  const { status, data, message } = useAppSelector(selectTerraformState);
+  const { status, data, message } = useAppSelector(
+    selectCommandTerraformResponseData
+  );
 
+  const print = (status: string, data: string, message: string) => {
+    switch (status) {
+      case 'SUCCESS': {
+        return data;
+      }
+      case 'ERROR': {
+        return message;
+      }
+      case 'INIT': {
+        return INIT_STRING;
+      }
+      default:
+    }
+  };
+
+  useTerraformApplyOutput();
   return (
     <Box
       sx={{
@@ -28,7 +48,7 @@ const TopologyCommand = () => {
           marginLeft: '30px',
         }}
       >
-        {status === 'SUCCESS' ? data : message}
+        {print(status, data, message)}
       </Typography>
     </Box>
   );

@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as _ from 'lodash-es';
 import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import * as TerraformTypes from '@main/terraform-command/common/terraform';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { exportProject } from '@renderer/utils/ipc/workspaceIpcUtils';
 import {
@@ -17,8 +16,6 @@ import {
   setSelectedContent,
 } from '@renderer/features/codeSlice';
 import { setFileDirty, setSidePanel } from '@renderer/features/uiSlice';
-import { setTerraformState } from '@renderer/features/commonSlice';
-import { getTerraformPlan } from '@renderer/utils/ipc/terraformIpcUtils';
 import {
   fetchGraphDataByWorkspaceId,
   watchGraphData,
@@ -281,26 +278,6 @@ const SaveSection = (props: SaveSectionProps) => {
               dispatch(setFileDirty(true));
               dispatch(watchGraphData(workspaceUid));
             }
-
-            await getTerraformPlan({ workspaceUid })
-              .then((res: TerraformTypes.TerraformResponse) => {
-                const { status, data } = res;
-                const { planData } =
-                  data as TerraformTypes.TerraformPlanSuccessData;
-                const { message } = data as TerraformTypes.TerraformErrorData;
-                dispatch(
-                  setTerraformState({
-                    status,
-                    data: planData,
-                    message,
-                  })
-                );
-                return res;
-              })
-              .catch((e: any) => {
-                console.log(e);
-              });
-            console.log('[INFO] File export result : ', result);
           }}
         >
           {saveLabel || '저장'}

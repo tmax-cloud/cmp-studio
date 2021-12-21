@@ -19,7 +19,10 @@ import {
   setLoadingModal,
   setLoadingMsg,
 } from '@renderer/features/uiSlice';
-import { fetchTerraformPlanDataByWorkspaceId } from '@renderer/features/commandSlice';
+import {
+  fetchTerraformPlanDataByWorkspaceId,
+  fetchTerraformApplyDataByWorkspaceId,
+} from '@renderer/features/commandSlice';
 import {
   FitScreenButton,
   TerraformApplyButton,
@@ -68,6 +71,10 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
     dispatch(fetchTerraformPlanDataByWorkspaceId(workspaceUid));
     dispatch(setLoadingModal(true));
   };
+  const handleTerraformApplyButton = async () => {
+    dispatch(fetchTerraformApplyDataByWorkspaceId(workspaceUid));
+    dispatch(setLoadingModal(true));
+  };
 
   return (
     <Toolbar
@@ -90,11 +97,7 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
           ml: 5,
         }}
       >
-        <TerraformApplyButton
-          onClick={() => {
-            console.log('apply');
-          }}
-        />
+        <TerraformApplyButton onClick={handleTerraformApplyButton} />
         <TerraformPlanButton onClick={handleTerraformPlanButton} />
         <Divider
           orientation="vertical"

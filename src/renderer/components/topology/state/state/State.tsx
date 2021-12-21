@@ -2,10 +2,12 @@ import * as React from 'react';
 import * as _ from 'lodash-es';
 import { Typography } from '@mui/material';
 import { useAppSelector } from '@renderer/app/store';
-import { selectTerraformState } from '@renderer/features/commonSliceInputSelectors';
+import { selectCommandTerraformResponseData } from '@renderer/features/commandSliceInputSelectors';
 
 const StateTab = () => {
-  const { status, data, message } = useAppSelector(selectTerraformState);
+  const { status, data, message } = useAppSelector(
+    selectCommandTerraformResponseData
+  );
 
   // const plan: TerraformPlanType.Plan = React.useMemo(() => {
   //   return parse(terraFormState);
