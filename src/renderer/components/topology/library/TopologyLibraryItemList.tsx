@@ -1,7 +1,6 @@
 import * as React from 'react';
 import path from 'path';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
-import * as TerraformTypes from '@main/terraform-command/common/terraform';
 import {
   List,
   styled,
