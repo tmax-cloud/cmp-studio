@@ -49,7 +49,12 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   const { formData, sourceSchema, setFormState } = props;
   const classes = useStyles();
 
-  const inputTypeList = ['string', 'object', 'array', 'boolean'];
+  const inputTypeList = [
+    { string: 'string' },
+    { object: 'map' },
+    { array: 'array' },
+    { boolean: 'boolean' },
+  ];
   const dispatch = useAppDispatch();
   const terraformSchemaMap: Map<string, JSONSchema7> = getSchemaMap();
 
@@ -59,7 +64,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   const [currentSchemaList, setCurrentSchemaList] = React.useState<string[]>(
     []
   );
-  const { type, resourceName, instanceName, content } = useAppSelector(
+  const { type, resourceName, instanceName } = useAppSelector(
     selectCodeSelectedObjectInfo
   );
 
@@ -175,8 +180,11 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               >
                 {currentSchemaList &&
                   inputTypeList.map((cur) => (
-                    <MenuItem key={cur} value={cur}>
-                      {cur}
+                    <MenuItem
+                      key={Object.keys(cur)[0]}
+                      value={Object.values(cur)[0]}
+                    >
+                      {Object.keys(cur)[0]}
                     </MenuItem>
                   ))}
               </Select>
