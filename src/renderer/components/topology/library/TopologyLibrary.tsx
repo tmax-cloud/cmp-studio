@@ -7,7 +7,7 @@ import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelector
 import TopologyLibararyItemList, { Item } from './TopologyLibraryItemList';
 import {
   Provider,
-  ProviderList,
+  providerList,
   resourceMap,
   datasourceMap,
 } from './TopologyLibrarySchema';
@@ -164,7 +164,7 @@ const TopologyLibrary = () => {
     let tempResourceItmes: Item[] = [];
     let tempDatasourceItmes: Item[] = [];
 
-    if (provider === 'aws' || provider === 'tls') {
+    if (providerList.indexOf(provider)) {
       tempResourceItmes = resourceMap.get(provider);
       tempDatasourceItmes = datasourceMap.get(provider);
     } else {
