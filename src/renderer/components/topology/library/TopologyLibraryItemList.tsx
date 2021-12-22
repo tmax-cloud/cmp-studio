@@ -161,9 +161,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
                                   path.sep +
                                   `${newFileName}.tf`,
                                 fileJson: {
-                                  [item.resourceName]: {
-                                    [newInstanceName]: addedObjectJSON,
-                                  },
+                                  [item.resourceName]: addedObjectJSON,
                                 },
                               },
                             ];
