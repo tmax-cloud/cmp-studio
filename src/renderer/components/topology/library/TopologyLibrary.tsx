@@ -4,34 +4,35 @@ import { Box, MenuItem, InputLabel, Select, TextField } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { useAppSelector } from '@renderer/app/store';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
+import { TerraformType } from '@renderer/types/terraform';
 import TopologyLibararyItemList from './TopologyLibraryItemList';
 import parseJson from '../state/form/utils/json2JsonSchemaParser';
 
-const defaultList = [
+const defaultList: Item[] = [
   {
     title: 'defaults-provider',
     resourceName: 'provider',
-    type: 'default',
+    type: 'provider',
   },
   {
     title: 'defaults-variable',
     resourceName: 'variable',
-    type: 'default',
+    type: 'variable',
   },
   {
     title: 'defaults-output',
     resourceName: 'output',
-    type: 'default',
+    type: 'output',
   },
   {
     title: 'defaults-terraform',
     resourceName: 'terraform',
-    type: 'default',
+    type: 'terraform',
   },
   {
     title: 'defaults-locals',
     resourceName: 'locals',
-    type: 'default',
+    type: 'locals',
   },
 ];
 
@@ -67,7 +68,7 @@ interface Item {
   title: string;
   instanceName?: string;
   resourceName: string;
-  type: string;
+  type: TerraformType;
   source?: string | any;
   version?: string;
   isLocalModule?: boolean;

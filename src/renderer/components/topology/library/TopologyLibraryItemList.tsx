@@ -36,6 +36,7 @@ import {
 } from '@renderer/features/graphSlice';
 import { useWorkspaceUri } from '@renderer/hooks/useWorkspaceUri';
 import { getIcon } from '@renderer/components/topology/icon/IconFactory';
+import { TerraformType } from '@renderer/types/terraform';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
   backgroundColor: theme.palette.object.accordion,
@@ -137,7 +138,13 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
                             dispatch(setSelectedNode(null));
                             dispatch(setSelectedModule(selectedModule));
                           }
-                        } else if (item.type === 'default') {
+                        } else if (
+                          item.resourceName === 'terraform' ||
+                          item.resourceName === 'locals' ||
+                          item.resourceName === 'provider' ||
+                          item.resourceName === 'output' ||
+                          item.resourceName === 'variable'
+                        ) {
                           const newFileName =
                             item.resourceName + '-' + fileObjects.length;
                           let newFileObject;
@@ -298,7 +305,7 @@ interface Item {
   title: string;
   instanceName?: string;
   resourceName: string;
-  type: string;
+  type: TerraformType;
   source?: string | any;
   version?: string;
   isLocalModule?: boolean;
