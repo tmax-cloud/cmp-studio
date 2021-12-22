@@ -129,12 +129,13 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
         }
       } else if (_.get(jsonSchema, makeSchemaPath + '.type') === 'map') {
         // type이 map일 때
-        const result = !Array.isArray(_.get(formData, makeObjPath))
-          ? _.entries(_.get(formData, makeObjPath)).map(([key, value]) => {
-              return { [key]: value };
-            })
-          : _.get(formData, makeObjPath);
+        // const result = !Array.isArray(_.get(formData, makeObjPath))
+        //   ? _.entries(_.get(formData, makeObjPath)).map(([key, value]) => {
+        //       return { [key]: value };
+        //     })
+        //   : _.get(formData, makeObjPath);
         // _.set(formData, makeObjPath, [result]);
+        const result = _.get(formData, makeObjPath);
         setFormData(result);
         setSchema({
           type: 'map',

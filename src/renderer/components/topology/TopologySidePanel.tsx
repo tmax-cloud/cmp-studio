@@ -32,16 +32,15 @@ const TopologySidePanel = () => {
     () => getSchemaMap(),
     []
   );
-  const currentSchema = _.isEmpty(sourceSchema)
-    ? terraformSchemaMap.get(id)
-    : sourceSchema;
+  const jsonSchema = terraformSchemaMap.get(id);
+  // const currentSchema = _.isEmpty(sourceSchema) ? jsonSchema : sourceSchema;
   const {
     customUISchema = {},
     formData = {},
     fixedSchema = {},
   } = React.useMemo(
-    () => preDefinedData(currentSchema, content, type),
-    [currentSchema, content, type]
+    () => preDefinedData(jsonSchema, content, type),
+    [jsonSchema, content, type]
   );
   const title = React.useMemo(() => {
     if (getObjectDataType[type] === 'ONE_DEPTH_DATA_TYPE') {
