@@ -5,32 +5,32 @@ import { Delete } from '@mui/icons-material';
 import { useAppSelector } from '@renderer/app/store';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
 import { TerraformType } from '@renderer/types/terraform';
-import TopologyLibararyItemList from './TopologyLibraryItemList';
+import TopologyLibararyItemList, { Item } from './TopologyLibraryItemList';
 import parseJson from '../state/form/utils/json2JsonSchemaParser';
 
 const defaultList: Item[] = [
   {
-    title: 'defaults-provider',
+    instanceName: 'defaults-provider',
     resourceName: 'provider',
     type: 'provider',
   },
   {
-    title: 'defaults-variable',
+    instanceName: 'defaults-variable',
     resourceName: 'variable',
     type: 'variable',
   },
   {
-    title: 'defaults-output',
+    instanceName: 'defaults-output',
     resourceName: 'output',
     type: 'output',
   },
   {
-    title: 'defaults-terraform',
+    instanceName: 'defaults-terraform',
     resourceName: 'terraform',
     type: 'terraform',
   },
   {
-    title: 'defaults-locals',
+    instanceName: 'defaults-locals',
     resourceName: 'locals',
     type: 'locals',
   },
@@ -61,18 +61,6 @@ function getModuleList(items: Item[]) {
 }
 */
 
-interface Item {
-  path?: string;
-  objectCount?: number;
-  provider?: string;
-  title: string;
-  instanceName?: string;
-  resourceName: string;
-  type: TerraformType;
-  source?: string | any;
-  version?: string;
-  isLocalModule?: boolean;
-}
 let selectedProvider = '';
 
 const TopologyLibrary = () => {
@@ -130,18 +118,17 @@ const TopologyLibrary = () => {
       const instanceName = Object.keys(object[resourceName])[0];
       const keySource = 'source';
       const source = object[resourceName][keySource];
-      const title = type + '-' + resourceName;
-      return { type, resourceName, title, instanceName, source };
+      return { type, resourceName, instanceName, source };
     })
     .forEach((i: Item) => {
       if (i.type === 'module') {
         const isLocal = i.source.charAt(0) === '.';
 
         itemsList.push({
-          title: i.title,
-          source: i.source,
+          instanceName: i.instanceName,
           resourceName: i.resourceName,
           type: i.type,
+          source: i.source,
           isLocalModule: isLocal,
         });
       }
@@ -158,13 +145,11 @@ const TopologyLibrary = () => {
     }
     const items: Item[] = [];
     schemaMap.forEach((schema) => {
-      const schemaProvider = provider;
       const schemaTitle = schema.title;
       const schemaResourceName = schema.title.split('-')[1];
       const schemaType = schema.title.split('-')[0];
       items.push({
-        provider: schemaProvider,
-        title: schemaTitle,
+        instanceName: schemaTitle,
         resourceName: schemaResourceName,
         type: schemaType,
       });
@@ -176,16 +161,14 @@ const TopologyLibrary = () => {
       if (searchByName(searchText, i.resourceName)) {
         if (i.type === 'resource') {
           resourceList.push({
-            provider: i.provider,
-            title: i.title,
+            instanceName: i.instanceName,
             resourceName: i.resourceName,
             type: i.type,
           });
         }
         if (i.type === 'data') {
           datasourceList.push({
-            provider: i.provider,
-            title: i.title,
+            instanceName: i.instanceName,
             resourceName: i.resourceName,
             type: i.type,
           });

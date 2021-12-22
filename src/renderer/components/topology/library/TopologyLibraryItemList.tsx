@@ -139,11 +139,11 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
                             dispatch(setSelectedModule(selectedModule));
                           }
                         } else if (
-                          item.resourceName === 'terraform' ||
-                          item.resourceName === 'locals' ||
-                          item.resourceName === 'provider' ||
-                          item.resourceName === 'output' ||
-                          item.resourceName === 'variable'
+                          item.type === 'terraform' ||
+                          item.type === 'locals' ||
+                          item.type === 'provider' ||
+                          item.type === 'output' ||
+                          item.type === 'variable'
                         ) {
                           const newFileName =
                             item.resourceName + '-' + fileObjects.length;
@@ -298,16 +298,11 @@ type TopologyLibararyItemListProps = {
   provider?: string;
 };
 
-interface Item {
-  path?: string;
-  objectCount?: number;
-  provider?: string;
-  title: string;
-  instanceName?: string;
+export interface Item {
+  instanceName: string;
   resourceName: string;
   type: TerraformType;
   source?: string | any;
-  version?: string;
   isLocalModule?: boolean;
 }
 
