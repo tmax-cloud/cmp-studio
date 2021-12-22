@@ -73,6 +73,7 @@ const TopologyLibrary = () => {
     selectedProvider || 'tls'
   );
   const [searchText, setSearchText] = React.useState('');
+  const [debounceSearchText, setDebounceSearchText] = React.useState('');
   const [resourceItems, setResourceItems] = React.useState<Item[]>(
     resourceMap.get('tls')
   );
@@ -84,11 +85,25 @@ const TopologyLibrary = () => {
     setSearchText('');
   };
   //const [terraformModuleItems, setTerraformModuleItems] = React.useState<Item[]>([]);
-  const searchTextChange = (event: any) => {
+  const [timer, setTimer] = React.useState(0);
+  const searchTextChange = async (event: any) => {
     setSearchText(event.target.value);
+    if (timer) {
+      console.log('clear timer');
+      clearTimeout(timer);
+    }
+    const newTimer: any = setTimeout(async () => {
+      try {
+        await setDebounceSearchText(searchText);
+      } catch (e) {
+        console.error('error', e);
+      }
+    }, 800);
+    setTimer(newTimer);
   };
   const deleteSearchText = () => {
     setSearchText('');
+    setDebounceSearchText('');
   };
   const [isSearchResultEmpty, setIsSearchResultEmpty] = React.useState(false);
 
@@ -107,7 +122,6 @@ const TopologyLibrary = () => {
   const objResult: any[] = [];
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
-
   useAppSelector(selectCodeFileObjects).forEach(
     (file: { filePath: string; fileJson: any }) => {
       // eslint-disable-next-line guard-for-in
@@ -180,21 +194,29 @@ const TopologyLibrary = () => {
       tempResourceItmes = [];
       tempDatasourceItmes = [];
     }
-
-    setResourceItems(
-      tempResourceItmes.filter((item) => {
-        return searchByName(searchText, item.resourceName);
-      })
-    );
-    setDatasourceItems(
-      tempDatasourceItmes.filter((item) => {
-        return searchByName(searchText, item.resourceName);
-      })
-    );
-  }, [searchText]);
+    if (debounceSearchText && debounceSearchText !== '') {
+      setResourceItems(
+        tempResourceItmes.filter((item) => {
+          return searchByName(debounceSearchText, item.resourceName);
+        })
+      );
+      setDatasourceItems(
+        tempDatasourceItmes.filter((item) => {
+          return searchByName(debounceSearchText, item.resourceName);
+        })
+      );
+    } else {
+      setResourceItems(tempResourceItmes);
+      setDatasourceItems(tempDatasourceItmes);
+    }
+  }, [debounceSearchText]);
 
   React.useEffect(() => {
-    if (resourceItems.length || datasourceItems.length || searchText === '') {
+    if (
+      resourceItems.length ||
+      datasourceItems.length ||
+      debounceSearchText === ''
+    ) {
       setIsSearchResultEmpty(false);
     } else {
       setIsSearchResultEmpty(true);
@@ -213,7 +235,7 @@ const TopologyLibrary = () => {
           displayEmpty
           style={{ marginTop: '10px' }}
         >
-          {ProviderList.map((provider) => {
+          {providerList.map((provider) => {
             return (
               <MenuItem value={provider} key={provider}>
                 {provider.toUpperCase()}
