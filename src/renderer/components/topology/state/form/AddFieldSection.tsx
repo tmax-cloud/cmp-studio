@@ -129,7 +129,11 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 
             <Button
               onClick={() => {
-                const result = addSchemaBasedField(content, additionalSchema);
+                const result = addSchemaBasedField(
+                  content,
+                  additionalSchema,
+                  type
+                );
                 setCurrentSchemaList((schemaList) =>
                   schemaList.filter((cur) => cur !== additionalSchema)
                 );
