@@ -3,11 +3,11 @@ import parseJson from '../state/form/utils/json2JsonSchemaParser';
 
 export type Provider = 'aws' | 'tls';
 
-const providerList: Provider[] = ['aws', 'tls'];
+export const ProviderList: Provider[] = ['aws', 'tls'];
 
 const tempResourceMap = new Map();
 const tempDatasourceMap = new Map();
-providerList.forEach((provider) => {
+ProviderList.forEach((provider) => {
   const tempMap = parseJson([provider]);
   const tempResourceList: Item[] = [];
   const tempDatasourceList: Item[] = [];

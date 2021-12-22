@@ -5,7 +5,12 @@ import { Delete } from '@mui/icons-material';
 import { useAppSelector } from '@renderer/app/store';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
 import TopologyLibararyItemList, { Item } from './TopologyLibraryItemList';
-import { Provider, resourceMap, datasourceMap } from './TopologyLibrarySchema';
+import {
+  Provider,
+  ProviderList,
+  resourceMap,
+  datasourceMap,
+} from './TopologyLibrarySchema';
 
 const defaultList: Item[] = [
   {
@@ -35,6 +40,7 @@ const defaultList: Item[] = [
   },
 ];
 
+//fuzzy search? 비슷한 문자열 검색으로 변경 필요
 function searchByName(searchText: string, name: string) {
   if (name.toUpperCase().indexOf(searchText.toUpperCase()) !== -1) {
     return true;
@@ -152,17 +158,8 @@ const TopologyLibrary = () => {
       tempResourceItmes = [];
       tempDatasourceItmes = [];
     }
-    //setResourceItems(tempResourceItmes);
-    //setDatasourceItems(tempDatasourceItmes);
     //setTerraformModuleItems(moduleList);
 
-    /*
-    if (resourceItems.length || datasourceItems.length) {
-      setIsSearchResultEmpty(false);
-    } else {
-      setIsSearchResultEmpty(true);
-    }
-    */
     selectedProvider = provider;
     setSearchText('');
 
@@ -183,17 +180,6 @@ const TopologyLibrary = () => {
       tempResourceItmes = [];
       tempDatasourceItmes = [];
     }
-    //setResourceItems(tempResourceItmes);
-    //setDatasourceItems(tempDatasourceItmes);
-    //setTerraformModuleItems(moduleList);
-
-    /*
-    if (resourceItems.length || datasourceItems.length) {
-      setIsSearchResultEmpty(false);
-    } else {
-      setIsSearchResultEmpty(true);
-    }
-    */
 
     setResourceItems(
       tempResourceItmes.filter((item) => {
@@ -227,14 +213,13 @@ const TopologyLibrary = () => {
           displayEmpty
           style={{ marginTop: '10px' }}
         >
-          <MenuItem value="aws">AWS</MenuItem>
-          <MenuItem value="tls">TLS</MenuItem>
-          {/*
-          <MenuItem value="azure">Microsoft Azure</MenuItem>
-          <MenuItem value="gcp">Google Cloud Platform</MenuItem>
-          <MenuItem value="openstack">OpenStack</MenuItem>
-          <MenuItem value="vmware">Vmware vSphere</MenuItem>
-          */}
+          {ProviderList.map((provider) => {
+            return (
+              <MenuItem value={provider} key={provider}>
+                {provider.toUpperCase()}
+              </MenuItem>
+            );
+          })}
         </Select>
         <div>
           <TextField
