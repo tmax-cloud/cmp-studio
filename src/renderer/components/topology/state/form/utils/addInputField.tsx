@@ -1,9 +1,4 @@
 import * as _ from 'lodash-es';
-export const addSchemaBasedField = (content: any, input: string) => {
-  const result = _.merge({ [input]: '' }, content);
-  return result;
-};
-
 const setAdditionalSchemaByType = (key: string, type: string) => {
   let newSchema = {};
   switch (type) {
@@ -44,8 +39,11 @@ const makeObject = ({ input }: makeObjectType) => {
     case 'string': {
       return { [input.key]: '' };
     }
+    case 'map': {
+      return { [input.key]: { '': '' } };
+    }
     case 'object': {
-      return { [input.key]: [] };
+      return { [input.key]: {} };
       break;
     }
     case 'array': {
@@ -57,6 +55,15 @@ const makeObject = ({ input }: makeObjectType) => {
     default:
   }
   return { [input.key]: '' };
+};
+
+export const addSchemaBasedField = (
+  content: any,
+  input: string,
+  type: string
+) => {
+  const result = _.merge(makeObject({ input: { type, key: input } }), content);
+  return result;
 };
 
 type makeObjectType = {

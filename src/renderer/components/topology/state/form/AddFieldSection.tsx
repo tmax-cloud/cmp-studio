@@ -23,6 +23,7 @@ import { ArrowDropDown } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectCodeSelectedObjectInfo } from '@renderer/features/codeSliceInputSelectors';
 import { getId } from '@renderer/types/terraform';
+import getPropertyTypeBySchema from './utils/getPropertyTypeBySchema';
 import { addSchemaBasedField, addCustomField } from './utils/addInputField';
 
 const useStyles: any = makeStyles((theme) =>
@@ -48,17 +49,22 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   const { formData, sourceSchema, setFormState } = props;
   const classes = useStyles();
 
-  const inputTypeList = ['string', 'object', 'array', 'boolean'];
+  const inputTypeList = [
+    { string: 'string' },
+    { object: 'map' },
+    { array: 'array' },
+    { boolean: 'boolean' },
+  ];
   const dispatch = useAppDispatch();
   const terraformSchemaMap: Map<string, JSONSchema7> = getSchemaMap();
 
-  const [additionalSchema, setAdditionalSchema] = React.useState('');
-  const [customFieldType, setCustomFieldType] = React.useState('');
-  const [customFieldKey, setCustomFieldKey] = React.useState('');
+  const [additionalSchema, setAdditionalSchema] = React.useState<string>('');
+  const [customFieldType, setCustomFieldType] = React.useState<string>('');
+  const [customFieldKey, setCustomFieldKey] = React.useState<string>('');
   const [currentSchemaList, setCurrentSchemaList] = React.useState<string[]>(
     []
   );
-  const { type, resourceName, instanceName, content } = useAppSelector(
+  const { type, resourceName, instanceName } = useAppSelector(
     selectCodeSelectedObjectInfo
   );
 
@@ -129,7 +135,18 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
 
             <Button
               onClick={() => {
-                const result = addSchemaBasedField(content, additionalSchema);
+                const schema: JSONSchema7 = terraformSchemaMap.get(
+                  id
+                ) as JSONSchema7;
+                const selectedProperty = schema.properties[additionalSchema];
+                const selectedPropertyType =
+                  getPropertyTypeBySchema(selectedProperty);
+
+                const result = addSchemaBasedField(
+                  formData,
+                  additionalSchema,
+                  selectedPropertyType
+                );
                 setCurrentSchemaList((schemaList) =>
                   schemaList.filter((cur) => cur !== additionalSchema)
                 );
@@ -163,8 +180,11 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
               >
                 {currentSchemaList &&
                   inputTypeList.map((cur) => (
-                    <MenuItem key={cur} value={cur}>
-                      {cur}
+                    <MenuItem
+                      key={Object.keys(cur)[0]}
+                      value={Object.values(cur)[0]}
+                    >
+                      {Object.keys(cur)[0]}
                     </MenuItem>
                   ))}
               </Select>
@@ -181,7 +201,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
             <Button
               onClick={() => {
                 const { object, schema } = addCustomField(
-                  content,
+                  formData,
                   {
                     type: customFieldType,
                     key: customFieldKey,

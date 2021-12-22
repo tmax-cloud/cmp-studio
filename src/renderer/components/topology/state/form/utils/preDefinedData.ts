@@ -74,23 +74,43 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
                   });
                 }
               } else {
-                // object
-                Object.keys(currentValue).forEach((objKey) => {
-                  //[TODO] object안에 array 아직 안함.
-                  if (typeof currentValue[objKey] === 'object') {
-                    makeFixedSchema(
-                      currentValue[objKey],
-                      makeSchemaPath + '.properties.' + objKey,
-                      ''
-                    );
-                  } else {
-                    _.set(
-                      fixedSchema,
-                      makeSchemaPath + '.properties.' + objKey,
-                      { type: 'string' }
-                    );
-                  }
+                // [TODO] 현재는 map타입만 제공되도록 했는데 tf파일을 직접 건드려서 수정할경우에 대한 처리 필요
+                setSchema({
+                  type: 'map',
+                  items: {
+                    type: 'string',
+                  },
                 });
+                // object
+                // if (
+                //   Object.keys(currentValue).length === 1 &&
+                //   !Object.keys(currentValue)[0]
+                // ) {
+                //   // key값이 비어있을 경우
+                //   setSchema({
+                //     type: 'map',
+                //     items: {
+                //       type: 'string',
+                //     },
+                //   });
+                //   break;
+                // }
+                // Object.keys(currentValue).forEach((objKey) => {
+                //   //[TODO] object안에 array 아직 안함.
+                //   if (typeof currentValue[objKey] === 'object') {
+                //     makeFixedSchema(
+                //       currentValue[objKey],
+                //       makeSchemaPath + '.properties.' + objKey,
+                //       ''
+                //     );
+                //   } else {
+                //     _.set(
+                //       fixedSchema,
+                //       makeSchemaPath + '.properties.' + objKey,
+                //       { type: 'string' }
+                //     );
+                //   }
+                // });
               }
               break;
             }
@@ -129,12 +149,13 @@ const preDefinedData = (jsonSchema: JSONSchema7, object: any, type: string) => {
         }
       } else if (_.get(jsonSchema, makeSchemaPath + '.type') === 'map') {
         // type이 map일 때
-        const result = !Array.isArray(_.get(formData, makeObjPath))
-          ? _.entries(_.get(formData, makeObjPath)).map(([key, value]) => {
-              return { [key]: value };
-            })
-          : _.get(formData, makeObjPath);
+        // const result = !Array.isArray(_.get(formData, makeObjPath))
+        //   ? _.entries(_.get(formData, makeObjPath)).map(([key, value]) => {
+        //       return { [key]: value };
+        //     })
+        //   : _.get(formData, makeObjPath);
         // _.set(formData, makeObjPath, [result]);
+        const result = _.get(formData, makeObjPath);
         setFormData(result);
         setSchema({
           type: 'map',
