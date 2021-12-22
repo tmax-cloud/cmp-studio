@@ -4,9 +4,8 @@ import { Box, MenuItem, InputLabel, Select, TextField } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { useAppSelector } from '@renderer/app/store';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
-import { TerraformType } from '@renderer/types/terraform';
 import TopologyLibararyItemList, { Item } from './TopologyLibraryItemList';
-import parseJson from '../state/form/utils/json2JsonSchemaParser';
+import { Provider, resourceMap, datasourceMap } from './TopologyLibrarySchema';
 
 const defaultList: Item[] = [
   {
@@ -61,21 +60,28 @@ function getModuleList(items: Item[]) {
 }
 */
 
-let selectedProvider = '';
+let selectedProvider: Provider = 'tls';
 
 const TopologyLibrary = () => {
-  const [provider, setProvider] = React.useState(selectedProvider || 'aws');
-  const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
-  const [datasourceItems, setdatasourceItems] = React.useState<Item[]>([]);
+  const [provider, setProvider] = React.useState<Provider>(
+    selectedProvider || 'tls'
+  );
+  const [searchText, setSearchText] = React.useState('');
+  const [resourceItems, setResourceItems] = React.useState<Item[]>(
+    resourceMap.get('tls')
+  );
+  const [datasourceItems, setDatasourceItems] = React.useState<Item[]>(
+    datasourceMap.get('tls')
+  );
   const providerHandleChange = (event: any) => {
     setProvider(event.target.value);
+    setSearchText('');
   };
   //const [terraformModuleItems, setTerraformModuleItems] = React.useState<Item[]>([]);
-  const [searchText, setSearchText] = React.useState('');
   const searchTextChange = (event: any) => {
     setSearchText(event.target.value);
   };
-  const deleteSearchText = (event: any) => {
+  const deleteSearchText = () => {
     setSearchText('');
   };
   const [isSearchResultEmpty, setIsSearchResultEmpty] = React.useState(false);
@@ -135,57 +141,79 @@ const TopologyLibrary = () => {
     });
 
   React.useEffect(() => {
-    let schemaMap;
+    let tempResourceItmes: Item[] = [];
+    let tempDatasourceItmes: Item[] = [];
 
-    try {
-      schemaMap = parseJson([provider]);
-    } catch (e) {
+    if (provider === 'aws' || provider === 'tls') {
+      tempResourceItmes = resourceMap.get(provider);
+      tempDatasourceItmes = datasourceMap.get(provider);
+    } else {
       console.log('Cannot get schema in ' + provider);
-      schemaMap = new Map();
+      tempResourceItmes = [];
+      tempDatasourceItmes = [];
     }
-    const items: Item[] = [];
-    schemaMap.forEach((schema) => {
-      const schemaTitle = schema.title;
-      const schemaResourceName = schema.title.split('-')[1];
-      const schemaType = schema.title.split('-')[0];
-      items.push({
-        instanceName: schemaTitle,
-        resourceName: schemaResourceName,
-        type: schemaType,
-      });
-    });
-    const resourceList: Item[] = [];
-    const datasourceList: Item[] = [];
-
-    items.forEach((i: Item) => {
-      if (searchByName(searchText, i.resourceName)) {
-        if (i.type === 'resource') {
-          resourceList.push({
-            instanceName: i.instanceName,
-            resourceName: i.resourceName,
-            type: i.type,
-          });
-        }
-        if (i.type === 'data') {
-          datasourceList.push({
-            instanceName: i.instanceName,
-            resourceName: i.resourceName,
-            type: i.type,
-          });
-        }
-      }
-    });
-    setResourceItems(resourceList);
-    setdatasourceItems(datasourceList);
+    //setResourceItems(tempResourceItmes);
+    //setDatasourceItems(tempDatasourceItmes);
     //setTerraformModuleItems(moduleList);
 
-    if (resourceList.length || datasourceList.length) {
+    /*
+    if (resourceItems.length || datasourceItems.length) {
       setIsSearchResultEmpty(false);
     } else {
       setIsSearchResultEmpty(true);
     }
+    */
     selectedProvider = provider;
-  }, [provider, searchText]);
+    setSearchText('');
+
+    setResourceItems(tempResourceItmes);
+    setDatasourceItems(tempDatasourceItmes);
+    setIsSearchResultEmpty(false);
+  }, [provider]);
+
+  React.useEffect(() => {
+    let tempResourceItmes: Item[] = [];
+    let tempDatasourceItmes: Item[] = [];
+
+    if (provider === 'aws' || provider === 'tls') {
+      tempResourceItmes = resourceMap.get(provider);
+      tempDatasourceItmes = datasourceMap.get(provider);
+    } else {
+      console.log('Cannot get schema in ' + provider);
+      tempResourceItmes = [];
+      tempDatasourceItmes = [];
+    }
+    //setResourceItems(tempResourceItmes);
+    //setDatasourceItems(tempDatasourceItmes);
+    //setTerraformModuleItems(moduleList);
+
+    /*
+    if (resourceItems.length || datasourceItems.length) {
+      setIsSearchResultEmpty(false);
+    } else {
+      setIsSearchResultEmpty(true);
+    }
+    */
+
+    setResourceItems(
+      tempResourceItmes.filter((item) => {
+        return searchByName(searchText, item.resourceName);
+      })
+    );
+    setDatasourceItems(
+      tempDatasourceItmes.filter((item) => {
+        return searchByName(searchText, item.resourceName);
+      })
+    );
+  }, [searchText]);
+
+  React.useEffect(() => {
+    if (resourceItems.length || datasourceItems.length || searchText === '') {
+      setIsSearchResultEmpty(false);
+    } else {
+      setIsSearchResultEmpty(true);
+    }
+  }, [resourceItems, datasourceItems]);
 
   return (
     <>
@@ -259,7 +287,6 @@ const TopologyLibrary = () => {
             />
           </>
         )}
-        {/* 테스트용 Object 표시 */}
         {/* 테스트 코드 주석 처리
         <Button onClick={handleModuleListModalOpen} value="test1">
           Modal Test
