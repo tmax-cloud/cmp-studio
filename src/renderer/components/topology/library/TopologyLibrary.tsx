@@ -4,37 +4,43 @@ import { Box, MenuItem, InputLabel, Select, TextField } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { useAppSelector } from '@renderer/app/store';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
-import TopologyLibararyItemList from './TopologyLibraryItemList';
-import parseJson from '../state/form/utils/json2JsonSchemaParser';
+import TopologyLibararyItemList, { Item } from './TopologyLibraryItemList';
+import {
+  Provider,
+  providerList,
+  resourceMap,
+  datasourceMap,
+} from './TopologyLibrarySchema';
 
-const defaultList = [
+const defaultList: Item[] = [
   {
-    title: 'defaults-provider',
+    instanceName: 'defaults-provider',
     resourceName: 'provider',
-    type: 'default',
+    type: 'provider',
   },
   {
-    title: 'defaults-variable',
+    instanceName: 'defaults-variable',
     resourceName: 'variable',
-    type: 'default',
+    type: 'variable',
   },
   {
-    title: 'defaults-output',
+    instanceName: 'defaults-output',
     resourceName: 'output',
-    type: 'default',
+    type: 'output',
   },
   {
-    title: 'defaults-terraform',
+    instanceName: 'defaults-terraform',
     resourceName: 'terraform',
-    type: 'default',
+    type: 'terraform',
   },
   {
-    title: 'defaults-locals',
+    instanceName: 'defaults-locals',
     resourceName: 'locals',
-    type: 'default',
+    type: 'locals',
   },
 ];
 
+//fuzzy search? 비슷한 문자열 검색으로 변경 필요
 function searchByName(searchText: string, name: string) {
   if (name.toUpperCase().indexOf(searchText.toUpperCase()) !== -1) {
     return true;
@@ -60,34 +66,44 @@ function getModuleList(items: Item[]) {
 }
 */
 
-interface Item {
-  path?: string;
-  objectCount?: number;
-  provider?: string;
-  title: string;
-  instanceName?: string;
-  resourceName: string;
-  type: string;
-  source?: string | any;
-  version?: string;
-  isLocalModule?: boolean;
-}
-let selectedProvider = '';
+let selectedProvider: Provider = 'tls';
 
 const TopologyLibrary = () => {
-  const [provider, setProvider] = React.useState(selectedProvider || 'aws');
-  const [resourceItems, setResourceItems] = React.useState<Item[]>([]);
-  const [datasourceItems, setdatasourceItems] = React.useState<Item[]>([]);
+  const [provider, setProvider] = React.useState<Provider>(
+    selectedProvider || 'tls'
+  );
+  const [searchText, setSearchText] = React.useState('');
+  const [debounceSearchText, setDebounceSearchText] = React.useState('');
+  const [resourceItems, setResourceItems] = React.useState<Item[]>(
+    resourceMap.get('tls')
+  );
+  const [datasourceItems, setDatasourceItems] = React.useState<Item[]>(
+    datasourceMap.get('tls')
+  );
   const providerHandleChange = (event: any) => {
     setProvider(event.target.value);
+    setSearchText('');
   };
   //const [terraformModuleItems, setTerraformModuleItems] = React.useState<Item[]>([]);
-  const [searchText, setSearchText] = React.useState('');
-  const searchTextChange = (event: any) => {
+  const [timer, setTimer] = React.useState(0);
+  const searchTextChange = async (event: any) => {
     setSearchText(event.target.value);
+    if (timer) {
+      console.log('clear timer');
+      clearTimeout(timer);
+    }
+    const newTimer: any = setTimeout(async () => {
+      try {
+        await setDebounceSearchText(searchText);
+      } catch (e) {
+        console.error('error', e);
+      }
+    }, 800);
+    setTimer(newTimer);
   };
-  const deleteSearchText = (event: any) => {
+  const deleteSearchText = () => {
     setSearchText('');
+    setDebounceSearchText('');
   };
   const [isSearchResultEmpty, setIsSearchResultEmpty] = React.useState(false);
 
@@ -106,7 +122,6 @@ const TopologyLibrary = () => {
   const objResult: any[] = [];
 
   // useSelector로 반환한 배열에 대해 반복문을 돌면서 objResult를 변경시킴... refactor할 예정
-
   useAppSelector(selectCodeFileObjects).forEach(
     (file: { filePath: string; fileJson: any }) => {
       // eslint-disable-next-line guard-for-in
@@ -129,79 +144,84 @@ const TopologyLibrary = () => {
       const instanceName = Object.keys(object[resourceName])[0];
       const keySource = 'source';
       const source = object[resourceName][keySource];
-      const title = type + '-' + resourceName;
-      return { type, resourceName, title, instanceName, source };
+      return { type, resourceName, instanceName, source };
     })
     .forEach((i: Item) => {
       if (i.type === 'module') {
         const isLocal = i.source.charAt(0) === '.';
 
         itemsList.push({
-          title: i.title,
-          source: i.source,
+          instanceName: i.instanceName,
           resourceName: i.resourceName,
           type: i.type,
+          source: i.source,
           isLocalModule: isLocal,
         });
       }
     });
 
   React.useEffect(() => {
-    let schemaMap;
+    let tempResourceItmes: Item[] = [];
+    let tempDatasourceItmes: Item[] = [];
 
-    try {
-      schemaMap = parseJson([provider]);
-    } catch (e) {
+    if (providerList.indexOf(provider)) {
+      tempResourceItmes = resourceMap.get(provider);
+      tempDatasourceItmes = datasourceMap.get(provider);
+    } else {
       console.log('Cannot get schema in ' + provider);
-      schemaMap = new Map();
+      tempResourceItmes = [];
+      tempDatasourceItmes = [];
     }
-    const items: Item[] = [];
-    schemaMap.forEach((schema) => {
-      const schemaProvider = provider;
-      const schemaTitle = schema.title;
-      const schemaResourceName = schema.title.split('-')[1];
-      const schemaType = schema.title.split('-')[0];
-      items.push({
-        provider: schemaProvider,
-        title: schemaTitle,
-        resourceName: schemaResourceName,
-        type: schemaType,
-      });
-    });
-    const resourceList: Item[] = [];
-    const datasourceList: Item[] = [];
-
-    items.forEach((i: Item) => {
-      if (searchByName(searchText, i.resourceName)) {
-        if (i.type === 'resource') {
-          resourceList.push({
-            provider: i.provider,
-            title: i.title,
-            resourceName: i.resourceName,
-            type: i.type,
-          });
-        }
-        if (i.type === 'data') {
-          datasourceList.push({
-            provider: i.provider,
-            title: i.title,
-            resourceName: i.resourceName,
-            type: i.type,
-          });
-        }
-      }
-    });
-    setResourceItems(resourceList);
-    setdatasourceItems(datasourceList);
     //setTerraformModuleItems(moduleList);
 
-    if (resourceList.length || datasourceList.length) {
+    selectedProvider = provider;
+    setSearchText('');
+
+    setResourceItems(tempResourceItmes);
+    setDatasourceItems(tempDatasourceItmes);
+    setIsSearchResultEmpty(false);
+  }, [provider]);
+
+  React.useEffect(() => {
+    let tempResourceItmes: Item[] = [];
+    let tempDatasourceItmes: Item[] = [];
+
+    if (provider === 'aws' || provider === 'tls') {
+      tempResourceItmes = resourceMap.get(provider);
+      tempDatasourceItmes = datasourceMap.get(provider);
+    } else {
+      console.log('Cannot get schema in ' + provider);
+      tempResourceItmes = [];
+      tempDatasourceItmes = [];
+    }
+    if (debounceSearchText && debounceSearchText !== '') {
+      setResourceItems(
+        tempResourceItmes.filter((item) => {
+          return searchByName(debounceSearchText, item.resourceName);
+        })
+      );
+      setDatasourceItems(
+        tempDatasourceItmes.filter((item) => {
+          return searchByName(debounceSearchText, item.resourceName);
+        })
+      );
+    } else {
+      setResourceItems(tempResourceItmes);
+      setDatasourceItems(tempDatasourceItmes);
+    }
+  }, [debounceSearchText]);
+
+  React.useEffect(() => {
+    if (
+      resourceItems.length ||
+      datasourceItems.length ||
+      debounceSearchText === ''
+    ) {
       setIsSearchResultEmpty(false);
     } else {
       setIsSearchResultEmpty(true);
     }
-    selectedProvider = provider;
-  }, [provider, searchText]);
+  }, [resourceItems, datasourceItems]);
 
   return (
     <>
@@ -215,14 +235,13 @@ const TopologyLibrary = () => {
           displayEmpty
           style={{ marginTop: '10px' }}
         >
-          <MenuItem value="aws">AWS</MenuItem>
-          <MenuItem value="tls">TLS</MenuItem>
-          {/*
-          <MenuItem value="azure">Microsoft Azure</MenuItem>
-          <MenuItem value="gcp">Google Cloud Platform</MenuItem>
-          <MenuItem value="openstack">OpenStack</MenuItem>
-          <MenuItem value="vmware">Vmware vSphere</MenuItem>
-          */}
+          {providerList.map((provider) => {
+            return (
+              <MenuItem value={provider} key={provider}>
+                {provider.toUpperCase()}
+              </MenuItem>
+            );
+          })}
         </Select>
         <div>
           <TextField
@@ -275,7 +294,6 @@ const TopologyLibrary = () => {
             />
           </>
         )}
-        {/* 테스트용 Object 표시 */}
         {/* 테스트 코드 주석 처리
         <Button onClick={handleModuleListModalOpen} value="test1">
           Modal Test

@@ -36,6 +36,7 @@ import {
 } from '@renderer/features/graphSlice';
 import { useWorkspaceUri } from '@renderer/hooks/useWorkspaceUri';
 import { getIcon } from '@renderer/components/topology/icon/IconFactory';
+import { TerraformType } from '@renderer/types/terraform';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
   backgroundColor: theme.palette.object.accordion,
@@ -137,7 +138,13 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
                             dispatch(setSelectedNode(null));
                             dispatch(setSelectedModule(selectedModule));
                           }
-                        } else if (item.type === 'default') {
+                        } else if (
+                          item.type === 'terraform' ||
+                          item.type === 'locals' ||
+                          item.type === 'provider' ||
+                          item.type === 'output' ||
+                          item.type === 'variable'
+                        ) {
                           const newFileName =
                             item.resourceName + '-' + fileObjects.length;
                           let newFileObject;
@@ -154,9 +161,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
                                   path.sep +
                                   `${newFileName}.tf`,
                                 fileJson: {
-                                  [item.resourceName]: {
-                                    [newInstanceName]: addedObjectJSON,
-                                  },
+                                  [item.resourceName]: addedObjectJSON,
                                 },
                               },
                             ];
@@ -291,16 +296,11 @@ type TopologyLibararyItemListProps = {
   provider?: string;
 };
 
-interface Item {
-  path?: string;
-  objectCount?: number;
-  provider?: string;
-  title: string;
-  instanceName?: string;
+export interface Item {
+  instanceName: string;
   resourceName: string;
-  type: string;
+  type: TerraformType;
   source?: string | any;
-  version?: string;
   isLocalModule?: boolean;
 }
 
