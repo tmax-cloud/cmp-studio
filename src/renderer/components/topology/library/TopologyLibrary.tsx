@@ -164,14 +164,9 @@ const TopologyLibrary = () => {
     let tempResourceItmes: Item[] = [];
     let tempDatasourceItmes: Item[] = [];
 
-    if (providerList.indexOf(provider)) {
-      tempResourceItmes = resourceMap.get(provider);
-      tempDatasourceItmes = datasourceMap.get(provider);
-    } else {
-      console.log('Cannot get schema in ' + provider);
-      tempResourceItmes = [];
-      tempDatasourceItmes = [];
-    }
+    tempResourceItmes = resourceMap.get(provider);
+    tempDatasourceItmes = datasourceMap.get(provider);
+
     //setTerraformModuleItems(moduleList);
 
     selectedProvider = provider;
@@ -186,14 +181,9 @@ const TopologyLibrary = () => {
     let tempResourceItmes: Item[] = [];
     let tempDatasourceItmes: Item[] = [];
 
-    if (provider === 'aws' || provider === 'tls') {
-      tempResourceItmes = resourceMap.get(provider);
-      tempDatasourceItmes = datasourceMap.get(provider);
-    } else {
-      console.log('Cannot get schema in ' + provider);
-      tempResourceItmes = [];
-      tempDatasourceItmes = [];
-    }
+    tempResourceItmes = resourceMap.get(provider);
+    tempDatasourceItmes = datasourceMap.get(provider);
+
     if (debounceSearchText && debounceSearchText !== '') {
       setResourceItems(
         tempResourceItmes.filter((item) => {
