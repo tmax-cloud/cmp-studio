@@ -150,7 +150,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
     item.required?.forEach((property: string) => {
       const setDefaultValue = (property: string) => {
         switch (item.properties[property]?.type) {
-          case 'beelean': {
+          case 'boolean': {
             return false;
           }
           case 'number': {
