@@ -71,6 +71,10 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
         ? Object.keys(sourceSchema.properties as JSONSchema7Definition)
         : [];
 
+    if (_.isEmpty(schema.properties as JSONSchema7Definition)) {
+      return [];
+    }
+
     return _.xor(
       _.intersection(
         selectedSchema,
