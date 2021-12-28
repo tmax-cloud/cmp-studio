@@ -36,7 +36,7 @@ import {
 } from '@renderer/features/graphSlice';
 import { useWorkspaceUri } from '@renderer/hooks/useWorkspaceUri';
 import { getIcon } from '@renderer/components/topology/icon/IconFactory';
-import { TerraformType } from '@renderer/types/terraform';
+import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
 
 const AccordionLayout = styled(Accordion)(({ theme }) => ({
   backgroundColor: theme.palette.object.accordion,
@@ -86,6 +86,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
   items,
   title,
   provider = '',
+  searchText = '',
 }) => {
   const dispatch = useAppDispatch();
   const fileObjects = useAppSelector(selectCodeFileObjects);
@@ -101,6 +102,118 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
       content: items,
     },
   ];
+  const showModule = (item: Item) => {
+    const name = item.resourceName;
+    const selectedModule = getModuleNodeByName(graphData.nodes, name);
+    if (selectedModule && selectedModule.id) {
+      const selectedData = getPrunedGraph(graphData.nodes, selectedModule.id);
+      dispatch(setSelectedData(selectedData));
+      dispatch(setSelectedNode(null));
+      dispatch(setSelectedModule(selectedModule));
+    }
+  };
+  const setFileName = (item: Item) => {
+    switch (getObjectDataType[item.type]) {
+      case 'THREE_DEPTH_DATA_TYPE': {
+        return item.type + '-' + item.resourceName + '-' + fileObjects.length;
+      }
+      case 'TWO_DEPTH_DATA_TYPE': {
+        return item.type + '-' + fileObjects.length;
+      }
+      case 'ONE_DEPTH_DATA_TYPE': {
+        return item.type + '-' + fileObjects.length;
+      }
+      default:
+        return item.type + '-' + fileObjects.length;
+    }
+  };
+  const setInstanceName = (item: Item) => {
+    if (item.type === 'provider') {
+      return provider;
+    }
+    switch (getObjectDataType[item.type]) {
+      case 'THREE_DEPTH_DATA_TYPE': {
+        return item.type + '-' + item.resourceName + '-' + fileObjects.length;
+      }
+      case 'TWO_DEPTH_DATA_TYPE': {
+        return item.type + '-' + fileObjects.length;
+      }
+      case 'ONE_DEPTH_DATA_TYPE': {
+        return item.type + '-' + fileObjects.length;
+      }
+      default:
+        return item.type + '-' + fileObjects.length;
+    }
+  };
+  const setDefaultValue = (item: Item) => {
+    return addedObjectJSON;
+  };
+  const setFileObject = (item: Item) => {
+    //Set FileName
+    const newFileName = setFileName(item);
+    const newInstanceName = setInstanceName(item);
+    switch (getObjectDataType[item.type]) {
+      case 'THREE_DEPTH_DATA_TYPE': {
+        const newFileObject = [
+          {
+            filePath: `${folderUri}` + path.sep + `${newInstanceName}.tf`,
+            fileJson: {
+              [item.type]: {
+                [item.resourceName]: {
+                  [newInstanceName]: setDefaultValue(item),
+                },
+              },
+            },
+          },
+        ];
+        return newFileObject;
+      }
+      case 'TWO_DEPTH_DATA_TYPE': {
+        const newFileObject = [
+          {
+            filePath: `${folderUri}` + path.sep + `${newFileName}.tf`,
+            fileJson: {
+              [item.resourceName]: {
+                [newInstanceName]: setDefaultValue(item),
+              },
+            },
+          },
+        ];
+        return newFileObject;
+      }
+      case 'ONE_DEPTH_DATA_TYPE': {
+        const newFileObject = [
+          {
+            filePath: `${folderUri}` + path.sep + `${newFileName}.tf`,
+            fileJson: {
+              [item.type]: setDefaultValue(item),
+            },
+          },
+        ];
+        return newFileObject;
+      }
+      default: {
+        const newFileObject = [
+          {
+            filePath: `${folderUri}` + path.sep + `${newFileName}.tf`,
+            fileJson: {
+              [item.type]: setDefaultValue(item),
+            },
+          },
+        ];
+        return newFileObject;
+      }
+    }
+  };
+  const setSidePanelObject = (item: Item) => {
+    const newObject = {
+      type: item.type,
+      resourceName: item.type === 'provider' ? provider : item.resourceName,
+      instanceName: setInstanceName(item),
+      content: setDefaultValue(item),
+    };
+    return newObject;
+  };
 
   return (
     <>
@@ -118,144 +231,25 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
           </AccordionHeader>
           <AccordionDetails sx={{ backgroundColor: 'white', padding: 0 }}>
             <List>
-              {items.map((item, index) => {
+              {accordion.content.map((item, index) => {
                 return (
                   <ListItem disablePadding key={`item-${index}`}>
                     <ListItemButton
                       onClick={async () => {
                         if (item.type === 'module') {
-                          const name = item.resourceName;
-                          const selectedModule = getModuleNodeByName(
-                            graphData.nodes,
-                            name
-                          );
-                          if (selectedModule && selectedModule.id) {
-                            const selectedData = getPrunedGraph(
-                              graphData.nodes,
-                              selectedModule.id
-                            );
-                            dispatch(setSelectedData(selectedData));
-                            dispatch(setSelectedNode(null));
-                            dispatch(setSelectedModule(selectedModule));
-                          }
-                        } else if (
-                          item.type === 'terraform' ||
-                          item.type === 'locals' ||
-                          item.type === 'provider' ||
-                          item.type === 'output' ||
-                          item.type === 'variable'
-                        ) {
-                          const newFileName =
-                            item.resourceName + '-' + fileObjects.length;
-                          let newFileObject;
-                          let newInstanceName = newFileName;
-                          if (
-                            item.resourceName === 'terraform' ||
-                            item.resourceName === 'locals'
-                          ) {
-                            newInstanceName = item.resourceName;
-                            newFileObject = [
-                              {
-                                filePath:
-                                  `${folderUri}` +
-                                  path.sep +
-                                  `${newFileName}.tf`,
-                                fileJson: {
-                                  [item.resourceName]: addedObjectJSON,
-                                },
-                              },
-                            ];
-                          } else if (item.resourceName === 'provider') {
-                            newInstanceName = provider;
-                            newFileObject = [
-                              {
-                                filePath:
-                                  `${folderUri}` +
-                                  path.sep +
-                                  `${newFileName}.tf`,
-                                fileJson: {
-                                  [item.resourceName]: {
-                                    [newInstanceName]: addedObjectJSON,
-                                  },
-                                },
-                              },
-                            ];
-                          } else {
-                            newFileObject = [
-                              {
-                                filePath:
-                                  `${folderUri}` +
-                                  path.sep +
-                                  `${newFileName}.tf`,
-                                fileJson: {
-                                  [item.resourceName]: {
-                                    [newInstanceName]: addedObjectJSON,
-                                  },
-                                },
-                              },
-                            ];
-                          }
-                          const newFileObjects =
-                            fileObjects.concat(newFileObject);
-                          dispatch(setFileObjects(newFileObjects));
-                          const object = {
-                            type: item.resourceName,
-                            resourceName: '',
-                            instanceName: newInstanceName,
-                            content: addedObjectJSON,
-                          };
-                          dispatch(setSelectedObjectInfo(object));
-                          dispatch(setSidePanel(true));
-                          // TemporaryDataPath에 변경사항 저장 (terraform plan 용도)
-                          const result = await exportProject({
-                            objects: newFileObjects,
-                            workspaceUid,
-                            isAllSave: false,
-                            typeMap: mapObjectCollection,
-                            deleteTypeInfo: {
-                              isFileDeleted: false,
-                              filePath: '',
-                            },
-                          });
-                          if (result.status === WorkspaceStatusType.SUCCESS) {
-                            dispatch(setFileDirty(true));
-                            dispatch(watchGraphData(workspaceUid));
-                          }
+                          showModule(item);
                         } else {
-                          const { type } = item;
-                          const newInstanceName =
-                            item.type +
-                            '-' +
-                            item.resourceName +
-                            '-' +
-                            fileObjects.length;
-                          const newFileObject = [
-                            {
-                              filePath:
-                                `${folderUri}` +
-                                path.sep +
-                                `${newInstanceName}.tf`,
-                              fileJson: {
-                                [type]: {
-                                  [item.resourceName]: {
-                                    [newInstanceName]: addedObjectJSON,
-                                  },
-                                },
-                              },
-                            },
-                          ];
+                          //Set FileObject
+                          const newFileObject = setFileObject(item);
+                          //Update FileObjects
                           const newFileObjects =
                             fileObjects.concat(newFileObject);
                           dispatch(setFileObjects(newFileObjects));
-                          const object = {
-                            type: item.type,
-                            resourceName: item.resourceName,
-                            instanceName: newInstanceName,
-                            content: addedObjectJSON,
-                          };
+                          //Set SidePanel
+                          const object = setSidePanelObject(item);
                           dispatch(setSelectedObjectInfo(object));
                           dispatch(setSidePanel(true));
-                          // TemporaryDataPath에 변경사항 저장 (terraform plan 용도)
+                          //Export to TemporaryDataPath (terraform plan 용도)
                           const result = await exportProject({
                             objects: newFileObjects,
                             workspaceUid,
@@ -288,12 +282,13 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
     </>
   );
 };
-TopologyLibararyItemList.defaultProps = { provider: '' };
+TopologyLibararyItemList.defaultProps = { provider: '', searchText: '' };
 
 type TopologyLibararyItemListProps = {
   items: Item[];
   title: string;
   provider?: string;
+  searchText?: string;
 };
 
 export interface Item {
@@ -302,6 +297,7 @@ export interface Item {
   type: TerraformType;
   source?: string | any;
   isLocalModule?: boolean;
+  properties?: any;
 }
 
 export default TopologyLibararyItemList;

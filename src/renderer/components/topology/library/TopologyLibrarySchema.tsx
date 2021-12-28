@@ -15,11 +15,13 @@ providerList.forEach((provider) => {
     const schemaTitle = schema.title;
     const schemaResourceName = schema.title.split('-')[1];
     const schemaType = schema.title.split('-')[0];
+    const schemaProperties = schema.properties;
     if (schemaType === 'resource') {
       tempResourceList.push({
         instanceName: schemaTitle,
         resourceName: schemaResourceName,
         type: schemaType,
+        properties: schemaProperties,
       });
     }
     if (schemaType === 'data') {
@@ -27,6 +29,7 @@ providerList.forEach((provider) => {
         instanceName: schemaTitle,
         resourceName: schemaResourceName,
         type: schemaType,
+        properties: schemaProperties,
       });
     }
   });
