@@ -1,4 +1,5 @@
 import * as React from 'react';
+import _ from 'lodash';
 import path from 'path';
 import { WorkspaceStatusType } from '@main/workspaces/common/workspace';
 import {
@@ -93,7 +94,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
   const workspaceUid = useAppSelector(selectWorkspaceUid);
   const mapObjectCollection = useAppSelector(selectMapObjectTypeCollection);
   const folderUri = useWorkspaceUri(workspaceUid);
-  const addedObjectJSON = {}; //temp
+  const addedObjectJSON: any = {}; //temp
   const graphData = useAppSelector(selectGraphData);
   const accordions = [
     {
@@ -145,7 +146,36 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
         return item.type + '-' + fileObjects.length;
     }
   };
-  const setDefaultValue = (item: Item) => {
+  const setDefaultValues = (item: Item) => {
+    item.required?.forEach((property: string) => {
+      const setDefaultValue = (property: string) => {
+        switch (item.properties[property]?.type) {
+          case 'beelean': {
+            return false;
+          }
+          case 'number': {
+            return 0;
+          }
+          case 'string': {
+            return '';
+          }
+          case 'object': {
+            return {};
+          }
+          case 'array': {
+            return [];
+          }
+          default:
+            return '';
+        }
+      };
+      _.merge(addedObjectJSON, { [property]: setDefaultValue(property) });
+    });
+    /*
+    item.properties.forEach((property: any) => {
+      Object.keys(property).includes('required');
+    });
+    */
     return addedObjectJSON;
   };
   const setFileObject = (item: Item) => {
@@ -160,7 +190,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
             fileJson: {
               [item.type]: {
                 [item.resourceName]: {
-                  [newInstanceName]: setDefaultValue(item),
+                  [newInstanceName]: setDefaultValues(item),
                 },
               },
             },
@@ -174,7 +204,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
             filePath: `${folderUri}` + path.sep + `${newFileName}.tf`,
             fileJson: {
               [item.resourceName]: {
-                [newInstanceName]: setDefaultValue(item),
+                [newInstanceName]: setDefaultValues(item),
               },
             },
           },
@@ -186,7 +216,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
           {
             filePath: `${folderUri}` + path.sep + `${newFileName}.tf`,
             fileJson: {
-              [item.type]: setDefaultValue(item),
+              [item.type]: setDefaultValues(item),
             },
           },
         ];
@@ -197,7 +227,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
           {
             filePath: `${folderUri}` + path.sep + `${newFileName}.tf`,
             fileJson: {
-              [item.type]: setDefaultValue(item),
+              [item.type]: setDefaultValues(item),
             },
           },
         ];
@@ -210,7 +240,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
       type: item.type,
       resourceName: item.type === 'provider' ? provider : item.resourceName,
       instanceName: setInstanceName(item),
-      content: setDefaultValue(item),
+      content: setDefaultValues(item),
     };
     return newObject;
   };
@@ -270,7 +300,11 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         {getIcon(item.resourceName, 24)}
                       </ListItemIcon>
-                      <ListItemName>{item.resourceName}</ListItemName>
+                      <ListItemName>
+                        {item.type === 'provider'
+                          ? 'provider(' + provider + ')'
+                          : item.resourceName}
+                      </ListItemName>
                     </ListItemButton>
                   </ListItem>
                 );
@@ -298,6 +332,7 @@ export interface Item {
   source?: string | any;
   isLocalModule?: boolean;
   properties?: any;
+  required?: any;
 }
 
 export default TopologyLibararyItemList;

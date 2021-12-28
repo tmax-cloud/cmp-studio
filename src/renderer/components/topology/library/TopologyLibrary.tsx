@@ -8,16 +8,12 @@ import TopologyLibararyItemList, { Item } from './TopologyLibraryItemList';
 import {
   Provider,
   providerList,
+  providerMap,
   resourceMap,
   datasourceMap,
 } from './TopologyLibrarySchema';
 
 const defaultList: Item[] = [
-  {
-    instanceName: 'defaults-provider',
-    resourceName: 'provider',
-    type: 'provider',
-  },
   {
     instanceName: 'defaults-variable',
     resourceName: 'variable',
@@ -65,7 +61,6 @@ function getModuleList(items: Item[]) {
   });
 }
 */
-
 let selectedProvider: Provider = 'tls';
 
 const TopologyLibrary = () => {
@@ -74,6 +69,9 @@ const TopologyLibrary = () => {
   );
   const [searchText, setSearchText] = React.useState('');
   const [debounceSearchText, setDebounceSearchText] = React.useState('');
+  const [providerItems, setProviderItems] = React.useState<Item[]>(
+    providerMap.get('tls').concat(defaultList)
+  );
   const [resourceItems, setResourceItems] = React.useState<Item[]>(
     resourceMap.get('tls')
   );
@@ -98,7 +96,7 @@ const TopologyLibrary = () => {
       } catch (e) {
         console.error('error', e);
       }
-    }, 800);
+    }, 500);
     setTimer(newTimer);
   };
   const deleteSearchText = () => {
@@ -161,9 +159,11 @@ const TopologyLibrary = () => {
     });
 
   React.useEffect(() => {
+    let tempProviderItmes: Item[] = [];
     let tempResourceItmes: Item[] = [];
     let tempDatasourceItmes: Item[] = [];
 
+    tempProviderItmes = providerMap.get(provider);
     tempResourceItmes = resourceMap.get(provider);
     tempDatasourceItmes = datasourceMap.get(provider);
 
@@ -171,7 +171,8 @@ const TopologyLibrary = () => {
 
     selectedProvider = provider;
     setSearchText('');
-
+    setDebounceSearchText('');
+    setProviderItems(tempProviderItmes.concat(defaultList));
     setResourceItems(tempResourceItmes);
     setDatasourceItems(tempDatasourceItmes);
     setIsSearchResultEmpty(false);
@@ -260,17 +261,11 @@ const TopologyLibrary = () => {
           title="로컬 모듈"
         />
         <TopologyLibararyItemList
-          items={defaultList}
+          items={providerItems}
           title="테라폼 디폴트"
           provider={provider}
         />
-        {isSearchResultEmpty ? (
-          <div>
-            <InputLabel>------</InputLabel>
-            <InputLabel>{searchText}</InputLabel>
-            <InputLabel>검색 결과가 없습니다.</InputLabel>
-          </div>
-        ) : (
+        {!isSearchResultEmpty && (
           <>
             {/* 모듈 추후 추가 */}
             {/* <TopologyLibararyItemList items={terraformModuleItems} title="테라폼 모듈" />*/}
@@ -283,6 +278,13 @@ const TopologyLibrary = () => {
               title="테라폼 데이터소스"
             />
           </>
+        )}
+        {isSearchResultEmpty && (
+          <div>
+            <InputLabel>------</InputLabel>
+            <InputLabel>{searchText}</InputLabel>
+            <InputLabel>검색 결과가 없습니다.</InputLabel>
+          </div>
         )}
         {/* 테스트 코드 주석 처리
         <Button onClick={handleModuleListModalOpen} value="test1">
