@@ -16,6 +16,7 @@ const theme = createTheme({
     },
     toolbar: {
       button: '#5b6c7f',
+      butonClicked: '#0066CC',
     },
     object: {
       accordion: '#F3F6FA',

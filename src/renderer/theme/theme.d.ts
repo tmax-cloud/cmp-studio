@@ -4,6 +4,7 @@ declare module '@mui/material/styles' {
   export interface Palette {
     toolbar: {
       button: string;
+      butonClicked: string;
     };
     object: {
       accordion: string;
@@ -16,6 +17,7 @@ declare module '@mui/material/styles' {
   export interface PaletteOptions {
     toolbar: {
       button: string;
+      buttonClicked: string;
     };
     object: {
       accordion: string;

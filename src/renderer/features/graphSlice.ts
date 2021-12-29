@@ -16,6 +16,7 @@ interface GraphState {
   selectedData: GraphData; // 선택한 모듈 하위 그래프 데이터
   selectedNode: NodeData | null; // 선택한 노드
   selectedModule: NodeData | null; // 선택한 모듈 모드
+  filterNodes: NodeData[] | null; // 검색 시 필터링된 노드
   errorMsg: string | null; // 에러 메시지
 }
 
@@ -30,6 +31,7 @@ const initialState: GraphState = {
   selectedData: { nodes: [], links: [] },
   selectedNode: null,
   selectedModule: null,
+  filterNodes: null,
   errorMsg: null,
 };
 
@@ -111,6 +113,9 @@ const graphSlice = createSlice({
     setSelectedModule: (state, { payload }) => {
       state.selectedModule = payload;
     },
+    setFilterNodes: (state, { payload }) => {
+      state.filterNodes = payload;
+    },
   },
   extraReducers: (builder) => {
     // watchGraphData: 데이터 가져오기 및 에러 상황 처리
@@ -172,6 +177,7 @@ export const {
   setSelectedData,
   setSelectedNode,
   setSelectedModule,
+  setFilterNodes,
 } = graphSlice.actions;
 
 export default graphSlice.reducer;

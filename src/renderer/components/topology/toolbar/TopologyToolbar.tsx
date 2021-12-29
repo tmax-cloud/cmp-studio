@@ -32,6 +32,7 @@ import {
 import ViewBreadcrumbs from './breadcrumb/ViewBreadcrumb';
 import { ModuleListModal } from '../modal';
 import ColorKeyPopover from './popover/ColorKeyPopover';
+import SearchTextfield from './textfield/SearchTextfield';
 
 export const TOPOLOGY_TOOLBAR_HEIGHT = 50;
 
@@ -143,6 +144,13 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
           anchorEl={openColorKeyPopover}
           setAnchorEl={setOpenColorKeyPopover}
         />
+        <Divider
+          orientation="vertical"
+          variant="middle"
+          flexItem
+          sx={{ mx: 1 }}
+        />
+        <SearchTextfield />
       </Box>
     </Toolbar>
   );

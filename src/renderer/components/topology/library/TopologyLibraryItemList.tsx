@@ -30,6 +30,7 @@ import { getModuleNodeByName, getPrunedGraph } from '@renderer/utils/graph';
 import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import {
+  setFilterNodes,
   setSelectedData,
   setSelectedModule,
   setSelectedNode,
@@ -111,6 +112,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
       dispatch(setSelectedData(selectedData));
       dispatch(setSelectedNode(null));
       dispatch(setSelectedModule(selectedModule));
+      dispatch(setFilterNodes(null));
     }
   };
   const setFileName = (item: Item) => {
