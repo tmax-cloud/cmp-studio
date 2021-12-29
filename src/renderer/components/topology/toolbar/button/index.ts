@@ -1,3 +1,4 @@
+export { default as ColorKeyButton } from './ColorKeyButton';
 export { default as FitScreenButton } from './FitScreenButton';
 export { default as SaveButton } from './SaveButton';
 export { default as SelectModuleButton } from './SelectModuleButton';

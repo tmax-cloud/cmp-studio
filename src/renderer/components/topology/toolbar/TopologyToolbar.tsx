@@ -27,18 +27,19 @@ import {
   ZoomInButton,
   ZoomOutButton,
   TerraformPlanButton,
+  ColorKeyButton,
 } from './button';
 import ViewBreadcrumbs from './breadcrumb/ViewBreadcrumb';
 import { ModuleListModal } from '../modal';
+import ColorKeyPopover from './popover/ColorKeyPopover';
 
 export const TOPOLOGY_TOOLBAR_HEIGHT = 50;
 
 const TopologyToolbar = (props: TopologyToolbarProps) => {
   const { handlers } = props;
   const [openModuleListModal, setOpenModuleListModal] = React.useState(false);
-
-  const handleModuleListModalOpen = () => setOpenModuleListModal(true);
-  const handleModuleListModalClose = () => setOpenModuleListModal(false);
+  const [openColorKeyPopover, setOpenColorKeyPopover] =
+    React.useState<HTMLButtonElement | null>(null);
 
   const fileObjects = useAppSelector(selectCodeFileObjects);
   const workspaceUid = useAppSelector(selectWorkspaceUid);
@@ -47,6 +48,9 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
   const workspaceName = useWorkspaceName(workspaceUid);
 
   const dispatch = useAppDispatch();
+
+  const handleModuleListModalOpen = () => setOpenModuleListModal(true);
+  const handleModuleListModalClose = () => setOpenModuleListModal(false);
 
   const handleSaveButtonClick = async () => {
     const result = await exportProject({
@@ -70,6 +74,15 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
   const handleTerraformApplyButton = async () => {
     dispatch(fetchTerraformApplyDataByWorkspaceId(workspaceUid));
     dispatch(setLoadingModal(true));
+  };
+
+  const handleColorKeyButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    const open = Boolean(openColorKeyPopover);
+    open
+      ? setOpenColorKeyPopover(null)
+      : setOpenColorKeyPopover(event.currentTarget);
   };
 
   return (
@@ -116,6 +129,20 @@ const TopologyToolbar = (props: TopologyToolbarProps) => {
         <ZoomInButton onClick={handlers.handleZoomIn} />
         <ZoomOutButton onClick={handlers.handleZoomOut} />
         <FitScreenButton onClick={handlers.handleZoomToFit} />
+        <Divider
+          orientation="vertical"
+          variant="middle"
+          flexItem
+          sx={{ mx: 1 }}
+        />
+        <ColorKeyButton
+          clicked={Boolean(openColorKeyPopover)}
+          onClick={handleColorKeyButtonClick}
+        />
+        <ColorKeyPopover
+          anchorEl={openColorKeyPopover}
+          setAnchorEl={setOpenColorKeyPopover}
+        />
       </Box>
     </Toolbar>
   );
