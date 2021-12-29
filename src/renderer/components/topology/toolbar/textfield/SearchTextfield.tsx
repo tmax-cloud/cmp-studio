@@ -39,10 +39,17 @@ const SearchTextfield = () => {
       dispatch(setFilterNodes(null));
     } else {
       const nodes = (graphData.nodes as NodeData[]).filter((node) => {
-        return (
-          node.resourceName?.includes(newValue) ||
-          node.instanceName.includes(newValue)
-        );
+        if (node.type !== 'resource' && node.type !== 'data') {
+          return (
+            node.type?.includes(newValue) ||
+            node.instanceName.includes(newValue)
+          );
+        } else {
+          return (
+            node.resourceName?.includes(newValue) ||
+            node.instanceName.includes(newValue)
+          );
+        }
       });
       nodes ? dispatch(setFilterNodes(nodes)) : dispatch(setFilterNodes(null));
       dispatch(setSelectedNode(null));
