@@ -41,8 +41,7 @@ const SearchTextfield = () => {
       const nodes = (graphData.nodes as NodeData[]).filter((node) => {
         if (node.type !== 'resource' && node.type !== 'data') {
           return (
-            node.type?.includes(newValue) ||
-            node.instanceName.includes(newValue)
+            node.type.includes(newValue) || node.instanceName.includes(newValue)
           );
         } else {
           return (
