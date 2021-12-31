@@ -12,7 +12,7 @@ export const selectSelectedNode = (state: RootState): NodeData | null =>
   state.graph.selectedNode;
 export const selectSelectedModule = (state: RootState): NodeData | null =>
   state.graph.selectedModule;
+export const selectFilterNodes = (state: RootState): NodeData[] | null =>
+  state.graph.filterNodes;
 export const selectErrorMsg = (state: RootState): string | null =>
   state.graph.errorMsg;
-export const selectLoadingMsg = (state: RootState): string | null =>
-  state.graph.loadingMsg;

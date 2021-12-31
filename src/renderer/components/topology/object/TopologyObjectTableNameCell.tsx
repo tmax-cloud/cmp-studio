@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import { selectSelectedData } from '@renderer/features/graphSliceInputSelectors';
 import { setSelectedObjectInfo } from '@renderer/features/codeSlice';
 import { setSidePanel } from '@renderer/features/uiSlice';
-import { setSelectedNode } from '@renderer/features/graphSlice';
+import { setFilterNodes, setSelectedNode } from '@renderer/features/graphSlice';
 import { NodeData } from '@renderer/types/graph';
 
 const filterObj = (
@@ -113,6 +113,7 @@ const TopologyObjectTableNameCell = (props: NameCellProps) => {
       );
     });
     node ? dispatch(setSelectedNode(node)) : dispatch(setSelectedNode(null));
+    dispatch(setFilterNodes(null));
 
     // 폼 에디터 연동
     const selectedObj = filterObj(objResult, type, resourceName, instanceName);

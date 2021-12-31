@@ -8,6 +8,7 @@ import {
   selectSelectedModule,
 } from '@renderer/features/graphSliceInputSelectors';
 import {
+  setFilterNodes,
   setSelectedData,
   setSelectedModule,
   setSelectedNode,
@@ -69,6 +70,7 @@ const ViewBreadcrumbs = (props: ViewBreadcrumbProps) => {
       dispatch(setSelectedData(selectedData));
       dispatch(setSelectedNode(null));
       dispatch(setSelectedModule(selectedModule));
+      dispatch(setFilterNodes(null));
     }
   };
 
@@ -77,6 +79,7 @@ const ViewBreadcrumbs = (props: ViewBreadcrumbProps) => {
     dispatch(setSelectedData(graphData));
     dispatch(setSelectedNode(null));
     dispatch(setSelectedModule(null));
+    dispatch(setFilterNodes(null));
   };
 
   const root = !!workspaceName

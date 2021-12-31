@@ -17,11 +17,13 @@ import {
 import { DrawingKind } from '@renderer/utils/graph/draw';
 import { useAppDispatch, useAppSelector } from '@renderer/app/store';
 import {
+  selectFilterNodes,
   selectSelectedData,
   selectSelectedModule,
   selectSelectedNode,
 } from '@renderer/features/graphSliceInputSelectors';
 import {
+  setFilterNodes,
   setSelectedData,
   setSelectedModule,
   setSelectedNode,
@@ -50,6 +52,7 @@ export const useGraphProps = () => {
   const graphData = useAppSelector(selectSelectedData);
   const selectedNode = useAppSelector(selectSelectedNode);
   const selectedModule = useAppSelector(selectSelectedModule);
+  const filterNodes = useAppSelector(selectFilterNodes);
 
   const dispatch = useAppDispatch();
 
@@ -70,6 +73,9 @@ export const useGraphProps = () => {
     if (hoverNode) {
       drawingKind = hasNode(highlightNodes, node) ? 'hover' : 'blur';
     }
+    if (filterNodes) {
+      drawingKind = hasNode(filterNodes, node) ? 'hover' : 'blur';
+    }
     if (node.id === selectedNode?.id) {
       drawingKind = 'selected';
     }
@@ -80,6 +86,9 @@ export const useGraphProps = () => {
   };
 
   const linkVisibility = (link: LinkObject) => {
+    if (filterNodes) {
+      return false;
+    }
     if (!configRef.current.hoverNode) {
       return true;
     }
@@ -125,6 +134,7 @@ export const useGraphProps = () => {
         dispatch(setSelectedData(newData));
         dispatch(setSelectedModule(node));
         dispatch(setSelectedNode(null));
+        dispatch(setSidePanel(true));
       }
     }
   };
@@ -146,7 +156,9 @@ export const useGraphProps = () => {
       const codeInfo: any = getCodeInfo(fileObjects, node);
       if (codeInfo) {
         dispatch(setSelectedObjectInfo(codeInfo));
-        dispatch(setSidePanel(true));
+        if (node.type !== 'module') {
+          dispatch(setSidePanel(true));
+        }
       } else {
         dispatch(setSidePanel(false));
       }
@@ -155,6 +167,7 @@ export const useGraphProps = () => {
       dispatch(setSelectedNode(null));
       dispatch(setSidePanel(false));
     }
+    dispatch(setFilterNodes(null));
   };
 
   const handleNodeHover = (
@@ -182,6 +195,7 @@ export const useGraphProps = () => {
     const node = obj as NodeData;
     configRef.current.dragNode = node;
     dispatch(setSelectedNode(null));
+    dispatch(setFilterNodes(null));
   };
 
   const handleNodeDragEnd = (

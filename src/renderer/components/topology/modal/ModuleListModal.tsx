@@ -20,6 +20,7 @@ import { selectGraphData } from '@renderer/features/graphSliceInputSelectors';
 import { getModuleData, getPrunedGraph } from '@renderer/utils/graph';
 import { ModuleData } from '@renderer/types/graph';
 import {
+  setFilterNodes,
   setSelectedData,
   setSelectedModule,
   setSelectedNode,
@@ -78,6 +79,7 @@ const ModuleListModal = (props: ModuleListModalProps) => {
       dispatch(setSelectedModule(nodesById(graphData.nodes)[item.id]));
     }
     dispatch(setSelectedNode(null));
+    dispatch(setFilterNodes(null));
     onClose();
   };
 
