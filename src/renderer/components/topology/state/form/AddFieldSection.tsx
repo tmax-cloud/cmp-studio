@@ -98,7 +98,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   }, [formData]);
   return (
     <div>
-      <Accordion>
+      <Accordion defaultExpanded={true}>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
           입력 필드 추가
         </AccordionSummary>

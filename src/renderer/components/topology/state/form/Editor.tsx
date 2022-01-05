@@ -33,7 +33,7 @@ const EditorTab = (props: EditorTabProps) => {
       <div
         style={{
           paddingTop: '12px',
-          height: '663px',
+          height: '530px',
           overflowY: 'auto',
           overflowX: 'hidden',
           marginBottom: '5px',
