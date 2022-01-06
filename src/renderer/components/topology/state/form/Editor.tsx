@@ -1,6 +1,9 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
 import SaveSection from '@renderer/components/topology/state/form/SaveSection';
+import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import { setSelectedObjectInfo } from '@renderer/features/codeSlice';
+import { selectCodeSelectedObjectInfo } from '@renderer/features/codeSliceInputSelectors';
 import DynamicForm from './index';
 import AddFieldSection from './AddFieldSection';
 
@@ -24,9 +27,22 @@ const EditorTab = (props: EditorTabProps) => {
       )
     );
   }, [formState, formData, id]);
+  const dispatch = useAppDispatch();
+  const { type, resourceName, instanceName, sourceSchema } = useAppSelector(
+    selectCodeSelectedObjectInfo
+  );
 
   const onChange = React.useCallback(({ formData }, e) => {
     setFormState(formData);
+
+    const object = {
+      type,
+      resourceName,
+      instanceName,
+      content: formData,
+      sourceSchema,
+    };
+    dispatch(setSelectedObjectInfo(object));
   }, []);
   return (
     <>
