@@ -26,6 +26,7 @@ import {
 } from '@renderer/features/uiSlice';
 import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
 import { LOADING } from '@renderer/utils/graph';
+import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
 import parseToCustomizeKey from './state/form/utils/parseToCustomizeKey';
 
 import {
@@ -108,6 +109,9 @@ const TopologySidebar = () => {
   const [prjAnchorEl, setPrjAnchorEl] = React.useState(null);
   const [tabIndex, setTabIndex] = React.useState(0);
   const dispatch = useAppDispatch();
+
+  const workspaceUid = useAppSelector(selectWorkspaceUid);
+
   const handleTabChange = (event: any, newValue: number) => {
     setTabIndex(newValue);
   };
@@ -119,7 +123,7 @@ const TopologySidebar = () => {
     openExistFolder(args)
       .then(async (response: any) => {
         const uid = response?.data?.uid;
-        if (uid) {
+        if (uid && uid !== workspaceUid) {
           dispatch(setLoadingMsg(LOADING));
           dispatch(setFileDirty(false));
           const projectJsonRes = await getProjectJson(args);
