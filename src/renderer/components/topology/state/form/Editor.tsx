@@ -1,14 +1,26 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
 import SaveSection from '@renderer/components/topology/state/form/SaveSection';
-import { useAppDispatch, useAppSelector } from '@renderer/app/store';
+import { useAppDispatch } from '@renderer/app/store';
 import { setSelectedObjectInfo } from '@renderer/features/codeSlice';
-import { selectCodeSelectedObjectInfo } from '@renderer/features/codeSliceInputSelectors';
 import DynamicForm from './index';
 import AddFieldSection from './AddFieldSection';
 
+let tempType: any;
+let tempResourceName: any;
+let tempInstanceName: any;
+let tempSourceSchema: any;
+
 const EditorTab = (props: EditorTabProps) => {
   const { schema, formData, uiSchema, id } = props;
+  const { type, resourceName, instanceName, sourceSchema } = props;
+
+  if (type && type !== '') {
+    tempType = type;
+    tempResourceName = resourceName;
+    tempInstanceName = instanceName;
+    tempSourceSchema = sourceSchema;
+  }
 
   const [formState, setFormState] = React.useState(formData);
   const [formSchema, setFormSchema] = React.useState(schema);
@@ -28,19 +40,16 @@ const EditorTab = (props: EditorTabProps) => {
     );
   }, [formState, formData, id]);
   const dispatch = useAppDispatch();
-  const { type, resourceName, instanceName, sourceSchema } = useAppSelector(
-    selectCodeSelectedObjectInfo
-  );
 
   const onChange = React.useCallback(({ formData }, e) => {
     setFormState(formData);
 
     const object = {
-      type,
-      resourceName,
-      instanceName,
+      type: tempType,
+      resourceName: tempResourceName,
+      instanceName: tempInstanceName,
       content: formData,
-      sourceSchema,
+      sourceSchema: tempSourceSchema,
     };
     dispatch(setSelectedObjectInfo(object));
   }, []);
@@ -77,6 +86,10 @@ type EditorTabProps = {
   formData: any;
   uiSchema: any;
   id: string;
+  type: any;
+  resourceName: any;
+  instanceName: any;
+  sourceSchema: any;
 };
 
 export default EditorTab;
