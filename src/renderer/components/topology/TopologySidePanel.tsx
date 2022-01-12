@@ -74,6 +74,10 @@ const TopologySidePanel = () => {
           formData={formData}
           uiSchema={customUISchema}
           id={id}
+          type={type}
+          resourceName={resourceName}
+          instanceName={instanceName}
+          sourceSchema={sourceSchema}
         />
       </Drawer>
     </>

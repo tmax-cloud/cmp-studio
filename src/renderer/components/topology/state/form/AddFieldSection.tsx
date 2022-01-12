@@ -98,7 +98,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
   }, [formData]);
   return (
     <div>
-      <Accordion>
+      <Accordion defaultExpanded={true}>
         <AccordionSummary expandIcon={<ArrowDropDown />}>
           입력 필드 추가
         </AccordionSummary>
@@ -111,7 +111,9 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
             }}
           >
             <FormControl fullWidth>
-              <InputLabel id="schema-label">스키마</InputLabel>
+              <InputLabel id="schema-label">
+                {currentSchemaList.length === 0 ? '스키마 없음' : '스키마'}
+              </InputLabel>
               <Select
                 labelId="schema-label"
                 id={getId(type, resourceName, instanceName)}
@@ -121,6 +123,7 @@ const AddFieldSection = (props: AddFieldSectionProps) => {
                 onChange={(e) => {
                   setAdditionalSchema(e.target.value);
                 }}
+                disabled={currentSchemaList.length === 0}
               >
                 {currentSchemaList &&
                   currentSchemaList.map((cur) => (

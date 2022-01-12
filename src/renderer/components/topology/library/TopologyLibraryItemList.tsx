@@ -205,7 +205,7 @@ const TopologyLibararyItemList: React.FC<TopologyLibararyItemListProps> = ({
           {
             filePath: `${folderUri}` + path.sep + `${newFileName}.tf`,
             fileJson: {
-              [item.resourceName]: {
+              [item.type]: {
                 [newInstanceName]: setDefaultValues(item),
               },
             },

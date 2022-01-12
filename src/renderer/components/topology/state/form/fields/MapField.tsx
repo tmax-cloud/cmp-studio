@@ -36,9 +36,17 @@ const MapField = (props: FieldProps) => {
 
   const [mapData, setMapData] = React.useState(formData);
 
-  React.useEffect(() => {
-    setMapData(formData);
-  }, [formData]);
+  //Editor.tsx 에서 onChange 에서 redux 값을 sidepanel과 동기화 했을때, configurable 속성이 false 로 변경된것을 찾을때 쓴 테스트 코드
+  //React.useEffect(() => {
+  //  console.log(Object.getOwnPropertyDescriptors(mapData));
+  //}, [mapData]);
+
+  //Editor.tsx 에서 onChange 에서 redux 값을 sidepanel과 동기화 했을때, configurable 속성이 false 로 변경되는것을 확인
+  //이부분 제거했을때, 정상동작으로 추정됨
+  //Editor.tsx 에서 onChange 에서 redux 값을 sidepanel과 동기화와 목적이 동일해 보여서 제거하고 테스트 함
+  //React.useEffect(() => {
+  //  setMapData(formData);
+  //}, [formData]);
 
   if (!additional) {
     return <>{children}</>;
