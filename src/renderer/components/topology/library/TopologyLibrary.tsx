@@ -1,6 +1,6 @@
 import * as React from 'react';
 import _ from 'lodash';
-import * as fuzzy from 'fuzzysearch';
+import fuzzysearch from 'fuzzysearch';
 import { Box, MenuItem, InputLabel, Select, TextField } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { useAppSelector } from '@renderer/app/store';
@@ -39,7 +39,7 @@ const defaultList: Item[] = [
 
 //fuzzy search? 비슷한 문자열 검색으로 변경 필요
 function searchByName(searchText: string, name: string) {
-  return fuzzy(searchText, name);
+  return fuzzysearch(searchText, name);
   /*
   if (name.toUpperCase().indexOf(searchText.toUpperCase()) !== -1) {
     return true;
