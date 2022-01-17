@@ -21,12 +21,14 @@ import * as WorkspaceTypes from '@main/workspaces/common/workspace';
 import { selectCodeFileObjects } from '@renderer/features/codeSliceInputSelectors';
 import {
   setFileDirty,
+  setLoadingModal,
   setLoadingMsg,
   setSidePanel,
 } from '@renderer/features/uiSlice';
 import { TerraformType, getObjectDataType } from '@renderer/types/terraform';
 import { LOADING } from '@renderer/utils/graph';
 import { selectWorkspaceUid } from '@renderer/features/commonSliceInputSelectors';
+import { setGraphErrorMsg } from '@renderer/features/graphSlice';
 import parseToCustomizeKey from './state/form/utils/parseToCustomizeKey';
 
 import {
@@ -124,7 +126,9 @@ const TopologySidebar = () => {
       .then(async (response: any) => {
         const uid = response?.data?.uid;
         if (uid && uid !== workspaceUid) {
+          dispatch(setLoadingModal(true));
           dispatch(setLoadingMsg(LOADING));
+          dispatch(setGraphErrorMsg(null));
           dispatch(setFileDirty(false));
           const projectJsonRes = await getProjectJson(args);
           console.log('error throw: ', projectJsonRes);

@@ -29,7 +29,10 @@ const TopologyGraph = (props: TopologyGraphProps) => {
 
   React.useEffect(() => {
     dispatch(setLoadingModal(!!loadingMsg));
-  }, [dispatch, loadingMsg]);
+    if (errorMsg) {
+      dispatch(setLoadingModal(false));
+    }
+  }, [dispatch, loadingMsg, errorMsg]);
 
   return (
     <Box
@@ -41,7 +44,7 @@ const TopologyGraph = (props: TopologyGraphProps) => {
       }}
     >
       {loadingMsg || errorMsg ? (
-        <Error isLoading={!!loadingMsg} message={errorMsg} />
+        <Error message={errorMsg} />
       ) : (
         <ForceGraph2D
           ref={graphRef}

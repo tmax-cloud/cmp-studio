@@ -116,6 +116,9 @@ const graphSlice = createSlice({
     setFilterNodes: (state, { payload }) => {
       state.filterNodes = payload;
     },
+    setGraphErrorMsg: (state, { payload }) => {
+      state.errorMsg = payload;
+    },
   },
   extraReducers: (builder) => {
     // watchGraphData: 데이터 가져오기 및 에러 상황 처리
@@ -178,6 +181,7 @@ export const {
   setSelectedNode,
   setSelectedModule,
   setFilterNodes,
+  setGraphErrorMsg,
 } = graphSlice.actions;
 
 export default graphSlice.reducer;
