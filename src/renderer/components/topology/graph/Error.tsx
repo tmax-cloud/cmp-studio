@@ -4,7 +4,7 @@ import RunningWithErrorsIcon from '@mui/icons-material/RunningWithErrors';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import { QUICK_START } from '@renderer/utils/graph';
 
-const ErrorDetail = (props: ErrorDetailProps) => {
+const ErrorDetail = (props: ErrorProps) => {
   const { message } = props;
   return (
     <>
@@ -60,9 +60,9 @@ const InfoDetail = () => {
 };
 
 const Error = (props: ErrorProps) => {
-  const { message, isLoading } = props;
+  const { message } = props;
 
-  if (isLoading || !message) {
+  if (!message) {
     return null;
   }
 
@@ -84,11 +84,7 @@ const Error = (props: ErrorProps) => {
   );
 };
 
-interface ErrorDetailProps {
-  message: string;
-}
 interface ErrorProps {
-  isLoading: boolean;
   message: string | null;
 }
 
